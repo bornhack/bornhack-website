@@ -234,22 +234,6 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         help_text="The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.",
     )
 
-    invoice_fk = models.ForeignKey(
-        "shop.Invoice",
-        on_delete=models.PROTECT,
-        related_name="revenues",
-        help_text="The Invoice object to which this Revenue object relates. Can be None if this revenue does not have a related BornHack Invoice.",
-        blank=True,
-        null=True,
-    )
-
-    responsible_team = models.ForeignKey(
-        "teams.Team",
-        on_delete=models.PROTECT,
-        related_name="revenues",
-        help_text="The team to which this revenue belongs. When in doubt pick the Economy team.",
-    )
-
     approved = models.BooleanField(
         blank=True,
         null=True,
@@ -260,6 +244,56 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
     notes = models.TextField(
         blank=True,
         help_text="Economy Team notes for this revenue. Only visible to the Economy team and the submitting user.",
+    )
+
+    PAYMENT_STATUS_CHOICES = [
+        ("", "Unknown"),
+        (
+            "Paid to BornHack",
+            (
+                ("PAID_TO_TYKLINGS_MASTERCARD", "Revenue was credited to Tyklings BornHack Mastercard"),
+                ("PAID_TO_AHFS_MASTERCARD", "Revenue was credited to ahfs BornHack Mastercard"),
+                ("PAID_TO_VIDIRS_MASTERCARD", "Revenue was credited to Vidirs BornHack Mastercard"),
+                ("PAID_IN_NETBANK", "Revenue was transferred to a BornHack bank account"),
+                ("PAID_IN_CASH", "Revenue was paid to BornHack with cash"),
+                ("PAID_LEGACY", "Revenue was paid to BornHack before we started tracking payment status"),
+            ),
+        ),
+        (
+            "Paid to Participant",
+            (
+                ("PAID_NEEDS_REDISBURSEMENT", "Revenue has been paid out to me, a redisbursement is needed"),
+                ("PAID_AND_REDISBURSED", "Revenue has been received from the volunteer"),
+            ),
+        ),
+        (
+            "Unpaid",
+            (("UNPAID_NEEDS_PAYMENT", "Revenue is unpaid"),),
+        ),
+    ]
+    payment_status = models.CharField(
+        choices=PAYMENT_STATUS_CHOICES,
+        help_text="Payment status for this revenue.",
+        default="",
+    )
+
+    reimbursement = models.ForeignKey(
+        "economy.Reimbursement",
+        on_delete=models.SET_NULL,  # do not CASCADE here, just set to None if reimbursement is deleted
+        related_name="revenues",
+        null=True,
+        blank=True,
+        help_text=(
+            "The reimbursement for this revenue, if any. This is a dual-purpose field. "
+            "If revenue.created_for_reimbursement is True then revenue.reimbursement references the reimbursement "
+            "which this revenue was created to handle. If revenue.created_for_reimbursement is False then "
+            "revenue.reimbursement references the reimbursement which redisbursed this revenue."
+        ),
+    )
+
+    created_for_reimbursement = models.BooleanField(
+        default=False,
+        help_text="True if this revenue was created to settle a reimbursement",
     )
 
     def clean(self) -> None:
@@ -361,6 +395,37 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         help_text="Leave checked if this expense was paid by BornHack. Uncheck if you need a reimbursement for this expense.",
     )
 
+    PAYMENT_STATUS_CHOICES = [
+        ("", "Unknown"),
+        (
+            "Paid by BornHack",
+            (
+                ("PAID_WITH_TYKLINGS_MASTERCARD", "Expense was paid with Tyklings BornHack Mastercard"),
+                ("PAID_WITH_AHFS_MASTERCARD", "Expense was paid with ahfs BornHack Mastercard"),
+                ("PAID_WITH_VIDIRS_MASTERCARD", "Expense was paid with Vidirs BornHack Mastercard"),
+                ("PAID_IN_NETBANK", "Expense was paid with bank transfer from BornHacks netbank"),
+                ("PAID_WITH_BORNHACKS_CASH", "Expense was paid with BornHacks cash"),
+                ("PAID_LEGACY", "Expense was paid by BornHack before we started tracking payment status"),
+            ),
+        ),
+        (
+            "Paid by Participant",
+            (
+                ("PAID_NEEDS_REIMBURSEMENT", "Expense was paid by me, I need a reimbursement"),
+                ("PAID_AND_REIMBURSED", "Expense has been reimbursed to the volunteer"),
+            ),
+        ),
+        (
+            "Unpaid",
+            (("UNPAID_NEEDS_PAYMENT", "Expense is unpaid"),),
+        ),
+    ]
+    payment_status = models.CharField(
+        choices=PAYMENT_STATUS_CHOICES,
+        help_text="Payment status for this expense.",
+        default="",
+    )
+
     invoice = models.ImageField(
         help_text="The invoice for this expense. Please make sure the amount on the invoice matches the amount you entered above. All common image formats are accepted.",
         upload_to="expenses/",
@@ -368,13 +433,6 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
 
     invoice_date = models.DateField(
         help_text="The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.",
-    )
-
-    responsible_team = models.ForeignKey(
-        "teams.Team",
-        on_delete=models.PROTECT,
-        related_name="expenses",
-        help_text="The team to which this Expense belongs. A team lead will need to approve the expense. When in doubt pick the Orga team.",
     )
 
     approved = models.BooleanField(
@@ -390,7 +448,17 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         related_name="expenses",
         null=True,
         blank=True,
-        help_text="The reimbursement for this expense, if any. This is a dual-purpose field. If expense.paid_by_bornhack is true then expense.reimbursement references the reimbursement which this expense is created to cover. If expense.paid_by_bornhack is false then expense.reimbursement references the reimbursement which reimbursed this expense.",
+        help_text=(
+            "The reimbursement for this expense, if any. This is a dual-purpose field. "
+            "If expense.created_for_reimbursement is True then expense.reimbursement references the reimbursement "
+            "which this expense was created to handle. If expense.created_for_reimbursement is False then "
+            "expense.reimbursement references the reimbursement which reimbursed this expense."
+        ),
+    )
+
+    created_for_reimbursement = models.BooleanField(
+        default=False,
+        help_text="True if this expense was created to pay back a reimbursement",
     )
 
     notes = models.TextField(
@@ -459,7 +527,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         messages.success(request, f"Expense {self.pk} rejected")
 
     def __str__(self) -> str:
-        return f"{self.responsible_team.name} Team - {self.amount} DKK - {self.creditor.name} - {self.description}"
+        return f"{self.amount} DKK - {self.creditor.name} - {self.description}"
 
 
 class Reimbursement(
@@ -467,7 +535,7 @@ class Reimbursement(
     CampRelatedModel,
     UUIDModel,
 ):
-    """A reimbursement covers one or more expenses."""
+    """A reimbursement covers one or more expenses and revenues."""
 
     camp = models.ForeignKey(
         "camps.Camp",
@@ -491,7 +559,9 @@ class Reimbursement(
     )
 
     bank_account = models.TextField(
-        help_text="The bank account where you want the payment of this reimbursement transferred to. For transfers outside Denmark please include IBAN and BIC.",
+        null=True,
+        blank=True,
+        help_text="The bank account where you want the payment of this reimbursement transferred to. For transfers outside Denmark please include IBAN and BIC. Bank account is only needed if the reimbursement amout is > 0 DKK (meaning BornHack owes you money).",
     )
 
     notes = models.TextField(
@@ -501,7 +571,7 @@ class Reimbursement(
 
     paid = models.BooleanField(
         default=False,
-        help_text="Check when this reimbursement has been paid to the user. Do not check until the bank transfer has been fully approved.",
+        help_text="Check when this reimbursement has been paid to/from the user. Do not check until the bank transfer has been received/fully approved",
     )
 
     def get_backoffice_url(self):
@@ -513,27 +583,47 @@ class Reimbursement(
     @property
     def covered_expenses(self):
         """Returns a queryset of all expenses covered by this reimbursement. Excludes the expense which paid back the reimbursement."""
-        return self.expenses.filter(paid_by_bornhack=False)
+        return self.expenses.filter(created_for_reimbursement=False)
+
+    @property
+    def covered_revenues(self):
+        """Returns a queryset of all revenues covered by this reimbursement. Excludes the revenue which paid back the reimbursement (if any)."""
+        return self.revenues.filter(created_for_reimbursement=False)
 
     @property
     def amount(self):
-        """The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses."""
-        return self.expenses.filter(paid_by_bornhack=False).aggregate(
-            models.Sum("amount"),
+        """The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses and substracting all the related revenues."""
+        expenses_total = self.expenses.filter(created_for_reimbursement=False).aggregate(
+            models.Sum("amount", default=0)
         )["amount__sum"]
+        revenues_total = self.revenues.filter(created_for_reimbursement=False).aggregate(
+            models.Sum("amount", default=0)
+        )["amount__sum"]
+        return expenses_total - revenues_total
 
     @property
     def payback_expense(self):
-        """Return the expense created to pay back this reimbursement."""
-        if self.expenses.filter(paid_by_bornhack=True).exists():
-            return self.expenses.get(paid_by_bornhack=True)
+        """Return the expense created to settle this reimbursement (if any)."""
+        if self.expenses.filter(created_for_reimbursement=True).exists():
+            return self.expenses.get(created_for_reimbursement=True)
+        return None
+
+    @property
+    def payback_revenue(self):
+        """Return the revenue created to settle this reimbursement (if any)."""
+        if self.revenues.filter(created_for_reimbursement=True).exists():
+            return self.revenues.get(created_for_reimbursement=True)
         return None
 
     def create_payback_expense(self):
-        """Create the expense to pay back this reimbursement."""
+        """Create the expense to settle this reimbursement."""
         if self.payback_expense:
             # we already have an expense created, just return that one
             return self.payback_expense
+
+        if self.amount < 0:
+            # we need a payback revenue for this, not a payback expense
+            return False
 
         # we need an economy team to do this
         if not self.camp.economy_team:
@@ -545,8 +635,7 @@ class Reimbursement(
         expense.user = self.user
         expense.amount = self.amount
         expense.description = f"Payment of reimbursement {self.pk} to {self.reimbursement_user}"
-        expense.paid_by_bornhack = True
-        expense.responsible_team = self.camp.economy_team
+        expense.payment_status = "UNPAID_NEEDS_PAYMENT"
         expense.approved = True
         expense.reimbursement = self
         expense.invoice_date = self.created
@@ -560,8 +649,55 @@ class Reimbursement(
                 ),
             ),
         )
+        expense.created_for_reimbursement = True
         expense.save()
         return expense
+
+    def create_payback_revenue(self):
+        """Create the revenue to settle this reimbursement."""
+        if self.payback_revenue:
+            # we already have an revenue created, just return that one
+            return self.payback_revenue
+
+        if self.amount > 0:
+            # we need a payback expense for this, not a payback revenue
+            return False
+
+        # we need an economy team to do this
+        if not self.camp.economy_team:
+            return False
+
+        # create the revenue
+        revenue = Revenue(
+            camp=self.camp,
+            user=self.user,
+            amount=self.amount * -1,
+            description=f"Payment of reimbursement {self.pk} from {self.reimbursement_user}",
+            payment_status="UNPAID_NEEDS_PAYMENT",
+            approved=True,
+            reimbursement=self,
+            invoice_date=self.created,
+            debtor=Credebtor.objects.get(name="Reimbursement"),
+            created_for_reimbursement=True,
+        )
+        revenue.invoice.save(
+            "na.jpg",
+            File(
+                open(
+                    os.path.join(settings.BASE_DIR, "static_src/img/na.jpg"),
+                    "rb",
+                ),
+            ),
+        )
+        revenue.save()
+        return revenue
+
+    def mark_as_paid(self) -> None:
+        """Mark reimbursement as paid and related expenses+revenues as reimbursement done."""
+        self.paid = True
+        self.save()
+        self.expenses.update(payment_status="PAID_AND_REIMBURSED")
+        self.revenues.update(payment_status="PAID_AND_REIMBURSED")
 
 
 ##################################

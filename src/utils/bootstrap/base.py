@@ -45,6 +45,7 @@ from economy.factories import ZettleReceiptFactory
 from economy.models import Chain
 from economy.models import Credebtor
 from economy.models import Expense
+from economy.models import Revenue
 from economy.models import Pos
 from economy.models import Reimbursement
 from events.factories import EventProposalFactory
@@ -2048,8 +2049,7 @@ class Bootstrap:
     def create_camp_expenses(self, camp: Camp) -> None:
         """Create camp expenses."""
         self.output(f"Creating expenses for {camp}...")
-        for team in Team.objects.filter(camp=camp):
-            ExpenseFactory.create_batch(10, camp=camp, responsible_team=team)
+        ExpenseFactory.create_batch(200, camp=camp)
 
     def create_camp_reimbursements(self, camp: Camp) -> None:
         """Create camp reimbursements."""
@@ -2058,7 +2058,7 @@ class Bootstrap:
             id__in=Expense.objects.filter(
                 camp=camp,
                 reimbursement__isnull=True,
-                paid_by_bornhack=False,
+                payment_status="PAID_NEEDS_REIMBURSEMENT",
                 approved=True,
             )
             .values_list("user", flat=True)
@@ -2069,8 +2069,16 @@ class Bootstrap:
                 user=user,
                 approved=True,
                 reimbursement__isnull=True,
-                paid_by_bornhack=False,
+                payment_status="PAID_NEEDS_REIMBURSEMENT",
             )
+            revenues = Revenue.objects.filter(
+                user=user,
+                approved=True,
+                reimbursement__isnull=True,
+                payment_status="PAID_NEEDS_REDISBURSEMENT",
+            )
+            if not expenses and not revenues:
+                continue
             reimbursement = Reimbursement.objects.create(
                 camp=camp,
                 user=user,
@@ -2080,12 +2088,14 @@ class Bootstrap:
                 paid=random.choice([True, True, False]),  # noqa: S311
             )
             expenses.update(reimbursement=reimbursement)
-            reimbursement.create_payback_expense()
+            revenues.update(reimbursement=reimbursement)
+            if reimbursement.paid:
+                reimbursement.mark_as_paid()
 
     def create_camp_revenues(self, camp: Camp) -> None:
         """Method for creating revenue."""
         self.output(f"Creating revenues for {camp}...")
-        RevenueFactory.create_batch(20, camp=camp)
+        RevenueFactory.create_batch(200, camp=camp)
 
     def add_team_permissions(self, camp: Camp) -> None:
         """Assign member permissions to the team groups for this camp."""
