@@ -1,0 +1,37 @@
+{% extends 'profile_base.html' %}
+{% load django_bootstrap5 %}
+{% load formatting %}
+
+{% block title %}
+  Feedback | {{ block.super }}
+{% endblock %}
+
+{% block profile_content %}
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-title">Your facility feedback</h4>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <tr>
+          <th>Facility</th>
+          <th>Quick Feedback</th>
+          <th>Comment</th>
+          <th>Urgent</th>
+          <th>Handled</th>
+          <th>Created</th>
+        </tr>
+        {% for feedback in feedback_list %}
+          <tr>
+            <td>{{ feedback.facility }}</td>
+            <td><i class="{{ feedback.quick_feedback.icon }} fa-2x"></i> {{ feedback.quick_feedback }}</td>
+            <td>{{ feedback.comment|default:"N/A" }}</td>
+            <td class="{% if feedback.urgent %}text-bg-danger{% endif %}">{{ feedback.urgent|yesno }}</td>
+            <td>{{ feedback.handled|yesno }}</td>
+            <td>{{ feedback.created }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+{% endblock profile_content %}

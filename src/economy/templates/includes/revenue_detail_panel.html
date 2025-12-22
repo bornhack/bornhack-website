@@ -2,10 +2,12 @@
   <div class="card-header">Revenue Details for {{ revenue.pk }}</div>
   <div class="card-body">
     <table class="table">
-      <tr>
-        <th>Created By</th>
-        <td>{{ revenue.user }}</td>
-      </tr>
+      {% if request.resolver_match.app_name == "backoffice" %}
+        <tr>
+          <th>Created By</th>
+          <td>{{ revenue.user.profile.get_name }}</td>
+        </tr>
+      {% endif %}
       <tr>
         <th>Chain</th>
         <td>{{ revenue.debtor.chain.name }}</td>

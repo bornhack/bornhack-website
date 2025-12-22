@@ -2,10 +2,12 @@
   <div class="card-header">Expense Details for {{ expense.pk }}</div>
   <div class="card-body">
     <table class="table">
-      <tr>
-        <th>Created By</th>
-        <td>{{ expense.user.profile.get_name }}</td>
-      </tr>
+      {% if request.resolver_match.app_name == "backoffice" %}
+        <tr>
+          <th>Created By</th>
+          <td>{{ expense.user.profile.get_name }}</td>
+        </tr>
+      {% endif %}
       <tr>
         <th>Amount</th>
         <td>{{ expense.amount }} DKK</td>

@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+  {% if pos_list|length == 0 %}
+    <h4>No POS locations configured</h4>
+  {% endif %}
   <div class="list-group">
     {% for pos in pos_list %}
       <a href="{% url 'backoffice:scan_inventory' camp_slug=camp.slug pos_slug=pos.slug %}" class="list-group-item list-group-item-action">

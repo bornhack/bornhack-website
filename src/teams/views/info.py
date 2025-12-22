@@ -1,4 +1,5 @@
 """View for managing the team info pages."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -21,6 +22,7 @@ from .mixins import TeamViewMixin
 if TYPE_CHECKING:
     from django.forms import Form
 
+
 class InfoCategoriesListView(
     TeamViewMixin,
     TeamInfopagerPermissionMixin,
@@ -28,6 +30,7 @@ class InfoCategoriesListView(
     ListView,
 ):
     """Info Categories list view."""
+
     model = InfoCategory
     template_name = "team_info_categories.html"
     slug_field = "anchor"
@@ -41,6 +44,7 @@ class InfoItemCreateView(
     CreateView,
 ):
     """Info item create view."""
+
     model = InfoItem
     template_name = "team_info_item_form.html"
     fields = ("headline", "body", "anchor", "weight")
@@ -86,6 +90,7 @@ class InfoItemUpdateView(
     UpdateView,
 ):
     """Info item update view."""
+
     model = InfoItem
     template_name = "team_info_item_form.html"
     fields = ("headline", "body", "anchor", "weight")
@@ -115,6 +120,7 @@ class InfoItemDeleteView(
     DeleteView,
 ):
     """View for deleting a info item."""
+
     model = InfoItem
     template_name = "team_info_item_delete_confirm.html"
     slug_field = "anchor"
