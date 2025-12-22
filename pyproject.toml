@@ -56,12 +56,11 @@ bootstrap = [
 
 dev = [
     "bornhack-website[bootstrap]",
+    "bornhack-website[test]",
     "django-debug-toolbar==5.2.0",
     "pipdeptree==2.26.1",
     "pre-commit==4.2.0",
-    "tblib==3.1.0",  # used to see backtraces in unit tests
     "setuptools_scm==8.3.1",
-    "unittest-xml-reporting==3.2.0",
 ]
 
 test = [
@@ -69,10 +68,9 @@ test = [
     "beautifulsoup4==4.13.4",
     "coverage==7.8.0",
     "hypothesis==6.131.15",
-    "beautifulsoup4==4.13.4",
     "unittest-xml-reporting==3.2.0",
+    "tblib==3.1.0",  # used to see backtraces in unit tests
 ]
-
 
 [project.urls]
 homepage = "https://github.com/bornhack/bornhack-website"
