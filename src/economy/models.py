@@ -251,6 +251,7 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
     )
 
     PAYMENT_STATUS_CHOICES = [
+        ("", "Unknown"),
         (
             "Paid to BornHack",
             (
@@ -275,7 +276,6 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         ),
     ]
     payment_status = models.CharField(
-        null=True,
         choices=PAYMENT_STATUS_CHOICES,
         help_text="Payment status for this revenue.",
     )
@@ -399,6 +399,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
     )
 
     PAYMENT_STATUS_CHOICES = [
+        ("", "Unknown"),
         (
             "Paid by BornHack",
             (
@@ -423,7 +424,6 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         ),
     ]
     payment_status = models.CharField(
-        null=True,
         choices=PAYMENT_STATUS_CHOICES,
         help_text="Payment status for this expense.",
     )
