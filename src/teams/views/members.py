@@ -174,3 +174,52 @@ class TeamMemberApproveView(
             camp_slug=self.camp.slug,
             team_slug=form.instance.team.slug,
         )
+
+
+
+class TeamMemberMakeLeadView(
+    LoginRequiredMixin,
+    TeamViewMixin,
+    EnsureTeamMemberLeadMixin,
+    UpdateView,
+):
+    """View for turning a team member into a team lead."""
+    template_name = "teammember_make_lead.html"
+    model = TeamMember
+    fields = ()
+    active_menu = "members"
+
+    def form_valid(self, form: Form) -> HttpResponseRedirect:
+        """Method to delete instance and show message.."""
+        form.instance.lead = True
+        form.instance.save()
+        messages.success(self.request, "Team member is now team lead")
+        return redirect(
+            "teams:members",
+            camp_slug=self.camp.slug,
+            team_slug=form.instance.team.slug,
+        )
+
+
+class TeamMemberTakeLeadView(
+    LoginRequiredMixin,
+    TeamViewMixin,
+    EnsureTeamMemberLeadMixin,
+    UpdateView,
+):
+    """View for turning a team lead into a normal member."""
+    template_name = "teammember_take_lead.html"
+    model = TeamMember
+    fields = ()
+    active_menu = "members"
+
+    def form_valid(self, form: Form) -> HttpResponseRedirect:
+        """Method to set approve true and show message.."""
+        form.instance.lead = False
+        form.instance.save()
+        messages.success(self.request, "Team member is no longer team lead")
+        return redirect(
+            "teams:members",
+            camp_slug=self.camp.slug,
+            team_slug=form.instance.team.slug,
+        )

@@ -16,7 +16,6 @@ dependencies = [
     "Django==4.2.21",
     "channels==4.2.2",
     "channels-redis==4.2.1",
-    "asyncio==3.4.3",
     "commonmark==0.9.1",
     "conference-scheduler==3.0.1",
     "django-allauth[mfa]==65.8.1",
