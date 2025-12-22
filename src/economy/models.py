@@ -595,16 +595,12 @@ class Reimbursement(
     @property
     def amount(self):
         """The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses and substracting all the related revenues."""
-        expenses_total = self.expenses.filter(created_for_reimbursement=False).aggregate(models.Sum("amount"))[
+        expenses_total = self.expenses.filter(created_for_reimbursement=False).aggregate(models.Sum("amount", default=0))[
             "amount__sum"
         ]
-        revenues_total = self.revenues.filter(created_for_reimbursement=False).aggregate(models.Sum("amount"))[
+        revenues_total = self.revenues.filter(created_for_reimbursement=False).aggregate(models.Sum("amount", default=0))[
             "amount__sum"
         ]
-        if expenses_total is None:
-            expenses_total = 0
-        if revenues_total is None:
-            revenues_total = 0
         return expenses_total - revenues_total
 
     @property
