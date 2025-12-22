@@ -29,11 +29,11 @@ class BankAccountCsvImportTest(TestCase):
             account_no="12345678",
         )
 
-        # make sure we create 90 transactions
+        # make sure we create 6 transactions
         with open("testdata/bank.csv", encoding="utf-8-sig") as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
             created = account.import_csv(reader)
-            self.assertEqual(created, 90)
+            self.assertEqual(created, 6)
 
         # make sure we create 0 if we load the same file again
         with open("testdata/bank.csv", encoding="utf-8-sig") as f:

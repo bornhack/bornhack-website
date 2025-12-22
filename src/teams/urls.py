@@ -18,6 +18,8 @@ from teams.views.members import TeamJoinView
 from teams.views.members import TeamLeaveView
 from teams.views.members import TeamMemberApproveView
 from teams.views.members import TeamMemberRemoveView
+from teams.views.members import TeamMemberMakeLeadView
+from teams.views.members import TeamMemberTakeLeadView
 from teams.views.members import TeamMembersView
 from teams.views.shifts import MemberDropsShift
 from teams.views.shifts import MemberTakesShift
@@ -62,6 +64,16 @@ urlpatterns = [
                                 "<int:pk>/approve/",
                                 TeamMemberApproveView.as_view(),
                                 name="member_approve",
+                            ),
+                            path(
+                                "<int:pk>/make_lead/",
+                                TeamMemberMakeLeadView.as_view(),
+                                name="member_make_lead",
+                            ),
+                            path(
+                                "<int:pk>/remove_lead/",
+                                TeamMemberTakeLeadView.as_view(),
+                                name="member_take_lead",
                             ),
                         ],
                     ),

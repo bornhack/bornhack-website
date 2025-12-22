@@ -82,7 +82,7 @@
             </td>
 
             <td class="text-center">
-              <span class="badge text-bg-secondary">{{ team.members.count }}</span><br>
+              <span class="badge text-bg-secondary" title="leads">{{ team.leads.count }}</span>&nbsp;<span class="badge text-bg-secondary" title="members">{{ team.regular_members.count }}</span>&nbsp;<span class="badge text-bg-secondary" title="pending">{{ team.unapproved_members.count }}</span><br>
               {% if team.needs_members %}(more needed){% endif %}
             </td>
 
