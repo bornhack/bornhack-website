@@ -8,9 +8,11 @@
             <th>Camp</th>
         {% endif %}
         <th>Invoice Date</th>
-        <th>Created By</th>
-        {% if not reimbursement %}
-          <th>Paid by</th>
+        {% if request.resolver_match.app_name == "backoffice" %}
+          <th>Created By</th>
+          {% if not reimbursement %}
+            <th>Paid by</th>
+          {% endif %}
         {% endif %}
         <th>Creditor</th>
         <th>Amount</th>
@@ -34,9 +36,11 @@
           <td data-order="{{ expense.camp.title|sortable }}">{{ expense.camp.title }}</td>
           {% endif %}
           <td data-order="{{ expense.invoice_date|sortable }}">{{ expense.invoice_date }}</td>
-          <td>{{ expense.user.profile.get_name }}</td>
-          {% if not reimbursement %}
-            <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user.profile.get_name }}{% endif %}</td>
+          {% if request.resolver_match.app_name == "backoffice" %}
+            <td>{{ expense.user.profile.get_name }}</td>
+            {% if not reimbursement %}
+              <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user.profile.get_name }}{% endif %}</td>
+            {% endif %}
           {% endif %}
           <td>{{ expense.creditor.name }}</td>
           <td data-order="{{ expense.amount }}">{{ expense.amount }} DKK</td>
