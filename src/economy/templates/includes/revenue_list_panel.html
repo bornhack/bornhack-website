@@ -32,7 +32,7 @@
 
           <td data-order="{{ revenue.invoice_date|sortable }}">{{ revenue.invoice_date }}</td>
           <td>{{ revenue.user.profile.get_name }}</td>
-          <td>{{ revenue.payment_status }}</td>
+          <td>{{ revenue.get_payment_status_display }}</td>
           <td>{{ revenue.debtor }}</td>
           <td data-order="{{ revenue.amount }}">{{ revenue.amount }} DKK</td>
           <td>{{ revenue.description }}</td>
