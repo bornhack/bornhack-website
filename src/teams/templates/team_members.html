@@ -24,7 +24,7 @@
             <th>
               Status
             </th>
-            {% if request.user in team.leads.all %}
+            {% if team.lead_permission_set in perms %}
               <th>
                 Name
               </th>
@@ -35,14 +35,14 @@
                 Description
               </th>
               <th>
-                Action
+                Actions
               </th>
             {% endif %}
           </tr>
         </thead>
         <tbody>
           {% for member in team.memberships.all %}
-            {% if member.approved or not member.approved and request.user in team.leads.all %}
+            {% if member.approved or not member.approved and team.lead_permission_set in perms %}
               <tr>
                 <td>
                   {{ member.user.profile.get_public_credit_name }} {% if member.user == request.user %}(this is you!){% endif %}
@@ -51,7 +51,7 @@
                   Team {% if member.lead %}Lead{% else %}Member{% endif %}
                   {% if not member.approved %}(pending approval){% endif %}
                 </td>
-                {% if request.user in team.leads.all %}
+                {% if team.lead_permission_set in perms %}
                   <td>
                     {{ member.user.profile.name }}
                   </td>
@@ -67,7 +67,19 @@
                          href="{% url 'teams:member_remove' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                         <i class="fas fa-trash"></i> Remove
                       </a>
-                      {% if not member.approved %}
+                      {% if member.approved %}
+                        {% if member.lead %}
+                          <a class="btn btn-danger btn-sm text-nowrap"
+                             href="{% url 'teams:member_take_lead' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
+                            <i class="fas fa-times"></i> Take Team Lead
+                          </a>
+                          {% else %}
+                          <a class="btn btn-success btn-sm text-nowrap"
+                             href="{% url 'teams:member_make_lead' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
+                            <i class="fas fa-check"></i> Make Team Lead
+                          </a>
+                        {% endif %}
+                      {% else %}
                         <a class="btn btn-success btn-sm text-nowrap"
                            href="{% url 'teams:member_approve' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                           <i class="fas fa-check"></i> Approve

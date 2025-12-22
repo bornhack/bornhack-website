@@ -251,7 +251,7 @@ OAUTH2_PROVIDER = {
 }
 
 # only used for bootstrap-devsite
-UPCOMING_CAMP_YEAR = 2025
+UPCOMING_CAMP_YEAR = 2031
 
 # django-tables2 settings
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5-responsive.html"

@@ -2,10 +2,12 @@
   <div class="card-header">Expense Details for {{ expense.pk }}</div>
   <div class="card-body">
     <table class="table">
-      <tr>
-        <th>Created By</th>
-        <td>{{ expense.user.profile.get_name }}</td>
-      </tr>
+      {% if request.resolver_match.app_name == "backoffice" %}
+        <tr>
+          <th>Created By</th>
+          <td>{{ expense.user.profile.get_name }}</td>
+        </tr>
+      {% endif %}
       <tr>
         <th>Amount</th>
         <td>{{ expense.amount }} DKK</td>
@@ -28,7 +30,7 @@
       </tr>
       <tr>
         <th>Paid by BornHack?</th>
-        <td>This expense was paid by {% if expense.paid_by_bornhack %}<b>BornHack</b>{% else %}<b>{{ expense.user.profile.get_name }}</b>, and will be reimbursed.{% endif %}</td>
+        <td>This expense was paid by {% if expense.paid_by_bornhack %}<b>BornHack</b>{% elif request.resolver_match.app_name == "backoffice" %}<b>{{ expense.user.profile.get_name }}</b>, and will be reimbursed.{% else %}the creator of the expense{% endif %}</td>
       </tr>
       <tr>
         <th>Filename</th>

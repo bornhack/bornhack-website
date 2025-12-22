@@ -8,7 +8,9 @@
             <th>Camp</th>
         {% endif %}
         <th>Invoice Date</th>
-        <th>Created By</th>
+        {% if request.resolver_match.app_name == "backoffice" %}
+          <th>Created By</th>
+        {% endif %}
         <th>Debtor</th>
         <th>Amount</th>
         <th>Description</th>
@@ -25,7 +27,9 @@
           <td data-order="{{ revenue.camp.title|sortable }}">{{ revenue.camp.title }}</td>
           {% endif %}
           <td data-order="{{ revenue.invoice_date|sortable }}">{{ revenue.invoice_date }}</td>
-          <td>{{ revenue.user.email }}</td>
+          {% if request.resolver_match.app_name == "backoffice" %}
+            <td>{{ revenue.user.profile.get_name }}</td>
+          {% endif %}
           <td>{{ revenue.debtor }}</td>
           <td data-order="{{ revenue.amount }}">{{ revenue.amount }} DKK</td>
           <td>{{ revenue.description }}</td>

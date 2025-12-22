@@ -13,44 +13,39 @@ classifiers = [
 ########## DEPENDENCIES ##########
 
 dependencies = [
-    "Django==5.2.5",
-    "channels==4.3.1",
+    "Django==5.2.9",
+    "channels==4.3.2",
     "channels-redis==4.3.0",
-    "asyncio==3.4.3",
     "commonmark==0.9.1",
     "conference-scheduler==3.0.1",
-    "django-allauth[mfa]==65.8.1",
-    "django-bootstrap5==25.2",
+    "django-allauth[mfa]==65.13.1",
+    "django-bootstrap5==25.3",
     "django-colorfield==0.14.0",
-    "django-cors-headers==4.7.0",
-    "django-filter==25.1",
-    "django-leaflet==0.32.0",
+    "django-cors-headers==4.9.0",
+    "django-filter==25.2",
+    "django-leaflet==0.33.0",
     "django-jsonview==2.0.0",
-    "django-oauth-toolkit==3.0.1",
-    "django-otp==1.6.0",
-    "django-prometheus==2.3.1",
-    "django-reversion==5.0.12",
-    "django_stubs_ext==5.2.0",
-    "django-tables2==2.7.5",
+    "django-oauth-toolkit==3.1.0",
+    "django-otp==1.6.3",
+    "django-prometheus==2.4.1",
+    "django-reversion==6.1.0",
+    "django_stubs_ext==5.2.8",
+    "django-tables2==2.8.0",
     "django-taggit==6.1.0",
     "django-weasyprint==2.4.0",
-    "future==1.0.0",
-    "html5lib==1.1",
-    "icalendar==6.2.0",
+    "icalendar==6.3.2",
     "irc3==1.1.10",
-    "lxml==5.4.0",
-    "nh3==0.2.21",
-    "olefile==0.47",
-    "openpyxl==3.1.2",
-    "pandas==2.2.3",
-    "psycopg2-binary==2.9.10",
+    "lxml==6.0.2",
+    "nh3==0.3.2",
+    "openpyxl==3.1.2",  # used to import excel files in economy backoffice
+    "pandas==2.3.3",
+    "psycopg2-binary==2.9.11",
     "python-magic==0.4.27",
     "quickpay-api-client==2.0.1",
-    "service-identity==24.2.0",
     "Unidecode==1.4.0",
     # pillow is only here to make old migrations run
-    "Pillow==11.2.1",
-    "weasyprint==65.1",
+    "Pillow==12.0.0",
+    "weasyprint==67.0",
 ]
 
 [project.optional-dependencies]
@@ -61,23 +56,21 @@ bootstrap = [
 
 dev = [
     "bornhack-website[bootstrap]",
-    "pre-commit==4.2.0",
-    "setuptools_scm==8.3.1",
-    "django-debug-toolbar==5.2.0",
-    "tblib==3.1.0",
-    "unittest-xml-reporting==3.2.0",
-    "pipdeptree==2.26.1",
+    "bornhack-website[test]",
+    "django-debug-toolbar==6.1.0",
+    "pipdeptree==2.30.0",
+    "pre-commit==4.5.1",
+    "setuptools_scm==9.2.2",
 ]
 
 test = [
     "bornhack-website[bootstrap]",
-    "beautifulsoup4==4.13.4",
-    "coverage==7.8.0",
-    "hypothesis==6.131.15",
-    "beautifulsoup4==4.13.4",
+    "beautifulsoup4==4.14.3",
+    "coverage==7.13.0",
+    "hypothesis==6.148.7",
     "unittest-xml-reporting==3.2.0",
+    "tblib==3.1.0",  # used to see backtraces in unit tests
 ]
-
 
 [project.urls]
 homepage = "https://github.com/bornhack/bornhack-website"
