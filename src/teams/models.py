@@ -68,6 +68,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     lead_group = models.OneToOneField(
         Group,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="team_lead",
         help_text="The django group carrying the team lead permissions for this team.",
@@ -75,6 +76,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     member_group = models.OneToOneField(
         Group,
+        blank=True,
         on_delete=models.CASCADE,
         related_name="team_member",
         help_text="The django group carrying the team permissions for this team.",
@@ -82,6 +84,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     mapper_group = models.OneToOneField(
         Group,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="team_mapper",
         help_text="The django group carrying the team mapper permissions for this team.",
@@ -89,6 +92,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     facilitator_group = models.OneToOneField(
         Group,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="team_facilitator",
         help_text="The django group carrying the team facilitator permissions for this team.",
@@ -96,6 +100,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     infopager_group = models.OneToOneField(
         Group,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="team_infopager",
         help_text="The django group carrying the team infopager permissions for this team.",
@@ -103,6 +108,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     pos_group = models.OneToOneField(
         Group,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="team_pos",
         help_text="The django group carrying the team pos permissions for this team.",
@@ -110,6 +116,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     tasker_group = models.OneToOneField(
         Group,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="team_tasker",
         help_text="The django group carrying the team tasker permissions for this team.",

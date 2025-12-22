@@ -1,4 +1,5 @@
 """Views for team members."""
+
 from __future__ import annotations
 
 import logging
@@ -32,6 +33,7 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 
 class TeamMembersView(CampViewMixin, IsTeamPermContextMixin, DetailView):
     """List view for team members."""
+
     template_name = "team_members.html"
     context_object_name = "team"
     model = Team
@@ -41,6 +43,7 @@ class TeamMembersView(CampViewMixin, IsTeamPermContextMixin, DetailView):
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
     """View displayed when joining a team."""
+
     template_name = "team_join.html"
     model = Team
     fields = ()
@@ -78,6 +81,7 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
 class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
     """View for leaving a team."""
+
     template_name = "team_leave.html"
     model = Team
     fields = ()
@@ -112,6 +116,7 @@ class TeamMemberRemoveView(
     UpdateView,
 ):
     """View for removing a team member."""
+
     template_name = "teammember_remove.html"
     model = TeamMember
     fields = ()
@@ -144,6 +149,7 @@ class TeamMemberApproveView(
     UpdateView,
 ):
     """View to approve team member."""
+
     template_name = "teammember_approve.html"
     model = TeamMember
     fields = ()
@@ -165,6 +171,55 @@ class TeamMemberApproveView(
             )
         return redirect(
             "teams:general",
+            camp_slug=self.camp.slug,
+            team_slug=form.instance.team.slug,
+        )
+
+
+
+class TeamMemberMakeLeadView(
+    LoginRequiredMixin,
+    TeamViewMixin,
+    EnsureTeamMemberLeadMixin,
+    UpdateView,
+):
+    """View for turning a team member into a team lead."""
+    template_name = "teammember_make_lead.html"
+    model = TeamMember
+    fields = ()
+    active_menu = "members"
+
+    def form_valid(self, form: Form) -> HttpResponseRedirect:
+        """Method to delete instance and show message.."""
+        form.instance.lead = True
+        form.instance.save()
+        messages.success(self.request, "Team member is now team lead")
+        return redirect(
+            "teams:members",
+            camp_slug=self.camp.slug,
+            team_slug=form.instance.team.slug,
+        )
+
+
+class TeamMemberTakeLeadView(
+    LoginRequiredMixin,
+    TeamViewMixin,
+    EnsureTeamMemberLeadMixin,
+    UpdateView,
+):
+    """View for turning a team lead into a normal member."""
+    template_name = "teammember_take_lead.html"
+    model = TeamMember
+    fields = ()
+    active_menu = "members"
+
+    def form_valid(self, form: Form) -> HttpResponseRedirect:
+        """Method to set approve true and show message.."""
+        form.instance.lead = False
+        form.instance.save()
+        messages.success(self.request, "Team member is no longer team lead")
+        return redirect(
+            "teams:members",
             camp_slug=self.camp.slug,
             team_slug=form.instance.team.slug,
         )
