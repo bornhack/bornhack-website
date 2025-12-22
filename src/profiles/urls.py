@@ -1,9 +1,12 @@
+"""URLs for the user profiles app."""
+
 from __future__ import annotations
 
 from django.urls import path
 
 from .views import ProfileApiView
 from .views import ProfileDetail
+from .views import ProfileFacilityFeedbackListView
 from .views import ProfileOIDCView
 from .views import ProfilePermissionList
 from .views import ProfileSessionThemeSwitchView
@@ -17,4 +20,5 @@ urlpatterns = [
     path("api/", ProfileApiView.as_view(), name="api"),
     path("permissions/", ProfilePermissionList.as_view(), name="permissions_list"),
     path("oidc/", ProfileOIDCView.as_view(), name="oidc"),
+    path("facility_feedback/", ProfileFacilityFeedbackListView.as_view(), name="facility_feedback_list"),
 ]
