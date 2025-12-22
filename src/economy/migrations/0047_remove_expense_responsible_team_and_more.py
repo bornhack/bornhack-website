@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                     ("Unpaid", (("UNPAID_NEEDS_PAYMENT", "Expense is unpaid"),)),
                 ],
                 help_text="Payment status for this expense.",
-                null=True,
+                default="",
             ),
         ),
         migrations.AddField(
@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
                     ("Unpaid", (("UNPAID_NEEDS_PAYMENT", "Revenue is unpaid"),)),
                 ],
                 help_text="Payment status for this revenue.",
-                null=True,
+                default="",
             ),
         ),
         migrations.AddField(

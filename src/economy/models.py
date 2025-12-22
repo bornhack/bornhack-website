@@ -274,6 +274,7 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
     payment_status = models.CharField(
         choices=PAYMENT_STATUS_CHOICES,
         help_text="Payment status for this revenue.",
+        default="",
     )
 
     reimbursement = models.ForeignKey(
@@ -422,6 +423,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
     payment_status = models.CharField(
         choices=PAYMENT_STATUS_CHOICES,
         help_text="Payment status for this expense.",
+        default="",
     )
 
     invoice = models.ImageField(
@@ -591,12 +593,12 @@ class Reimbursement(
     @property
     def amount(self):
         """The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses and substracting all the related revenues."""
-        expenses_total = self.expenses.filter(created_for_reimbursement=False).aggregate(models.Sum("amount", default=0))[
-            "amount__sum"
-        ]
-        revenues_total = self.revenues.filter(created_for_reimbursement=False).aggregate(models.Sum("amount", default=0))[
-            "amount__sum"
-        ]
+        expenses_total = self.expenses.filter(created_for_reimbursement=False).aggregate(
+            models.Sum("amount", default=0)
+        )["amount__sum"]
+        revenues_total = self.revenues.filter(created_for_reimbursement=False).aggregate(
+            models.Sum("amount", default=0)
+        )["amount__sum"]
         return expenses_total - revenues_total
 
     @property
