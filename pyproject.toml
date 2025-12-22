@@ -18,7 +18,7 @@ dependencies = [
     "channels-redis==4.2.1",
     "commonmark==0.9.1",
     "conference-scheduler==3.0.1",
-    "django-allauth[mfa]==65.8.1",
+    "django-allauth[mfa]==65.13.1",
     "django-bootstrap5==25.3",
     "django-colorfield==0.14.0",
     "django-cors-headers==4.9.0",
