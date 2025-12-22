@@ -26,7 +26,7 @@ dependencies = [
     "django-leaflet==0.33.0",
     "django-jsonview==2.0.0",
     "django-oauth-toolkit==3.1.0",
-    "django-otp==1.6.0",
+    "django-otp==1.6.3",
     "django-prometheus==2.4.1",
     "django-reversion==5.0.12",
     "django_stubs_ext==5.2.8",
