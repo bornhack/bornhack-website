@@ -14,7 +14,7 @@ classifiers = [
 
 dependencies = [
     "Django==4.2.21",
-    "channels==4.2.2",
+    "channels==4.3.2",
     "channels-redis==4.2.1",
     "commonmark==0.9.1",
     "conference-scheduler==3.0.1",
