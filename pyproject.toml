@@ -33,7 +33,7 @@ dependencies = [
     "django-tables2==2.7.5",
     "django-taggit==6.1.0",
     "django-weasyprint==2.4.0",
-    "icalendar==6.2.0",
+    "icalendar==6.3.2",
     "irc3==1.1.10",
     "lxml==6.0.2",
     "nh3==0.3.2",
