@@ -211,7 +211,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
                 logger.debug(f"Added permission {permission} to group {group}")
 
     def deactivate_team_permissions(self) -> None:
-        """Add permissions to this camps teams."""
+        """Remove permissions from this camps teams."""
         permission_content_type = ContentType.objects.get_for_model(Permission)
         for team in self.teams.all():
             for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():

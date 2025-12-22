@@ -29,30 +29,39 @@ class TeamTaskViewTest(BornhackTestBase):
 
     def test_team_task_view_permissions(self) -> None:
         """Test the team shift view permissions."""
-        self.client.force_login(self.users[0]) # Non noc team member
+        self.client.force_login(self.users[0])  # Non noc team member
         # Test access control to the views
-        url = reverse("teams:task_create", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:task_create",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 403
 
     def test_team_task_views(self) -> None:
         """Test the team task views."""
-        self.client.force_login(self.users[4]) # Noc team tasker
-        url = reverse("teams:tasks", kwargs={
-            "camp_slug": self.camp.slug,
-            "team_slug": self.teams["noc"].slug,
-        })
+        self.client.force_login(self.users[4])  # Noc team tasker
+        url = reverse(
+            "teams:tasks",
+            kwargs={
+                "camp_slug": self.camp.slug,
+                "team_slug": self.teams["noc"].slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 
         # Test creating a shift
-        url = reverse("teams:task_create", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:task_create",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -63,7 +72,7 @@ class TeamTaskViewTest(BornhackTestBase):
                 "description": "Test task description",
                 "when_0": self.camp.buildup.lower,
                 "when_1": self.camp.buildup.upper,
-                },
+            },
             follow=True,
         )
         assert response.status_code == 200
@@ -71,10 +80,13 @@ class TeamTaskViewTest(BornhackTestBase):
         task = response.context["task"]
 
         # Test if the task got to the list.
-        url = reverse("teams:tasks", kwargs={
-            "camp_slug": self.camp.slug,
-            "team_slug": self.teams["noc"].slug,
-        })
+        url = reverse(
+            "teams:tasks",
+            kwargs={
+                "camp_slug": self.camp.slug,
+                "team_slug": self.teams["noc"].slug,
+            },
+        )
         response = self.client.get(path=url)
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
@@ -82,11 +94,14 @@ class TeamTaskViewTest(BornhackTestBase):
         self.assertEqual(len(rows), 1, "team task list does not return 1 entries after create")
 
         # Test updating a task.
-        url = reverse("teams:task_update", kwargs={
-            "camp_slug": self.camp.slug,
-            "team_slug": self.teams["noc"].slug,
-            "slug": task.slug,
-        })
+        url = reverse(
+            "teams:task_update",
+            kwargs={
+                "camp_slug": self.camp.slug,
+                "team_slug": self.teams["noc"].slug,
+                "slug": task.slug,
+            },
+        )
 
         response = self.client.get(path=url)
         assert response.status_code == 200
@@ -99,34 +114,37 @@ class TeamTaskViewTest(BornhackTestBase):
                 "when_0": self.camp.buildup.lower,
                 "when_1": self.camp.buildup.upper,
                 "completed": True,
-                },
+            },
             follow=True,
         )
         assert response.status_code == 200
 
         # Test submitting a comment
-        url = reverse("teams:task_detail", kwargs={
-            "camp_slug": self.camp.slug,
-            "team_slug": self.teams["noc"].slug,
-            "slug": task.slug,
-        })
+        url = reverse(
+            "teams:task_detail",
+            kwargs={
+                "camp_slug": self.camp.slug,
+                "team_slug": self.teams["noc"].slug,
+                "slug": task.slug,
+            },
+        )
 
         response = self.client.post(
-                path=url,
-                data={
-                    "comment": "Some test comment",
-                    },
-                follow=True,
-                )
+            path=url,
+            data={
+                "comment": "Some test comment",
+            },
+            follow=True,
+        )
         assert response.status_code == 200
 
         response = self.client.post(
-                path=url,
-                data={
-                    "comment": "",
-                    },
-                follow=True,
-                )
+            path=url,
+            data={
+                "comment": "",
+            },
+            follow=True,
+        )
         assert response.status_code == 200
 
         # Test if the page returned a failure

@@ -365,10 +365,10 @@ class RevenueUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     def form_valid(self, form):
         """We have three submit buttons in this form, Save, Approve and Reject."""
         revenue = form.save()
-        if "approve" in form.data and not expense.approved:
+        if "approve" in form.data and not revenue.approved:
             # approve button was pressed
             revenue.approve(self.request)
-        elif "reject" in form.data and not expense.approved:
+        elif "reject" in form.data and not revenue.approved:
             # reject button was pressed
             revenue.reject(self.request)
         elif "save" in form.data:

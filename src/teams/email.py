@@ -56,12 +56,14 @@ def add_new_membership_email(membership: Form) -> bool:
         "camp": membership.team.camp.title,
         "memberlist_link": f"https://bornhack.dk/{membership.team.camp.slug}/teams/{membership.team.slug}/members",
     }
-
+    leads = [resp.email for resp in membership.team.leads.all()]
+    if not leads:
+        leads = ["info@bornhack.dk"]
     return add_outgoing_email(
         responsible_team=membership.team,
         text_template="emails/new_membership_email.txt",
         html_template="emails/new_membership_email.html",
-        to_recipients=[resp.email for resp in membership.team.leads.all()],
+        to_recipients=leads,
         formatdict=formatdict,
         subject=f"New membership request for {membership.team.name} at {membership.team.camp.title}",
         hold=False,

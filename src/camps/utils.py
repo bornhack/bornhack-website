@@ -52,7 +52,7 @@ class CampPropertyListFilter(admin.SimpleListFilter):
         return queryset
 
 
-def get_closest_camp(timestamp):
+def get_closest_camp(timestamp, max_days_from_prev: int=0):
     """Return the Camp object happening closest to the provided datetime."""
     # is the timestamp during a camp?
     try:
@@ -76,7 +76,7 @@ def get_closest_camp(timestamp):
         prev_camp = None
 
     if not prev_camp:
-        # no bornhack happened before the first bornhack
+        # no bornhack happened before the timestamp
         return next_camp
 
     if not next_camp:
@@ -87,8 +87,8 @@ def get_closest_camp(timestamp):
     time_since_prev = timestamp - prev_camp.teardown.upper
     time_until_next = next_camp.buildup.lower - timestamp
 
-    if time_since_prev < time_until_next:
-        # timestamp is closer to the previous camp
-        return prev_camp
-    # timestamp is closer to the upcoming/next camp
-    return next_camp
+    if time_since_prev > time_until_next or ( max_days_from_prev and time_since_prev.days > max_days_from_prev):
+        # timestamp is closer to the next camp or max_days_from_prev was exceeded
+        return next_camp
+    # timestamp is closer to the previous camp
+    return prev_camp
