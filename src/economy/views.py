@@ -451,6 +451,13 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
 
     def form_valid(self, form):
         """Set user and camp for the Reimbursement before saving."""
+        # do we have an Economy team for this camp?
+        if not self.camp.economy_team:
+            messages.error(self.request, "No economy team found")
+            return redirect(
+                reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
+            )
+
         # get the expenses for this user
         expenses = Expense.objects.filter(
             user=self.request.user,
@@ -470,13 +477,6 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
         revenues_total = revenues.aggregate(Sum("amount"))["amount__sum"] or 0
         if not expenses and not revenues:
             messages.error(self.request, "No approved unhandled expenses or revenues found")
-            return redirect(
-                reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
-            )
-
-        # do we have an Economy team for this camp?
-        if not self.camp.economy_team:
-            messages.error(self.request, "No economy team found")
             return redirect(
                 reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
             )
