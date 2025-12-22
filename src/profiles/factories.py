@@ -40,6 +40,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         """Meta."""
 
         model = User
+        skip_postgeneration_save = True
 
     profile = factory.RelatedFactory(ProfileFactory, "user")
 
