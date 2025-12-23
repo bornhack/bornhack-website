@@ -567,7 +567,7 @@ class TestOrderProductRelationModel(TestCase):
         opr.create_rpr(refund=refund, quantity=1)
         opr.save()
 
-        # Quantity is 4, but 1 is used and 1 is refunded, so we should be able to refund 4
+        # Quantity is 5, but 1 is used and 1 is refunded, so we should be able to refund 3
         self.assertEqual(opr.possible_refund, 3)
 
 
@@ -678,7 +678,7 @@ class TestRefund(TestCase):
         # Now to refunding
         self.assertEqual(self.opr1.non_refunded_quantity, 5)
         form_data = self._get_form_data(
-            refund_tickets=[self.opr1.shoptickets.order_by("created").first()],
+            refund_tickets=[self.opr1.shoptickets.latest("created")],
         )
         response = self.client.post(url, form_data)
 

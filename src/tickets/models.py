@@ -155,6 +155,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
 
     class Meta:
         abstract = True
+        ordering = ["-created"]
 
     camp_filter = "ticket_type__camp"
 
