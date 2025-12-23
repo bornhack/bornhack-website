@@ -154,13 +154,10 @@ class ZettleImportTest(TestCase):
         self.assertEqual(created, 0)
 
     def test_zettle_balances_import(self):
-        with open(
-            "testdata/Zettle-Account-Statement-Report-20210101-20210910.xlsx",
-            "rb",
-        ) as f:
+        with open("testdata/Zettle-Account-Statement-Report-20230901-20250903.xlsx", "rb") as f:
             df = ZettleExcelImporter.load_zettle_balances_excel(f)
         created = ZettleExcelImporter.import_zettle_balances_df(df)
-        self.assertEqual(created, 11)
+        self.assertEqual(created, 4059)
         # import the same df again to make sure we don't create duplicates
         created = ZettleExcelImporter.import_zettle_balances_df(df)
         self.assertEqual(created, 0)
