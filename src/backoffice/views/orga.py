@@ -12,11 +12,11 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
+from django.views.generic import UpdateView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import View
 from django.views.generic.edit import FormView
-from django.views.generic.edit import SingleObjectMixin
 
 from backoffice.mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
@@ -329,11 +329,12 @@ class FeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     template_name = "feedback_detail.html"
 
 
-class FeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, SingleObjectMixin, View):
+class FeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
     """View for marking feedback as processed"""
 
     model = Feedback
-    http_method_names = ["post"]
+    fields = ["processed_at", "processed_by"]
+    template_name = "feedback_list_processed_confirm.html"
 
     def post(self, request, *args, **kwargs):
         """Mark feedback as processed."""
@@ -344,3 +345,4 @@ class FeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, SingleObjectMi
         return HttpResponseRedirect(
             reverse("backoffice:feedback_list", kwargs={"camp_slug": self.camp.slug}),
         )
+

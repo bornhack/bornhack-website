@@ -39,10 +39,7 @@
             <td>
               <a href="{% url 'backoffice:feedback_detail' camp_slug=camp.slug  pk=feedback.pk %}" class="btn btn-sm btn-primary">Detail</a>
               {% if not feedback.processed_by %}
-              <form method="post" action="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Processed</a>
-              </form>
+                <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Processed</a>
               {% endif %}
             </td>
           </tr>

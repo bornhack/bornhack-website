@@ -20,14 +20,11 @@
           </figcaption>
         </figure>
       </div>
-      <div>
-        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#orga"><i class="fas fa-undo"></i> Backoffice</a>
-        <a class="btn btn-primary" href="{% url 'backoffice:feedback_list' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Feedback list</a>
+      <div class="d-flex justify-content-start">
+        <a class="btn btn-secondary me-2" href="{% url 'backoffice:index' camp_slug=camp.slug %}#orga"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-primary me-2" href="{% url 'backoffice:feedback_list' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Feedback list</a>
         {% if not feedback.processed_by %}
-        <form method="post" action="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Processed</a>
-        </form>
+          <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Processed</a>
         {% endif %}
       </div>
     </div>
