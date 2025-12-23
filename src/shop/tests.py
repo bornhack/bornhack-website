@@ -714,7 +714,7 @@ class TestRefund(TestCase):
             form_data[f"ticket-{opr.id}-INITIAL_FORMS"] = "1"
             form_data[f"ticket-{opr.id}-MIN_NUM_FORMS"] = "0"
             form_data[f"ticket-{opr.id}-MAX_NUM_FORMS"] = "1000"
-            for index, ticket in enumerate(opr.shoptickets.all()):
+            for index, ticket in enumerate(opr.shoptickets.order_by("-created").all()):
                 form_data[f"ticket-{opr.id}-{index}-uuid"] = str(ticket.uuid)
                 if ticket in refund_tickets:
                     form_data[f"ticket-{opr.id}-{index}-refund"] = "on"
@@ -724,7 +724,7 @@ class TestRefund(TestCase):
             form_data[f"ticket-group-{opr.id}-INITIAL_FORMS"] = "1"
             form_data[f"ticket-group-{opr.id}-MIN_NUM_FORMS"] = "0"
             form_data[f"ticket-group-{opr.id}-MAX_NUM_FORMS"] = "1000"
-            for index, ticket_group in enumerate(opr.ticketgroups.all()):
+            for index, ticket_group in enumerate(opr.ticketgroups.order_by("-created").all()):
                 form_data[f"ticket-group-{opr.id}-{index}-uuid"] = str(
                     ticket_group.uuid,
                 )

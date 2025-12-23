@@ -246,7 +246,7 @@ class TicketGroup(
             return self.annotate(
                 has_used_tickets=Exists(used_tickets_subquery),
                 has_tickets=Exists(tickets),
-            ).distinct("uuid")
+            ).distinct("uuid", "created")
 
     objects = QuerySet.as_manager()
 
