@@ -330,7 +330,7 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
         ).hexdigest()
 
     def __str__(self) -> str:
-        return f"Ticket {self.order.user} {self.product}"
+        return f"Ticket {self.pk} {self.product}"
 
     def get_absolute_url(self):
         return str(reverse_lazy("tickets:shopticket_edit", kwargs={"pk": self.pk}))

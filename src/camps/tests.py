@@ -31,33 +31,33 @@ class TestCampModel(BornhackTestBase):
         super().setUp()
         self.full_week_adults = {  # All tickets are created by bootstrapping
             "shop_tickets": (
-                ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                ShopTicket.objects.filter(
                     ticket_type=self.camp.ticket_type_full_week_adult,
                 )
             ),
             "sponsor_tickets": (
-                SponsorTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                SponsorTicket.objects.filter(
                     ticket_type=self.camp.ticket_type_full_week_adult,
                 )
             ),
             "prize_tickets": (
-                PrizeTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                PrizeTicket.objects.filter(
                     ticket_type=self.camp.ticket_type_full_week_adult,
                 )
             ),
         }
         self.full_week_children = (  # ShopTickets created by bootstrapping
-            ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+            ShopTicket.objects.filter(
                 ticket_type=self.camp.ticket_type_full_week_child,
             )
         )
         self.one_day_adults = (  # ShopTickets created by bootstrapping
-            ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+            ShopTicket.objects.filter(
                 ticket_type=self.camp.ticket_type_one_day_adult,
             )
         )
         self.one_day_children = (  # ShopTickets created by bootstrapping
-            ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+            ShopTicket.objects.filter(
                 ticket_type=self.camp.ticket_type_one_day_child,
             )
         )
