@@ -86,6 +86,9 @@ from .views import FacilityTypeImportView
 from .views import FacilityTypeListView
 from .views import FacilityTypeUpdateView
 from .views import FacilityUpdateView
+from .views import FeedbackDetailView
+from .views import FeedbackListView
+from .views import FeedbackProcessView
 from .views import InvoiceDownloadMultipleView
 from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView
@@ -418,6 +421,10 @@ urlpatterns = [
             ],
         ),
     ),
+    # feedback
+    path("feedback_list/", FeedbackListView.as_view(), name="feedback_list"),
+    path("feedback_detail/<uuid:pk>", FeedbackDetailView.as_view(), name="feedback_detail"),
+    path("feedback_process/<uuid:pk>", FeedbackProcessView.as_view(), name="feedback_process"),
     # infodesk
     path(
         "infodesk/",
