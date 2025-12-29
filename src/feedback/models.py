@@ -8,10 +8,37 @@ from utils.models import UUIDModel
 
 
 class Feedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUIDModel):
-    camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
-    user = models.ForeignKey("auth.User", on_delete=models.PROTECT)
-    feedback = models.TextField()
-    processed_at = models.DateTimeField(null=True, blank=True)
+    """Event feedback model"""
+
+    camp = models.ForeignKey(
+        "camps.Camp",
+        on_delete=models.PROTECT
+    )
+
+    user = models.ForeignKey(
+        "auth.User",
+        on_delete=models.PROTECT
+    )
+
+    feedback = models.TextField(
+        help_text="Enter your feedback for this year's event"
+    )
+
+    state = models.CharField(
+        choices = [
+            ("reviewed", "Reviewed"),
+            ("spam", "Spam"),
+            ("unprocessed", "Unprocessed"),
+        ],
+        default="unprocessed",
+        help_text="Set state of the feedback",
+    )
+
+    processed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     processed_by = models.ForeignKey(
         "auth.User",
         on_delete=models.PROTECT,
@@ -19,3 +46,4 @@ class Feedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUIDMod
         null=True,
         blank=True,
     )
+
