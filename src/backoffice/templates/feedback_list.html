@@ -23,6 +23,7 @@
           <th>Username</th>
           <th>Public Credit Name</th>
           <th>Feedback</th>
+          <th>State</th>
           <th>Processed at</th>
           <th>Processed by</th>
           <th>Actions</th>
@@ -34,12 +35,24 @@
             <td>{{ feedback.user.username }}</td>
             <td>{{ feedback.user.profile.public_credit_name }}</td>
             <td>{{ feedback.feedback|truncatewords:25 }}</td>
+            <td>
+              <span
+                {% if feedback.state == "spam" %}
+                class="badge text-bg-warning"
+                {% elif feedback.state == "reviewed" %}
+                class="badge text-bg-success"
+                {% else %}
+                class="badge text-bg-primary"
+                {% endif %}
+                >
+              {{ feedback.get_state_display }}</span></td>
             <td>{{ feedback.processed_at|default_if_none:"" }}</td>
             <td>{{ feedback.processed_by|default_if_none:"" }}</td>
             <td>
-              <a href="{% url 'backoffice:feedback_detail' camp_slug=camp.slug  pk=feedback.pk %}" class="btn btn-sm btn-primary">Detail</a>
+              <a href="{% url 'backoffice:feedback_detail' camp_slug=camp.slug  pk=feedback.pk %}" class="btn btn-sm btn-secondary">Detail</a>
               {% if not feedback.processed_by %}
                 <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Processed</a>
+                <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-warning"><i class="fa-solid fa-fire-extinguisher"></i> Spam</a>
               {% endif %}
             </td>
           </tr>
