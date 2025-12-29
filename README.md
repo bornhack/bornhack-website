@@ -71,9 +71,9 @@ pip3 install virtualenv
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
 
-  - OpenBSD: pkg_add postgresql-client-11
+  - OpenBSD: pkg_add postgresql-client-16
   - Debian: libpq-dev
-  - FreeBSD: databases/postgresql11-client
+  - FreeBSD: databases/postgresql16-client
   - macOS: If using the PostgreSQL.app, the headers are included, only path needs to be added
 - libjpeg (for pdf generation)
   - OpenBSD: pkg_add jpeg
@@ -106,7 +106,7 @@ Install pip packages:
 
 #### Postgres
 
-You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 12 and the postgis version in production is 2.5. The minimum postgres version is 10, because we use GIST indexes on uuid fields (for ExclusionConstraints). You might also need `create extension btree_gist`, again as a superuser.
+You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 16 and the postgis version in production is 3.5. The minimum postgres version is 14. You will also need `create extension btree_gist`, again as a superuser.
 
 #### Configuration file
 
