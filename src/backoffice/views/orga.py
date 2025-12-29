@@ -6,10 +6,13 @@ from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.forms import modelformset_factory
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.generic import DetailView
+from django.views.generic import UpdateView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import View
@@ -17,6 +20,7 @@ from django.views.generic.edit import FormView
 
 from backoffice.mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
+from feedback.models import Feedback
 from profiles.models import Profile
 from shop.models import OrderProductRelation
 from shop.models import Product
@@ -305,3 +309,40 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
                 2,
             )
         return context
+
+
+##############
+# FEEDBACK
+
+
+class EventFeedbackListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+    """View for listing all feedbacks."""
+
+    model = Feedback
+    template_name = "feedback_list.html"
+
+
+class EventFeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
+    """View for listing all feedbacks."""
+
+    model = Feedback
+    template_name = "feedback_detail.html"
+
+
+class EventFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+    """View for marking feedback as processed"""
+
+    model = Feedback
+    fields = ["processed_at", "processed_by"]
+    template_name = "feedback_list_processed_confirm.html"
+
+    def post(self, request, *args, **kwargs):
+        """Mark feedback as processed."""
+        self.object = self.get_object()
+        self.object.processed_by = self.request.user
+        self.object.processed_at = timezone.now()
+        self.object.save()
+        return HttpResponseRedirect(
+            reverse("backoffice:feedback_list", kwargs={"camp_slug": self.camp.slug}),
+        )
+

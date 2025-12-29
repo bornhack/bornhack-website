@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static %}
+{% load imageutils %}
+
+{% block title %}
+  Event Feedback List | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <h2>Event Feedback List</h2>
+    <div>
+      <p class="lead">List of all feedbacks for this camp </p>
+      <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#orga"><i class="fas fa-undo"></i> Backoffice</a>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <table class="table table-hover datatable">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Public Credit Name</th>
+          <th>Feedback</th>
+          <th>Processed at</th>
+          <th>Processed by</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for feedback in object_list %}
+          <tr>
+            <td>{{ feedback.user.username }}</td>
+            <td>{{ feedback.user.profile.public_credit_name }}</td>
+            <td>{{ feedback.feedback|truncatewords:12 }}</td>
+            <td>{{ feedback.processed_at|default_if_none:"" }}</td>
+            <td>{{ feedback.processed_by|default_if_none:"" }}</td>
+            <td>
+              <a href="{% url 'backoffice:feedback_detail' camp_slug=camp.slug  pk=feedback.pk %}" class="btn btn-sm btn-primary">Detail</a>
+              {% if not feedback.processed_by %}
+                <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Processed</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}
