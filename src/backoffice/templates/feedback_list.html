@@ -33,7 +33,7 @@
           <tr>
             <td>{{ feedback.user.username }}</td>
             <td>{{ feedback.user.profile.public_credit_name }}</td>
-            <td>{{ feedback.feedback|truncatewords:12 }}</td>
+            <td>{{ feedback.feedback|truncatewords:25 }}</td>
             <td>{{ feedback.processed_at|default_if_none:"" }}</td>
             <td>{{ feedback.processed_by|default_if_none:"" }}</td>
             <td>
