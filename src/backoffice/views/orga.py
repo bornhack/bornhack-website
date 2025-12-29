@@ -315,21 +315,21 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
 # FEEDBACK
 
 
-class FeedbackListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+class EventFeedbackListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     """View for listing all feedbacks."""
 
     model = Feedback
     template_name = "feedback_list.html"
 
 
-class FeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
+class EventFeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     """View for listing all feedbacks."""
 
     model = Feedback
     template_name = "feedback_detail.html"
 
 
-class FeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class EventFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
     """View for marking feedback as processed"""
 
     model = Feedback
