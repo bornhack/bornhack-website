@@ -333,15 +333,28 @@ class EventFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateVie
     """View for marking feedback as processed"""
 
     model = Feedback
-    fields = ["processed_at", "processed_by"]
+    fields = ["state"]
     template_name = "feedback_list_processed_confirm.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context.update({"state": self.kwargs.get("state")})
+        return context
 
     def post(self, request, *args, **kwargs):
         """Mark feedback as processed."""
         self.object = self.get_object()
+        state = kwargs.get("state")
+
+        if state == "reviewed":
+            self.object.state = "reviewed"
+        elif state == "spam":
+            self.object.state = "spam"
+
         self.object.processed_by = self.request.user
         self.object.processed_at = timezone.now()
         self.object.save()
+
         return HttpResponseRedirect(
             reverse("backoffice:feedback_list", kwargs={"camp_slug": self.camp.slug}),
         )

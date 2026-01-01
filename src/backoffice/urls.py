@@ -424,7 +424,7 @@ urlpatterns = [
     # feedback
     path("feedback_list/", EventFeedbackListView.as_view(), name="feedback_list"),
     path("feedback_detail/<uuid:pk>/", EventFeedbackDetailView.as_view(), name="feedback_detail"),
-    path("feedback_process/<uuid:pk>/", EventFeedbackProcessView.as_view(), name="feedback_process"),
+    path("feedback_process/<uuid:pk>/<str:state>", EventFeedbackProcessView.as_view(), name="feedback_process"),
     # infodesk
     path(
         "infodesk/",

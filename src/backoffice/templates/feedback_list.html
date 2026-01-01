@@ -51,8 +51,8 @@
             <td>
               <a href="{% url 'backoffice:feedback_detail' camp_slug=camp.slug  pk=feedback.pk %}" class="btn btn-sm btn-secondary">Detail</a>
               {% if not feedback.processed_by %}
-                <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Processed</a>
-                <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-warning"><i class="fa-solid fa-fire-extinguisher"></i> Spam</a>
+                <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk state='reviewed' %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Reviewed</a>
+                <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk state='spam' %}" class="btn btn-sm btn-warning"><i class="fa-solid fa-fire"></i> Spam</a>
               {% endif %}
             </td>
           </tr>
