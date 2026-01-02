@@ -10,6 +10,11 @@ from utils.models import UUIDModel
 class Feedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUIDModel):
     """Event feedback model"""
 
+    class StateChoices(models.TextChoices):
+        REVIEWED = "reviewed", "Reviewed"
+        SPAM = "spam", "Spam"
+        UNPROCESSED = "unprocessed", "Unprocessed"
+
     camp = models.ForeignKey(
         "camps.Camp",
         on_delete=models.PROTECT
@@ -25,12 +30,8 @@ class Feedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUIDMod
     )
 
     state = models.CharField(
-        choices = [
-            ("reviewed", "Reviewed"),
-            ("spam", "Spam"),
-            ("unprocessed", "Unprocessed"),
-        ],
-        default="unprocessed",
+        choices = StateChoices.choices,
+        default=StateChoices.UNPROCESSED,
         help_text="Set state of the feedback",
     )
 
