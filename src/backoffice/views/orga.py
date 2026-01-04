@@ -346,14 +346,7 @@ class EventFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateVie
         self.object = self.get_object()
         state = kwargs.get("state")
 
-        if state == "reviewed":
-            self.object.state = "reviewed"
-        elif state == "spam":
-            self.object.state = "spam"
-
-        self.object.processed_by = self.request.user
-        self.object.processed_at = timezone.now()
-        self.object.save()
+        self.object.process_feedback(state, request.user)
 
         return HttpResponseRedirect(
             reverse("backoffice:feedback_list", kwargs={"camp_slug": self.camp.slug}),
