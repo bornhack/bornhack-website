@@ -697,7 +697,7 @@ class Reimbursement(
         self.paid = True
         self.save()
         self.expenses.update(payment_status="PAID_AND_REIMBURSED")
-        self.revenues.update(payment_status="PAID_AND_REIMBURSED")
+        self.revenues.update(payment_status="PAID_AND_REDISBURSED")
 
 
 ##################################
