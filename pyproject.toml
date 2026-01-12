@@ -67,7 +67,7 @@ test = [
     "bornhack-website[bootstrap]",
     "beautifulsoup4==4.14.3",
     "coverage==7.13.0",
-    "hypothesis==6.148.7",
+    "hypothesis==6.150.1",
     "unittest-xml-reporting==3.2.0",
     "tblib==3.1.0",  # used to see backtraces in unit tests
 ]
