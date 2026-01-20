@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
+from django.http.request import BadRequest
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -330,23 +331,33 @@ class EventFeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView
 
 
 class EventFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
-    """View for marking feedback as processed"""
+    """View for processing feedback."""
 
     model = Feedback
     fields = ["state"]
-    template_name = "feedback_list_processed_confirm.html"
+    template_name = "feedback_processed_confirm.html"
 
     def get_context_data(self, *args, **kwargs):
+        """Get `state` from URL and if valid add to context else raise error."""
         context = super().get_context_data(*args, **kwargs)
-        context.update({"state": self.kwargs.get("state")})
+        state_arg = self.kwargs.get("state")
+
+        try:
+            context.update({"state": self.object.StateChoices(state_arg)})
+        except ValueError:
+            raise BadRequest(f"Argument: '{state_arg}' is invalid.")
+
         return context
 
     def post(self, request, *args, **kwargs):
-        """Mark feedback as processed."""
+        """Process feedback with parsed state."""
         self.object = self.get_object()
         state = kwargs.get("state")
 
-        self.object.process_feedback(state, request.user)
+        try:
+            self.object.process_feedback(state, request.user)
+        except ValueError:
+            raise BadRequest(f"Argument: '{state}' is invalid.")
 
         return HttpResponseRedirect(
             reverse("backoffice:feedback_list", kwargs={"camp_slug": self.camp.slug}),

@@ -45,3 +45,35 @@ class TestEventFeedbackProcessView(BornhackTestBase):
 
         assert self.feedback.state == Feedback.StateChoices.SPAM
 
+    def test_admin_resets_feedback_as_unprocessed(self) -> None:
+        """Test admin user resets feedback as unprocessed."""
+        self.client.force_login(self.admin)
+        self.kwargs.update({"state": "unprocessed"})
+        url = reverse("backoffice:feedback_process", kwargs=self.kwargs)
+
+        self.client.post(url)
+        self.feedback.refresh_from_db()
+
+        assert self.feedback.state == Feedback.StateChoices.UNPROCESSED
+
+    def test_bad_request_processing_feedback_with_invalid_state(self) -> None:
+        """
+        Test processing feedback with invalid state return BadRequest.
+        """
+        self.client.force_login(self.admin)
+        self.kwargs.update({"state": "unknown"})
+        url = reverse("backoffice:feedback_process", kwargs=self.kwargs)
+
+        response = self.client.post(url)
+
+        assert response.status_code == 400
+
+    def test_bad_request_requesting_view_with_invalid_state(self) -> None:
+        """Test `GET` request to view with invalid state return BadRequest."""
+        self.client.force_login(self.admin)
+        self.kwargs.update({"state": "unknown"})
+        url = reverse("backoffice:feedback_process", kwargs=self.kwargs)
+
+        response = self.client.get(url)
+
+        assert response.status_code == 400
