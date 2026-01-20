@@ -3,10 +3,10 @@ from __future__ import annotations
 from django.contrib import admin
 from django.utils import timezone
 
-from .models import Feedback
+from .models import CampFeedback
 
 
-@admin.register(Feedback)
+@admin.register(CampFeedback)
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ("user", "camp", "feedback", "state", "processed_at", "processed_by")
     list_filter = ["processed_at"]

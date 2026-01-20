@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  Event Feedback Detail | Orga | BackOffice | {{ block.super }}
+  Camp Feedback Detail | Orga | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        Event Feedback detail
+        Camp Feedback detail
         <span
           {% if feedback.state == "spam" %}
           class="badge text-bg-warning"

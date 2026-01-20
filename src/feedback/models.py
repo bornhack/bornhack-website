@@ -9,8 +9,8 @@ from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 
 
-class Feedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUIDModel):
-    """Event feedback model"""
+class CampFeedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUIDModel):
+    """Camp feedback model"""
 
     class StateChoices(models.TextChoices):
         REVIEWED = "reviewed", "Reviewed"
@@ -28,7 +28,7 @@ class Feedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUIDMod
     )
 
     feedback = models.TextField(
-        help_text="Enter your feedback for this year's event"
+        help_text="Enter your feedback for this year's camp"
     )
 
     state = models.CharField(

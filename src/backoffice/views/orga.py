@@ -21,7 +21,7 @@ from django.views.generic.edit import FormView
 
 from backoffice.mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
-from feedback.models import Feedback
+from feedback.models import CampFeedback
 from profiles.models import Profile
 from shop.models import OrderProductRelation
 from shop.models import Product
@@ -316,26 +316,29 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
 # FEEDBACK
 
 
-class EventFeedbackListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+class CampFeedbackListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     """View for listing all feedbacks."""
 
-    model = Feedback
+    model = CampFeedback
     template_name = "feedback_list.html"
+    context_object_name = "feedback"
 
 
-class EventFeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
+class CampFeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     """View for listing all feedbacks."""
 
-    model = Feedback
+    model = CampFeedback
     template_name = "feedback_detail.html"
+    context_object_name = "feedback"
 
 
-class EventFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class CampFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
     """View for processing feedback."""
 
-    model = Feedback
+    model = CampFeedback
     fields = ["state"]
     template_name = "feedback_processed_confirm.html"
+    context_object_name = "feedback"
 
     def get_context_data(self, *args, **kwargs):
         """Get `state` from URL and if valid add to context else raise error."""

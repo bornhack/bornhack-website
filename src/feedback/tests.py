@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from feedback.models import Feedback
+from feedback.models import CampFeedback
 from utils.tests import BornhackTestBase
 
 class TestFeedbackModel(BornhackTestBase):
@@ -10,7 +10,7 @@ class TestFeedbackModel(BornhackTestBase):
     def setUpTestData(cls) -> None:
         """Test setup."""
         super().setUpTestData()
-        cls.feedback = Feedback.objects.create(
+        cls.feedback = CampFeedback.objects.create(
             camp=cls.camp,
             user=cls.users[0],
             feedback="Test Feedback"
@@ -21,7 +21,7 @@ class TestFeedbackModel(BornhackTestBase):
 
     def test_state_of_new_feedback_is_unprocessed(self) -> None:
         """Test the state of a new event feedback."""
-        assert self.feedback.state == Feedback.StateChoices.UNPROCESSED
+        assert self.feedback.state == CampFeedback.StateChoices.UNPROCESSED
 
     def test_process_feedback_sets_user_and_timestamp(self) -> None:
         """
@@ -44,13 +44,13 @@ class TestFeedbackModel(BornhackTestBase):
         """Test process_feedback changes the state for Feedback to SPAM."""
         self.feedback.process_feedback("spam", self.admin)
 
-        assert self.feedback.state is Feedback.StateChoices.SPAM
+        assert self.feedback.state is CampFeedback.StateChoices.SPAM
 
     def test_process_feedback_changes_state_to_reviewed(self) -> None:
         """Test process_feedback changes the state for Feedback to reviewed."""
         self.feedback.process_feedback("reviewed", self.admin)
 
-        assert self.feedback.state is Feedback.StateChoices.REVIEWED
+        assert self.feedback.state is CampFeedback.StateChoices.REVIEWED
 
     def test_process_feedback_changes_state_to_unprocessed(self) -> None:
         """
@@ -60,7 +60,7 @@ class TestFeedbackModel(BornhackTestBase):
         self.feedback.process_feedback("spam", self.admin)
         self.feedback.process_feedback("unprocessed", self.admin)
 
-        assert self.feedback.state is Feedback.StateChoices.UNPROCESSED
+        assert self.feedback.state is CampFeedback.StateChoices.UNPROCESSED
         assert self.feedback.processed_by is None
         assert self.feedback.processed_at is None
 
@@ -77,5 +77,5 @@ class TestFeedbackModel(BornhackTestBase):
         """
         self.feedback.process_feedback("SPAM", self.admin)
 
-        assert self.feedback.state is Feedback.StateChoices.SPAM
+        assert self.feedback.state is CampFeedback.StateChoices.SPAM
 

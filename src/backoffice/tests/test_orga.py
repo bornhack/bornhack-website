@@ -1,17 +1,17 @@
 
 from django.urls import reverse
-from feedback.models import Feedback
+from feedback.models import CampFeedback
 from utils.tests import BornhackTestBase
 
 
-class TestEventFeedbackProcessView(BornhackTestBase):
-    """Test EventFeedbackProcessView."""
+class TestCampFeedbackProcessView(BornhackTestBase):
+    """Test CampFeedbackProcessView."""
 
     @classmethod
     def setUpTestData(cls) -> None:
         """Test setup."""
         super().setUpTestData()
-        cls.feedback = Feedback.objects.create(
+        cls.feedback = CampFeedback.objects.create(
             camp=cls.camp,
             user=cls.users[0],
             feedback="Test Feedback"
@@ -32,7 +32,7 @@ class TestEventFeedbackProcessView(BornhackTestBase):
         self.client.post(url)
         self.feedback.refresh_from_db()
 
-        assert self.feedback.state == Feedback.StateChoices.REVIEWED
+        assert self.feedback.state == CampFeedback.StateChoices.REVIEWED
 
     def test_admin_processing_feedback_as_spam(self) -> None:
         """Test admin user processing feedback as spam."""
@@ -43,7 +43,7 @@ class TestEventFeedbackProcessView(BornhackTestBase):
         self.client.post(url)
         self.feedback.refresh_from_db()
 
-        assert self.feedback.state == Feedback.StateChoices.SPAM
+        assert self.feedback.state == CampFeedback.StateChoices.SPAM
 
     def test_admin_resets_feedback_as_unprocessed(self) -> None:
         """Test admin user resets feedback as unprocessed."""
@@ -54,7 +54,7 @@ class TestEventFeedbackProcessView(BornhackTestBase):
         self.client.post(url)
         self.feedback.refresh_from_db()
 
-        assert self.feedback.state == Feedback.StateChoices.UNPROCESSED
+        assert self.feedback.state == CampFeedback.StateChoices.UNPROCESSED
 
     def test_bad_request_processing_feedback_with_invalid_state(self) -> None:
         """

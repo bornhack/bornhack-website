@@ -13,7 +13,7 @@ from camps.views import CampDetailView
 from camps.views import CampListView
 from camps.views import CampRedirectView
 from contact.views import ContactView
-from feedback.views import FeedbackCreate
+from feedback.views import CampFeedbackCreate
 from info.views import CampInfoView
 from maps.views import MapView
 from maps.views import UserLocationApiView
@@ -221,7 +221,7 @@ urlpatterns = [
                 path("teams/", include("teams.urls", namespace="teams")),
                 path("rideshare/", include("rideshare.urls", namespace="rideshare")),
                 path("backoffice/", include("backoffice.urls", namespace="backoffice")),
-                path("feedback/", FeedbackCreate.as_view(), name="feedback"),
+                path("feedback/", CampFeedbackCreate.as_view(), name="feedback"),
                 path("economy/", include("economy.urls", namespace="economy")),
                 path("wishlist/", include("wishlist.urls", namespace="wishlist")),
                 path("facilities/", include("facilities.urls", namespace="facilities")),
