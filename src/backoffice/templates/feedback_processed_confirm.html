@@ -13,7 +13,7 @@
       <div class="mb-4">
         <figure>
           <blockquote class="blockquote">
-            <p>{{ feedback.feedback }}</p>
+            {{ feedback.feedback|linebreaks }}
           </blockquote>
           <figcaption class="blockquote-footer">
             <cite title="Source Title">{{ feedback.user.profile.public_credit_name }}</cite>
