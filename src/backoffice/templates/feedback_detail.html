@@ -7,13 +7,25 @@
 {% block content %}
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">Event Feedback detail</h3>
+      <h3 class="card-title">
+        Event Feedback detail
+        <span
+          {% if feedback.state == "spam" %}
+          class="badge text-bg-warning"
+          {% elif feedback.state == "reviewed" %}
+          class="badge text-bg-success"
+          {% else %}
+          class="badge text-bg-primary"
+          {% endif %}
+          >
+        {{ feedback.get_state_display }}</span>
+      </h3>
     </div>
     <div class="card-body">
       <div class="mb-4">
         <figure>
           <blockquote class="blockquote">
-            <p>{{ feedback.feedback }}</p>
+            {{ feedback.feedback|linebreaks }}
           </blockquote>
           <figcaption class="blockquote-footer">
             <cite title="Source Title">{{ feedback.user.profile.public_credit_name }}</cite>
@@ -23,8 +35,11 @@
       <div class="d-flex justify-content-start">
         <a class="btn btn-secondary me-2" href="{% url 'backoffice:index' camp_slug=camp.slug %}#orga"><i class="fas fa-undo"></i> Backoffice</a>
         <a class="btn btn-primary me-2" href="{% url 'backoffice:feedback_list' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Feedback list</a>
-        {% if not feedback.processed_by %}
-          <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Processed</a>
+        {% if feedback.state == 'unprocessed' %}
+          <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk state='reviewed' %}" class="btn btn-success"><i class="fas fa-check"></i> Reviewed</a>
+          <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk state='spam' %}" class="btn btn-warning"><i class="fa-solid fa-fire"></i> Spam</a>
+        {% else %}
+          <a href="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk state='unprocessed' %}" class="btn btn-info"><i class="fa-solid fa-arrows-rotate"></i> Unprocess</a>
         {% endif %}
       </div>
     </div>
