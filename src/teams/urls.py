@@ -7,7 +7,7 @@ from django.urls import path
 from teams.views.base import FixIrcAclView
 from teams.views.base import TeamGeneralView
 from teams.views.base import TeamListView
-from teams.views.base import TeamManageView
+from teams.views.base import TeamSettingsView
 from teams.views.guide import TeamGuidePrintView
 from teams.views.guide import TeamGuideView
 from teams.views.info import InfoCategoriesListView
@@ -46,7 +46,7 @@ urlpatterns = [
                 path("", TeamGeneralView.as_view(), name="general"),
                 path("join/", TeamJoinView.as_view(), name="join"),
                 path("leave/", TeamLeaveView.as_view(), name="leave"),
-                path("manage/", TeamManageView.as_view(), name="manage"),
+                path("settings/", TeamSettingsView.as_view(), name="settings"),
                 path("guide/", TeamGuideView.as_view(), name="guide"),
                 path("guide/print/", TeamGuidePrintView.as_view(), name="guide_print"),
                 path("fix_irc_acl/", FixIrcAclView.as_view(), name="fix_irc_acl"),

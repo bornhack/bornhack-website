@@ -77,11 +77,11 @@ class TeamGeneralView(CampViewMixin, IsTeamPermContextMixin, DetailView):
         return context
 
 
-class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
+class TeamSettingsView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
     """View for mananaging team members."""
 
     model = Team
-    template_name = "team_manage.html"
+    template_name = "team_settings.html"
     fields = (
         "description",
         "needs_members",
@@ -100,6 +100,7 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin,
         "guide",
     )
     slug_url_kwarg = "team_slug"
+    active_menu = "settings"
 
     def get_form(self, *args, **kwargs) -> Form:
         """Method for updating form widgets."""
