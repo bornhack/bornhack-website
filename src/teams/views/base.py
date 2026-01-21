@@ -15,6 +15,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
 
 from camps.mixins import CampViewMixin
+from phonebook.models import DectRegistration
 from teams.models import Team
 from teams.models import TeamMember
 from utils.mixins import IsTeamPermContextMixin
@@ -92,6 +93,10 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin,
         "private_irc_channel_managed",
         "public_signal_channel_link",
         "private_signal_channel_link",
+        "public_phone_number",
+        "private_phone_number",
+        "public_dect_number",
+        "private_dect_number",
         "guide",
     )
     slug_url_kwarg = "team_slug"
@@ -100,14 +105,25 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin,
         """Method for updating form widgets."""
         form = super().get_form(*args, **kwargs)
         form.fields["guide"].widget = MarkdownWidget()
+
+        dect_filter = DectRegistration.objects.filter(
+            camp=self.camp,
+            user__in=self.object.members.all()
+        )
+        form.fields["public_dect_number"].queryset = dect_filter.filter(
+            publish_in_phonebook=True
+        )
+        form.fields["private_dect_number"].queryset = dect_filter
+
         return form
 
     def get_success_url(self) -> str:
         """Method for returning the success url."""
-        return reverse_lazy(
-            "teams:general",
-            kwargs={"camp_slug": self.camp.slug, "team_slug": self.get_object().slug},
-        )
+        kwargs = {
+            "camp_slug": self.camp.slug,
+            "team_slug": self.get_object().slug
+        }
+        return reverse_lazy("teams:general", kwargs=kwargs)
 
     def form_valid(self, form: Form) -> HttpResponseRedirect:
         """Method for sending success message if form is valid."""
