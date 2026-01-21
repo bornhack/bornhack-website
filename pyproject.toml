@@ -29,7 +29,7 @@ dependencies = [
     "django-otp==1.6.3",
     "django-prometheus==2.4.1",
     "django-reversion==6.1.0",
-    "django_stubs_ext==5.2.8",
+    "django_stubs_ext==5.2.9",
     "django-tables2==2.8.0",
     "django-taggit==6.1.0",
     "django-weasyprint==2.4.0",
