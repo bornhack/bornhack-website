@@ -50,6 +50,20 @@
       <p>The {{ team.name }} Team does not have a public Signal Group.</p>
     {% endif %}
 
+    <h5>Phone</h5>
+    {% if team.public_phone_number %}
+      <p>The {{ team.name }} Team public phone number <a href="tel:{{ team.public_phone_number }}">{{ team.public_phone_number|urlize }}</a></p>
+    {% else %}
+      <p>The {{ team.name }} Team does not have a public phone number.</p>
+    {% endif %}
+
+    <h5>DECT</h5>
+    {% if team.public_dect_number %}
+    <p>The {{ team.name }} Team public DECT number is <a href="{% url 'phonebook:list' camp_slug=camp.slug %}">{{ team.public_dect_number.number }}</a></p>
+    {% else %}
+      <p>The {{ team.name }} Team does not have a public DECT number.</p>
+    {% endif %}
+
     {% if request.user in team.approved_members.all and team.private_signal_channel_link %}
       <p>The {{ team.name }} Team private Signal group is <a href="{{ team.private_signal_channel_link }}">{{ team.private_signal_channel_link|urlize }}</a></p>
     {% endif %}
