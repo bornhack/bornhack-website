@@ -1,10 +1,20 @@
 Hi,
 
-Your expense {{ expense.pk }} for {{ expense.camp.title }} has been approved. The amount is DKK {{ expense.amount }} and description of the expense is:
+Your expense {{ expense.pk }} for {{ expense.camp.title }} has been approved.
+
+The amount is DKK {{ expense.amount }} and description of the expense is:
 
 {{ expense.description }}
 
-{% if not expense.paid_by_bornhack %}The money will be transferred to your bank account with the next batch of reimbursements.{% else %}As this expense was paid for by BornHack no further action will be taken.{% endif %}
+{% if expense.paid_by_bornhack %}
+As this expense was paid for by BornHack no further action will be taken.
+{% else %}
+IMPORTANT: Before we can transfer the money to your bank account, you need to create a reimbursement.
+
+Please visit https://bornhack.dk/{{ expense.camp.slug }}/economy/reimbursements/create/
+
+The money will be transferred to your bank account with the next batch, after creating the reimbursement.
+{% endif %}
 
 Have a nice day!
 
