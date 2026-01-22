@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 
+from django.contrib import messages
+
 from events.handler import handle_team_event
 
 logger = logging.getLogger(f"bornhack.{__name__}")
@@ -76,3 +78,16 @@ def nickserv_username_changed(instance, original) -> None:
 def set_session_on_login(sender, request, user, **kwargs) -> None:
     """Signal handler called on_login to set session["theme"] from the user profile."""
     request.session["theme"] = request.user.profile.theme
+
+def reimbursement_msg_on_login(sender, request, user, **kwargs) -> None:
+    """
+    Add message when user has approved expenses without matching reimbursement.
+    """
+    approved_expenses = user.expenses.all().filter(approved=True, reimbursement=None)
+
+    if approved_expenses.exists():
+        messages.info(
+            request,
+            f"You have {approved_expenses.count()} expenses with missing reimbursement"
+        )
+
