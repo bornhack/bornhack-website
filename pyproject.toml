@@ -177,3 +177,7 @@ omit = [
 exclude_also = [
     "if TYPE_CHECKING",
 ]
+
+############ PYTEST ############
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "bornhack.settings"
