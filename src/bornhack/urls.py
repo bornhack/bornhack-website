@@ -161,7 +161,7 @@ urlpatterns = [
                 path("info/", CampInfoView.as_view(), name="info"),
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
-                path("sponsors/call-for-sponsors", CallForSponsorsView.as_view(), name="call_for_sponsors"),
+                path("sponsors/call-for-sponsors/", CallForSponsorsView.as_view(), name="call_for_sponsors"),
                 path(
                     "map/",
                     include(
