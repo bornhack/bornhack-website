@@ -87,153 +87,16 @@
     <div class="col-12 col-lg-6 token-widgets">
       <div class="row g-3">
         <div class="col-12 col-md-6">
-          <div class="card h-100 shadow">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <h5>Total players</h5>
-                  <p><b>Last join:</b> <small>{{ widgets.total_players.last_join_time | timesince }} ago.</small></p>
-                </div>
-                <p class="h4">{{ widgets.total_players.count }}</p>
-              </div>
-              <div class="hide-for-no-js-users" id="total_players_chart"></div>
-              <div class="unhide-for-no-js-users mt-3">
-                <div class="widget-content-no-js">
-                  <table class="table table-sm table-striped">
-                    <thead>
-                    <tr>
-                      <th scope="col">Status</th>
-                      <th scope="col">Count</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                      {% for key, value in widgets.total_players.no_js.items %}
-                      <tr>
-                        <td scope="row">{{ key }}</td>
-                        <td>{{ value.value }} ({{ value.pct|floatformat:'0' }}%)</td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                  <p class="my-0">
-                    <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          {% include 'includes/total_players_widget.html' with widget=widgets.total_players %}
         </div>
         <div class="col-12 col-md-6">
-          <div class="card h-100 shadow">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <h5>Total finds</h5>
-                  <p><b>Latest find:</b> <small>{{ widgets.total_finds.latest_find | timesince }} ago.</small></p>
-                </div>
-                <p class="h4">{{ widgets.total_finds.count }}</p>
-              </div>
-              <div class="hide-for-no-js-users" id="total_finds_chart"></div>
-              <div class="unhide-for-no-js-users mt-3">
-                <div class="widget-content-no-js">
-                  <table class="table table-sm table-striped">
-                    <thead>
-                    <tr>
-                      <th scope="col">Status</th>
-                      <th scope="col">Count</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                      {% for key, value in widgets.total_finds.no_js.items %}
-                      <tr>
-                        <td scope="row">{{ key }}</td>
-                        <td>{{ value.value }} ({{ value.pct|floatformat:'0' }}%)</td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                  <p class="my-0">
-                    <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          {% include 'includes/total_finds_widget.html' with widget=widgets.total_finds %}
         </div>
         <div class="col-12 col-md-6">
-          <div class="card h-100 shadow">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div class="mb-0">
-                  <h5>Token categories</h5>
-                </div>
-                <p class="h4">{{ widgets.token_categories.count }}</p>
-              </div>
-              <div class="hide-for-no-js-users" id="token_category_chart"></div>
-              <div class="unhide-for-no-js-users mt-3">
-                <div class="widget-content-no-js">
-                <table class="table table-sm table-striped">
-                  <thead>
-                  <tr>
-                    <th scope="col">Category</th>
-                    <th scope="col">Found</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    {% for key, value in widgets.token_categories.no_js.items %}
-                    <tr>
-                      <td scope="row">{{ key }}</td>
-                      <td>
-                        <progress class="progress w-75 d-inline" max="100" value="{{ value|floatformat:'0' }}"></progress> <small>{{ value|floatformat:'0' }}%</small>
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-                </div>
-                <p class="my-0">
-                  <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
-                </p>
-              </div>
-            </div>
-          </div>
+          {% include 'includes/token_categories_widget.html' with widget=widgets.token_categories %}
         </div>
         <div class="col-12 col-md-6">
-          <div class="card h-100 shadow">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div class="mb-0">
-                  <h5>Token activity</h5>
-                  <p class="mb-4"><small>Finds in last 60 min.</small></p>
-                </div>
-                <p class="h4">{{ widgets.token_activity.last_60m_count }}</p>
-              </div>
-              <div class="hide-for-no-js-users" id="token_activity_chart"></div>
-              <div class="unhide-for-no-js-users mt-3">
-                <div class="widget-content-no-js">
-                  <table class="table table-sm table-striped">
-                    <thead>
-                    <tr>
-                      <th scope="col">Hour</th>
-                      <th scope="col">Tokens found</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                      {% for key, value  in widgets.token_activity.no_js.items %}
-                      <tr>
-                        <td scope="row">{{ key }}</td>
-                        <td>{{ value }}</td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-                <p class="my-0">
-                  <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
-                </p>
-              </div>
-            </div>
-          </div>
+          {% include 'includes/token_activity_widget.html' with widget=widgets.token_activity %}
         </div>
       </div>
     </div>
