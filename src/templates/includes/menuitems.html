@@ -17,6 +17,8 @@
   <a role="button" class="flex-lg-fill btn unhide-for-no-js-users {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
 {% endif %}
 
+<a role="button" class="flex-lg-fill btn unhide-for-no-js-users {% menubuttonclass 'token' %}" href="{% url 'tokens:dashboard' camp_slug=camp.slug %}">Token Game</a>
+
 <button type="button" class="hide-for-no-js-users flex-lg-fill btn btn-outline-secondary btn-menu dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">More <span class="caret"></span></button>
 <ul class="hide-for-no-js-users dropdown-menu">
   {% if is_volunteer %}

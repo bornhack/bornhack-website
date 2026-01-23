@@ -29,7 +29,7 @@ dependencies = [
     "django-otp==1.6.3",
     "django-prometheus==2.4.1",
     "django-reversion==6.1.0",
-    "django_stubs_ext==5.2.8",
+    "django_stubs_ext==5.2.9",
     "django-tables2==2.8.0",
     "django-taggit==6.1.0",
     "django-weasyprint==2.4.0",
@@ -38,7 +38,7 @@ dependencies = [
     "lxml==6.0.2",
     "nh3==0.3.2",
     "openpyxl==3.1.5",  # used to import excel files in economy backoffice
-    "pandas==2.3.3",
+    "pandas==3.0.0",
     "psycopg2-binary==2.9.11",
     "python-magic==0.4.27",
     "quickpay-api-client==2.0.1",
@@ -57,7 +57,7 @@ bootstrap = [
 dev = [
     "bornhack-website[bootstrap]",
     "bornhack-website[test]",
-    "django-debug-toolbar==6.1.0",
+    "django-debug-toolbar==6.2.0",
     "pipdeptree==2.30.0",
     "pre-commit==4.5.1",
     "setuptools_scm==9.2.2",
@@ -67,7 +67,7 @@ test = [
     "bornhack-website[bootstrap]",
     "beautifulsoup4==4.14.3",
     "coverage==7.13.0",
-    "hypothesis==6.148.7",
+    "hypothesis==6.150.3",
     "unittest-xml-reporting==3.2.0",
     "tblib==3.1.0",  # used to see backtraces in unit tests
 ]
@@ -177,3 +177,7 @@ omit = [
 exclude_also = [
     "if TYPE_CHECKING",
 ]
+
+############ PYTEST ############
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "bornhack.settings"

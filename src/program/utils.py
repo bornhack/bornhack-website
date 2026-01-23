@@ -5,11 +5,11 @@ import logging
 from collections import OrderedDict
 from datetime import timedelta
 
-import pytz
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
+from zoneinfo import ZoneInfo
 from psycopg2.extras import DateTimeTZRange
 
 logger = logging.getLogger(f"bornhack.{__name__}")
@@ -144,7 +144,7 @@ def save_speaker_availability(form, obj) -> None:
     AvailabilityModel.objects.filter(**kwargs).delete()
 
     # all the entered data is in the users local TIME_ZONE, interpret it as such
-    tz = pytz.timezone(settings.TIME_ZONE)
+    tz = ZoneInfo("Europe/Copenhagen")
 
     # count availability form fields
     fieldcounter = 0
@@ -165,24 +165,20 @@ def save_speaker_availability(form, obj) -> None:
         elements = field.split("_")
         # format is "availability_2020_08_28_18_00_to_2020_08_28_21_00"
         daychunk = DateTimeTZRange(
-            tz.localize(
-                datetime.datetime(
-                    int(elements[1]),
-                    int(elements[2]),
-                    int(elements[3]),
-                    int(elements[4]),
-                    int(elements[5]),
-                ),
-            ),
-            tz.localize(
-                datetime.datetime(
-                    int(elements[7]),
-                    int(elements[8]),
-                    int(elements[9]),
-                    int(elements[10]),
-                    int(elements[11]),
-                ),
-            ),
+            datetime.datetime(
+                int(elements[1]),
+                int(elements[2]),
+                int(elements[3]),
+                int(elements[4]),
+                int(elements[5]),
+            ).replace(tz=tz),
+            datetime.datetime(
+                int(elements[7]),
+                int(elements[8]),
+                int(elements[9]),
+                int(elements[10]),
+                int(elements[11]),
+            ).replace(tz=tz),
         )
         available = form.cleaned_data[field]
 

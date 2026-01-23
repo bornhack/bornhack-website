@@ -567,7 +567,7 @@ class TestOrderProductRelationModel(TestCase):
         opr.create_rpr(refund=refund, quantity=1)
         opr.save()
 
-        # Quantity is 4, but 1 is used and 1 is refunded, so we should be able to refund 4
+        # Quantity is 5, but 1 is used and 1 is refunded, so we should be able to refund 3
         self.assertEqual(opr.possible_refund, 3)
 
 
@@ -678,7 +678,7 @@ class TestRefund(TestCase):
         # Now to refunding
         self.assertEqual(self.opr1.non_refunded_quantity, 5)
         form_data = self._get_form_data(
-            refund_tickets=[self.opr1.shoptickets.order_by("created").first()],
+            refund_tickets=[self.opr1.shoptickets.latest("created")],
         )
         response = self.client.post(url, form_data)
 
@@ -689,7 +689,7 @@ class TestRefund(TestCase):
 
         # Now to refunding a bundle
         form_data = self._get_form_data(
-            refund_ticket_groups=[self.opr4.ticketgroups.order_by("created").first()],
+            refund_ticket_groups=[self.opr4.ticketgroups.latest("created")],
         )
         response = self.client.post(url, form_data)
 
@@ -714,7 +714,7 @@ class TestRefund(TestCase):
             form_data[f"ticket-{opr.id}-INITIAL_FORMS"] = "1"
             form_data[f"ticket-{opr.id}-MIN_NUM_FORMS"] = "0"
             form_data[f"ticket-{opr.id}-MAX_NUM_FORMS"] = "1000"
-            for index, ticket in enumerate(opr.shoptickets.all()):
+            for index, ticket in enumerate(opr.shoptickets.order_by("-created")):
                 form_data[f"ticket-{opr.id}-{index}-uuid"] = str(ticket.uuid)
                 if ticket in refund_tickets:
                     form_data[f"ticket-{opr.id}-{index}-refund"] = "on"
@@ -724,7 +724,7 @@ class TestRefund(TestCase):
             form_data[f"ticket-group-{opr.id}-INITIAL_FORMS"] = "1"
             form_data[f"ticket-group-{opr.id}-MIN_NUM_FORMS"] = "0"
             form_data[f"ticket-group-{opr.id}-MAX_NUM_FORMS"] = "1000"
-            for index, ticket_group in enumerate(opr.ticketgroups.all()):
+            for index, ticket_group in enumerate(opr.ticketgroups.order_by("-created")):
                 form_data[f"ticket-group-{opr.id}-{index}-uuid"] = str(
                     ticket_group.uuid,
                 )

@@ -6,11 +6,11 @@ import logging
 import random
 import sys
 import uuid
+from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import timedelta
 
 import factory
-import pytz
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -101,7 +101,7 @@ from villages.models import Village
 from .functions import output_fake_md_description
 
 fake = Faker()
-tz = pytz.timezone("Europe/Copenhagen")
+tz = ZoneInfo("Europe/Copenhagen")
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 

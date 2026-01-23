@@ -1,0 +1,22 @@
+{% extends 'sponsors_base.html' %}
+{% load commonmark %}
+
+{% block title %}
+  Call for Sponsors | {{ block.super }}
+{% endblock %}
+
+{% block sponsors_content %}
+
+  {% if not camp.call_for_sponsors_open %}
+    <div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Sponsors is not open.
+    </div>
+  {% endif %}
+
+  {% if not camp.call_for_sponsors %}
+    <p class='lead'>This CFS has not been written yet.</p>
+  {% else %}
+    {{ camp.call_for_sponsors|trustedcommonmark }}
+  {% endif %}
+
+{% endblock sponsors_content %}
