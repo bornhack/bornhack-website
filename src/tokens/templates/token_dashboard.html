@@ -266,7 +266,7 @@
               {% endif %}
                 <td>{{ token.category.name }}</td>
                 <td>
-                  {% if token.valid_now %}
+                  {% if token.is_valid_now %}
                     <i class="unhide-for-no-js-users text-success">&#10004;</i>
                     <i class="hide-for-no-js-users fas fa-check text-success"></i>
                   {% else %}
