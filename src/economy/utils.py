@@ -12,7 +12,6 @@ from pathlib import Path
 from zipfile import ZipFile
 
 import pandas as pd
-import pytz
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -43,9 +42,10 @@ from shop.models import CreditNote
 from shop.models import CustomOrder
 from shop.models import Invoice
 from shop.models import Order
+from zoneinfo import ZoneInfo
 
 # we need the Danish timezone here and there
-cph = pytz.timezone("Europe/Copenhagen")
+cph = ZoneInfo("Europe/Copenhagen")
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
