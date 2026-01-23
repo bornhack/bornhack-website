@@ -1,0 +1,24 @@
+<div class="p-5 mb-4 bg-body-tertiary">
+  <div class="container-fluid py-5">
+    <h1 class="display-5 fw-bold">Token game is being prepared...</h1>
+    <div class="col-md-7">
+    <p class="fs-4 mt-4">
+      The game team is working on tokens for this years bornhack.
+    </p>
+    <p class="fs-4">
+      Come back later.
+    </p>
+    <p class="fs-4">
+      If you would like to help out, you can join the
+      {% if game_team %}
+        <a href="{% url 'teams:general' camp_slug=camp.slug team_slug=game_team.slug %}">Game Team</a>.
+      {% else %}
+        Game Team.
+      {% endif %}
+    </p>
+    <p class="fs-4">
+      // Game Team
+    </p>
+    </div>
+  </div>
+</div>

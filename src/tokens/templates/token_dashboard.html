@@ -16,6 +16,12 @@
 
 {% block content %}
 
+  {% if object_list|length == 0 %}
+
+    {% include 'includes/game_not_started.html' %}
+
+  {% else %}
+
   <div class="row my-5">
     <div class="col-12 col-lg-6">
       <div class="mb-5">
@@ -167,5 +173,7 @@
       </div>
     </div>
   </div>
+
+{% endif %}
 
 {% endblock %}

@@ -27,6 +27,7 @@ from prometheus_client import Gauge
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
+from teams.models import Team
 from tokens.forms import TokenFindSubmitForm
 from utils.models import CampReadOnlyModeError
 
@@ -61,6 +62,10 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Return context containing form, player-statistics, and widgets metrics"""
         context = super().get_context_data(**kwargs)
+        context["game_team"] = Team.objects.filter(
+            camp=self.request.camp,
+            name__icontains="game"
+        )
         context["form"] = TokenFindSubmitForm()
 
         camp_finds = TokenFind.objects.filter(token__camp=self.request.camp.pk)
@@ -228,6 +233,14 @@ class TokenSubmitFormView(LoginRequiredMixin, FormView):
 
     form_class = TokenFindSubmitForm
     template_name = "token_submit.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Redirect to dashboard when no tokens exist for this camp."""
+        if not request.camp.token_set.all().exists():
+            _kwargs = {"camp_slug": kwargs.get("camp_slug")}
+            return redirect(reverse("tokens:dashboard", kwargs=_kwargs))
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
