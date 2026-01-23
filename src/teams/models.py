@@ -218,13 +218,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         help_text="The public phonenumber for this team.",
     )
 
-    private_phone_number  = models.CharField(
-        max_length=14, # Allow for "+00 1234567890"
-        blank=True,
-        null=True,
-        help_text="The private phonenumber for this team.",
-    )
-
     public_dect_number = models.ForeignKey(
         DectRegistration,
         on_delete=models.PROTECT,
@@ -232,15 +225,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         null=True,
         related_name="public_team_numbers",
         help_text="The public DECT for this team.",
-    )
-
-    private_dect_number = models.ForeignKey(
-        DectRegistration,
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        related_name="private_team_numbers",
-        help_text="The private DECT for this team.",
     )
 
     shifts_enabled = models.BooleanField(

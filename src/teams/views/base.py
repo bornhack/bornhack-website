@@ -94,9 +94,7 @@ class TeamSettingsView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixi
         "public_signal_channel_link",
         "private_signal_channel_link",
         "public_phone_number",
-        "private_phone_number",
         "public_dect_number",
-        "private_dect_number",
         "guide",
     )
     slug_url_kwarg = "team_slug"
@@ -114,7 +112,6 @@ class TeamSettingsView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixi
         form.fields["public_dect_number"].queryset = dect_filter.filter(
             publish_in_phonebook=True
         )
-        form.fields["private_dect_number"].queryset = dect_filter
 
         return form
 
