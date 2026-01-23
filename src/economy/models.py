@@ -1434,7 +1434,7 @@ class BankAccount(ExportModelOperationsMixin("bank_account"), CreatedUpdatedUUID
 
         The second date column is unused. Dates are in Europe/Copenhagen tz.
         """
-        cph = ZoneInfo("Europe/Copenhagen")
+        cph = ZoneInfo(settings.TIME_ZONE)
         create_count = 0
         # Bank csv has the most recent lines first in the file, and the oldest last.
         # Read lines in reverse so we add the earliest transaction first,

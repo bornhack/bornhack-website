@@ -144,7 +144,7 @@ def save_speaker_availability(form, obj) -> None:
     AvailabilityModel.objects.filter(**kwargs).delete()
 
     # all the entered data is in the users local TIME_ZONE, interpret it as such
-    tz = ZoneInfo("Europe/Copenhagen")
+    tz = ZoneInfo(settings.TIME_ZONE)
 
     # count availability form fields
     fieldcounter = 0

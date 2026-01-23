@@ -45,7 +45,7 @@ from shop.models import Order
 from zoneinfo import ZoneInfo
 
 # we need the Danish timezone here and there
-cph = ZoneInfo("Europe/Copenhagen")
+cph = ZoneInfo(settings.TIME_ZONE)
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
