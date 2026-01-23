@@ -36,11 +36,11 @@ strong { font-weight: bold; }
 }
 
 /* Navbar buttom customization */
-.bornhack-program-menu, .btn-menu {
+.bornhack-sub-menu, .btn-menu {
     --bs-btn-border-width: unset !important;
 }
 
-.btn-primary.bornhack-program-menu {
+.btn-primary.bornhack-sub-menu {
     background-color: unset;
     color: var(--bs-info);
 }

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Sponsors | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  {% with url_name=request.resolver_match.url_name proposal_urls="proposal_list,speaker_proposal_create,speaker_proposal_detail,speaker_proposal_update,speaker_proposal_submit,speaker_proposal_picture,event_proposal_create,event_proposal_detail,event_proposal_update,event_proposal_submit" %}
+
+    <div class="row">
+      <div class="d-flex flex-wrap justify-content-center mt-1">
+        <a href="{% url 'sponsors' camp_slug=camp.slug %}" class="bornhack-sub-menu btn {% if url_name == 'sponsors' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Sponsors</a>
+        <a href="{% url 'call_for_sponsors' camp_slug=camp.slug %}" class="bornhack-sub-menu btn {% if url_name == 'call_for_sponsors' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Call For Sponsors</a>
+      </div>
+    </div>
+
+    {% block sponsors_content %}
+    {% endblock sponsors_content %}
+
+  {% endwith %}
+
+{% endblock %}
