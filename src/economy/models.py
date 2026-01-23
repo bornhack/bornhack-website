@@ -1432,9 +1432,10 @@ class BankAccount(ExportModelOperationsMixin("bank_account"), CreatedUpdatedUUID
         "24-08-2021";"24-08-2021";"f1a7b16b-27d3-432f-bca7-2e2229";"-59,85";"230.398,91"
         "24-08-2021";"24-08-2021";"63e93a24-073b-4ebb-8b0d-5a3072";"-1.221,05";"230.458,76"
 
-        The second date column is unused. Dates are in Europe/Copenhagen tz.
+        The second date column is unused.
+        Timezone for dates are defined in settings.TIME_ZONE.
         """
-        cph = ZoneInfo(settings.TIME_ZONE)
+        tz = ZoneInfo(settings.TIME_ZONE)
         create_count = 0
         # Bank csv has the most recent lines first in the file, and the oldest last.
         # Read lines in reverse so we add the earliest transaction first,
@@ -1445,7 +1446,7 @@ class BankAccount(ExportModelOperationsMixin("bank_account"), CreatedUpdatedUUID
             # use update_or_create() so we can import a new CSV with the same transactions
             # but with updated descriptions, in case we fix a description in the bank
             tx, created = self.transactions.update_or_create(
-                date=datetime.strptime(row[0], "%d/%m/%Y").replace(tzinfo=cph),
+                date=datetime.strptime(row[0], "%d/%m/%Y").replace(tzinfo=tz),
                 amount=Decimal(row[3].replace(".", "").replace(",", ".")),
                 balance=Decimal(row[4].replace(".", "").replace(",", ".")),
                 defaults={
