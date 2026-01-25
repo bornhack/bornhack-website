@@ -65,6 +65,7 @@ dev = [
 
 test = [
     "bornhack-website[bootstrap]",
+    "pytest-django==4.11.1",
     "beautifulsoup4==4.14.3",
     "coverage==7.13.0",
     "hypothesis==6.150.3",
@@ -113,7 +114,6 @@ ignore = [
     "ARG002", # Unused method argument
     "EM101", # Exception must not use a string literal, assign to variable first
     "EM102", # Exception must not use a f-string literal, assign to variable first
-    "PT", # We use django tests, not pytest
 ]
 
 [tool.ruff.lint.per-file-ignores]
