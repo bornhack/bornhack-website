@@ -280,7 +280,7 @@ BORNHACK_TEAM_PERMISSIONS = {
     "tasker": "Team Tasker - task management",
 }
 
-FIXTURE_DIRS = ["testdata"]
+FIXTURE_DIR = BASE_DIR / "testdata"
 
 CACHES = {
     "default": {
