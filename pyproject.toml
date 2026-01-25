@@ -181,3 +181,5 @@ exclude_also = [
 ############ PYTEST ############
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "bornhack.settings"
+python_files = "tests.py test_*.py"
+pythonpath = ". src"

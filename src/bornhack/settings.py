@@ -288,3 +288,6 @@ CACHES = {
         "LOCATION": "tile-cache",
     },
 }
+
+# Use pytest as test runner for integrating with `./manage.py test`
+TEST_RUNNER = "pytest_django.runner.TestRunner"
