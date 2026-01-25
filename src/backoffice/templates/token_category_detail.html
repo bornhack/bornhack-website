@@ -27,7 +27,7 @@
           </tr>
           <tr>
             <th>Used by:</th>
-            <td>{{ object.token_set.count }}</td>
+            <td>{{ category_tokens | length }}</td>
           </tr>
           <tr>
             <th>Created:</th>
@@ -50,7 +50,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for token in object.token_set.all %}
+          {% for token in category_tokens %}
             <tr>
               <td><a href="{% url 'backoffice:token_detail' camp_slug=token.camp.slug pk=token.pk %}">{{ token.token }}</a></td>
               <td>{{ token.camp }}</td>
