@@ -56,7 +56,7 @@ jobs:
 
       - name: "Run tests"
         run: |
-          coverage run --rcfile ./pyproject.toml pytest -n auto
+          coverage run --rcfile ./pyproject.toml python -m pytest -n auto
           coverage xml --rcfile ./pyproject.toml
         env:
           POSTGRES_HOST: "localhost"
