@@ -56,8 +56,7 @@ jobs:
 
       - name: "Run tests"
         run: |
-          cd src
-          coverage run --rcfile ../pyproject.toml manage.py test . --noinput --parallel=4
+          coverage run --rcfile ../pyproject.toml pytest -n auto
           coverage xml --rcfile ../pyproject.toml
         env:
           POSTGRES_HOST: "localhost"
