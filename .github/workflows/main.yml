@@ -56,8 +56,8 @@ jobs:
 
       - name: "Run tests"
         run: |
-          coverage run --rcfile ../pyproject.toml pytest -n auto
-          coverage xml --rcfile ../pyproject.toml
+          coverage run --rcfile ./pyproject.toml pytest -n auto
+          coverage xml --rcfile ./pyproject.toml
         env:
           POSTGRES_HOST: "localhost"
           POSTGRES_PORT: 5432
