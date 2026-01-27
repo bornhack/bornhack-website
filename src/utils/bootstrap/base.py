@@ -2340,8 +2340,17 @@ class Bootstrap:
         self.create_users(16)
         self.create_event_types()
         self.create_product_categories()
-        teams = {}
-        for camp, read_only in self.camps:
+        self.bootstrap_test_camps(self.camps)
+        self.camp = self.camps[1][0]
+        self.add_team_permissions(self.camp)
+        self.teams = self.all_teams[self.camp.camp.lower.year]
+        for member in TeamMember.objects.filter(team__camp=self.camp):
+            member.save()
+
+    def bootstrap_test_camps(self, camps) -> None:
+        """Bootstrap camps used for testing, by setting 'read_only' last."""
+        self.all_teams = {}
+        for camp, read_only in camps:
             year = camp.camp.lower.year
             if year <= settings.UPCOMING_CAMP_YEAR:
                 ticket_types = self.create_camp_ticket_types(camp)
@@ -2362,18 +2371,13 @@ class Bootstrap:
                 self.create_prize_ticket(camp, ticket_types)
                 self.create_camp_tracks(camp)
 
-            teams[year] = self.create_camp_teams(camp)
-            self.create_camp_team_memberships(camp, teams[year], self.users)
-            camp.read_only = read_only
-            camp.call_for_participation_open = not read_only
-            camp.call_for_sponsors_open = not read_only
-            camp.save()
+            self.all_teams[year] = self.create_camp_teams(camp)
+            self.create_camp_team_memberships(camp, self.all_teams[year], self.users)
 
-        self.camp = self.camps[1][0]
-        self.add_team_permissions(self.camp)
-        self.teams = teams[self.camp.camp.lower.year]
-        for member in TeamMember.objects.filter(team__camp=self.camp):
-            member.save()
+            camp.read_only = read_only
+            camp.call_for_participation_open = not camp.read_only
+            camp.call_for_sponsors_open = not camp.read_only
+            camp.save()
 
     def bootstrap_camp(self, options: dict) -> None:
         """Bootstrap camp related entities."""
