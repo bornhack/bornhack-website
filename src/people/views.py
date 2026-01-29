@@ -12,6 +12,7 @@ class PeopleView(ListView):
     model = Camp
 
     def get_queryset(self):
+        """Prefetch and Select related models for performance optimization."""
         return super().get_queryset().prefetch_related(
             "teams",
             Prefetch(
