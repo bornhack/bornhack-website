@@ -73,11 +73,14 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         context["player_stats"] = self.get_player_stats_metrics(player_finds)
         context["widgets"] = {
-            "options": {"camp_colour": self.request.camp.colour},
             "total_players": self.get_total_players_metrics(camp_finds),
             "total_finds": self.get_total_finds_metrics(camp_finds),
             "token_activity": self.get_token_activity_metrics(camp_finds),
             "token_categories": self.get_token_categories_metrics(),
+            "options": {
+                "camp_colour": self.request.camp.colour,
+                "light_text": self.request.camp.light_text,
+            },
         }
 
         return context
