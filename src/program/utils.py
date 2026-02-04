@@ -171,14 +171,14 @@ def save_speaker_availability(form, obj) -> None:
                 int(elements[3]),
                 int(elements[4]),
                 int(elements[5]),
-            ).replace(tz=tz),
+            ).replace(tzinfo=tz),
             datetime.datetime(
                 int(elements[7]),
                 int(elements[8]),
                 int(elements[9]),
                 int(elements[10]),
                 int(elements[11]),
-            ).replace(tz=tz),
+            ).replace(tzinfo=tz),
         )
         available = form.cleaned_data[field]
 
