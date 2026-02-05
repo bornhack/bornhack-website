@@ -1,0 +1,49 @@
+<div class="card h-100 shadow">
+  <div class="card-body">
+    <div class="row d-flex justify-content-between">
+      <div class="col-8">
+        <h5>Total players</h5>
+      </div>
+      <div class="col-4 text-end">
+      <p class="h4">{{ widget.count }}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <p>
+        <b>Last join:</b>
+        <small>
+          {{ widget.last_join_time | timesince | default:'Never' }}
+          {% if widget.last_join_time %}
+            ago.
+          {% endif %}
+        </small>
+        </p>
+      </div>
+    </div>
+    <div class="hide-for-no-js-users" id="total_players_chart"></div>
+    <div class="unhide-for-no-js-users mt-3">
+      <div class="widget-content-no-js">
+        <table class="table table-sm table-striped">
+          <thead>
+          <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Count</th>
+          </tr>
+          </thead>
+          <tbody>
+            {% for key, value in widget.no_js.items %}
+            <tr>
+              <td scope="row">{{ key }}</td>
+              <td>{{ value.value }} ({{ value.pct|floatformat:'0' }}%)</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p class="my-0">
+          <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

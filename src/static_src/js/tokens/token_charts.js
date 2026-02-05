@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   const widgets = JSON.parse(document.getElementById('widgets').textContent);
-  const theme = getComputedStyle(document.body).getPropertyValue('color-scheme');
+  const theme = document.body.getAttribute('data-bs-theme');
 
   const defaultOptions = {
     chart: {
@@ -9,12 +9,13 @@ document.addEventListener('DOMContentLoaded', function () {
         show: false,
       },
     },
-    //colors: ['#198754', '#dc3545'],
     theme: {
-      mode: theme === 'normal' ? 'light' : 'dark',
+      mode: theme === 'light' ? 'light' : 'dark',
       monochrome: {
         enabled: true,
-        color: widgets.options.camp_colour,
+        shadeTo: widgets.options.light_text ? 'light' : 'dark',
+        color: theme === 'light' && widgets.options.camp_colour === '#ffffff'
+                ? '#f0f0f0' : widgets.options.camp_colour,
       },
     },
   }
@@ -35,6 +36,10 @@ document.addEventListener('DOMContentLoaded', function () {
           return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
       },
     },
+    tooltip: {
+      enabled: true,
+      theme:  widgets.options.light_text ? 'dark' : 'light',
+    }
   };
 
   var totalFindsOptions = {
@@ -53,6 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
           return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
       },
     },
+    tooltip: {
+      enabled: true,
+      theme:  widgets.options.light_text ? 'dark' : 'light',
+    }
   };
 
   var tokenCategoryOptions = {

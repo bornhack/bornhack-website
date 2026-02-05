@@ -1,0 +1,38 @@
+<div class="card h-100 shadow">
+  <div class="card-body">
+    <div class="row d-flex justify-content-between">
+      <div class="col-8 mb-0">
+        <h5>Token categories</h5>
+      </div>
+      <div class="col-4 text-end mb-0">
+        <p class="h4">{{ widget.count }}</p>
+      </div>
+    </div>
+    <div class="hide-for-no-js-users" id="token_category_chart"></div>
+    <div class="unhide-for-no-js-users mt-3">
+      <div class="widget-content-no-js">
+      <table class="table table-sm table-striped">
+        <thead>
+        <tr>
+          <th scope="col">Category</th>
+          <th scope="col">Found</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% for key, value in widget.no_js.items %}
+          <tr>
+            <td scope="row">{{ key }}</td>
+            <td>
+              <progress class="progress w-75 d-inline" max="100" value="{{ value|floatformat:'0' }}"></progress> <small>{{ value|floatformat:'0' }}%</small>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      <p class="my-0">
+        <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
+      </p>
+    </div>
+  </div>
+</div>
