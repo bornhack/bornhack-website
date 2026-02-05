@@ -2,6 +2,7 @@
 {% load commonmark %}
 {% load django_bootstrap5 %}
 {% load teams_tags %}
+{% load profile_display %}
 
 {% block title %}
   Members | {{ block.super }}
@@ -45,7 +46,7 @@
             {% if member.approved or not member.approved and team.lead_permission_set in perms %}
               <tr>
                 <td>
-                  {{ member.user.profile.get_public_credit_name }} {% if member.user == request.user %}(this is you!){% endif %}
+                  {% display_name member.user.profile %} {% if member.user == request.user %}(this is you!){% endif %}
                 </td>
                 <td>
                   Team {% if member.lead %}Lead{% else %}Member{% endif %}
