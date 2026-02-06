@@ -2,6 +2,7 @@
 {% load commonmark %}
 {% load teams_tags %}
 {% load static %}
+{% load profile_display %}
 
 {% block title %}
   People | {{ block.super }}
@@ -35,14 +36,12 @@
                     </td>
                     <td>
                       {% for resp in team.leads.all %}
-                        {{ resp.profile.get_public_credit_name }}<br>
+                        {% display_name resp.profile %}<br>
                       {% endfor %}
                     </td>
                     <td>
                       {% for member in team.regular_members.all %}
-                        {% if member.profile.get_public_credit_name != "Unnamed" %}
-                          {{ member.profile.get_public_credit_name }}<br>
-                        {% endif %}
+                        {% display_name member.profile %}<br>
                       {% empty %}
                         No team members
                       {% endfor %}

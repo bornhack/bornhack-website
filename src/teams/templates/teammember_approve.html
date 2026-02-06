@@ -1,18 +1,19 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
+{% load profile_display %}
 
 {% block title %}
-  Approve team member {{ teammember.user.profile.name }} for the {{ teammember.team.name }} team
+  Approve team member {% display_name teammember.user.profile %} for the {{ teammember.team.name }} team
 {% endblock %}
 
 {% block team_content %}
 
-  <h3>Approve member {{ teammember.user.profile.name }} for the {{ teammember.team.name }} team</h3>
-  <p class="lead">Really approve the user <b>{{ teammember.user.profile.name }}</b> for the {{ teammember.team.name }} team? The user will receive an email with a message.<p>
+  <h3>Approve member {% display_name teammember.user.profile %} for the {{ teammember.team.name }} team</h3>
+  <p class="lead">The user will receive an email with a message.</p>
     <form method="POST">
       {% csrf_token %}
       {{ form }}
-      <button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Add teammember</button>
+      <button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Add team member</button>
       <a href="{% url 'teams:general' camp_slug=teammember.team.camp.slug team_slug=teammember.team.slug %}" class="btn btn-secondary" type="submit"><i class="fas fa-times"></i> Cancel</a>
     </form>
 

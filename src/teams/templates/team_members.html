@@ -20,15 +20,12 @@
         <thead>
           <tr>
             <th>
-              Public name
+              User
             </th>
             <th>
               Status
             </th>
             {% if team.lead_permission_set in perms %}
-              <th>
-                Name
-              </th>
               <th>
                 Email
               </th>
@@ -46,16 +43,16 @@
             {% if member.approved or not member.approved and team.lead_permission_set in perms %}
               <tr>
                 <td>
-                  {% display_name member.user.profile %} {% if member.user == request.user %}(this is you!){% endif %}
+                  {% display_name member.user.profile %}
+                  {% if member.user == request.user %}
+                  <span class="badge text-bg-info">This is you</span>
+                  {% endif %}
                 </td>
                 <td>
                   Team {% if member.lead %}Lead{% else %}Member{% endif %}
                   {% if not member.approved %}(pending approval){% endif %}
                 </td>
                 {% if team.lead_permission_set in perms %}
-                  <td>
-                    {{ member.user.profile.name }}
-                  </td>
                   <td>
                     {{ member.user.email }}
                   </td>

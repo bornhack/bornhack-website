@@ -43,7 +43,7 @@ class TeamAdmin(admin.ModelAdmin):
     def get_leads(self, obj: Team) -> str:
         """Method to return team leads."""
         return ", ".join(
-            [lead.profile.public_credit_name for lead in obj.leads.all()],
+            [lead.profile.private_name for lead in obj.leads.all()],
         )
 
     list_display: ClassVar[list[str]] = [
