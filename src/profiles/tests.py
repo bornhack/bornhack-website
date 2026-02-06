@@ -1,4 +1,5 @@
 from collections import namedtuple
+from django.contrib.auth.models import AnonymousUser
 from django.template import Context
 from django.template import Template
 
@@ -195,6 +196,16 @@ class TestProfileModel(BornhackTestBase):
     def test_get_display_name_handling_not_a_team_member_in_any_camp(self) -> None:
         """Test `get_display_name` handles a user not being a team member in any camps."""
         user = self.users[13]
+
+        result = self.profile.get_display_name(user, self.camp)
+
+        assert result == self.profile.public_name
+
+    def test_get_display_name_with_unauthenticated_user(self) -> None:
+        """
+        Test `get_display_name` return public name when user is unauthenticated.
+        """
+        user = AnonymousUser()
 
         result = self.profile.get_display_name(user, self.camp)
 

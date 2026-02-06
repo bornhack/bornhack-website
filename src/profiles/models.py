@@ -101,6 +101,9 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
 
         `public_name` is unrestricted and returned in all other cases.
         """
+        if not user.is_authenticated:
+            return self.public_name
+
         if TeamMember.objects.filter(user=user, team__camp=camp).exists():
             return self.private_name
 
