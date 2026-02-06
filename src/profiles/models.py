@@ -36,7 +36,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         max_length=200,
         default="",
         blank=True,
-        help_text="Your name or handle (visible to all team members aka. volunteers)",
+        help_text="What can we call you? (visible to any team member aka. volunteer, but not the public)",
     )
 
     description = models.TextField(
