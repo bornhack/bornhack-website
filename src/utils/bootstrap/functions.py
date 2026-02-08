@@ -4,11 +4,9 @@ from __future__ import annotations
 
 import logging
 
-import pytz
 from faker import Faker
 
 fake = Faker()
-tz = pytz.timezone("Europe/Copenhagen")
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 

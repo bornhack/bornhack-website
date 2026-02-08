@@ -65,13 +65,13 @@
           <p>Token examples:</p>
           <p>
           <ul>
-            <li><code>BornHack{{ camp.camp.lower.year }}</code></li>
+            <li><code>BornHack{{ camp.year }}</code></li>
             <li><code>cm9sbGllczIwMjR5b3V3aW4K</code></li>
             <li><code>Ly5caCRLKRHrpiF6SQwe9geUKAxSsLQE</code></li>
           </ul>
           </p>
           <p>Tokens are hidden or in plain sight physically or virtually on the BornHack venue, online and offline.</p>
-          <p class="mb-0">Submit the tokens you find in the field below. You can start with this one: <b>HelloTokenHunters{{ camp.camp.lower.year }}</b></p>
+          <p class="mb-0">Submit the tokens you find in the field below. You can start with this one: <b>HelloTokenHunters{{ camp.year }}</b></p>
         </div>
         <div class="col-12 my-4">
           <form action="{% url 'tokens:submit' camp_slug=camp.slug %}" method="post">
