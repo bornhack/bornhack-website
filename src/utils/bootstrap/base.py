@@ -101,7 +101,7 @@ from villages.models import Village
 from .functions import output_fake_md_description
 
 fake = Faker()
-tz = ZoneInfo("Europe/Copenhagen")
+tz = ZoneInfo(settings.TIME_ZONE)
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
