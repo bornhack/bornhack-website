@@ -1,6 +1,7 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
 {% load django_bootstrap5 %}
+{% load profile_display %}
 
 {% block title %}
   Shifts | {{ block.super }}
@@ -59,7 +60,7 @@
           </td>
           <td>
             {% for member in shift.team_members.all %}
-              {{ member.user.profile.get_public_credit_name }}{% if not forloop.last %},{% endif %}
+              {% display_name member.user.profile %}{% if not forloop.last %},{% endif %}
             {% empty %}
               None!
             {% endfor %}

@@ -19,17 +19,15 @@
     <table class="table table-hover datatable">
       <thead>
         <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Public Credit Name</th>
+          <th>Private name</th>
+          <th>Public credit name</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for profile in profiles %}
           <tr>
-            <td>{{ profile.user.username }}</td>
-            <td>{{ profile.user.email }}</td>
+            <td>{{ profile.private_name }}</td>
             <td>{{ profile.public_credit_name }}</td>
             <td>
               <a href="/admin/profiles/profile/{{ profile.pk }}/change/" class="btn btn-success">Open In Admin</a>

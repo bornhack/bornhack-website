@@ -1,6 +1,7 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
 {% load django_bootstrap5 %}
+{% load profile_display %}
 
 {% block title %}
   {{ task.name }}
@@ -25,7 +26,7 @@
             <ul class="list-group">
               {% for comment in task.comments.all %}
                 <li class="list-group-item">
-                  <strong>{{ comment.author.user.profile.get_public_credit_name }}</strong>: {{ comment.comment }}
+                  <strong>{% display_name comment.author.user.profile %}</strong>: {{ comment.comment }}
                 </li>
               {% empty %}
                 <li class="list-group-item">

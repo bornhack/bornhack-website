@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load profile_display %}
 
 {% block title %}
   Event Feedback Detail | Orga | BackOffice | {{ block.super }}
@@ -16,7 +17,7 @@
             <p>{{ feedback.feedback }}</p>
           </blockquote>
           <figcaption class="blockquote-footer">
-            <cite title="Source Title">{{ feedback.user.profile.public_credit_name }}</cite>
+            <cite title="Source Title">{% display_name feedback.user.profile %}</cite>
           </figcaption>
         </figure>
       </div>

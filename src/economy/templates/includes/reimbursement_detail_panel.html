@@ -1,4 +1,5 @@
 {% load bornhack %}
+{% load profile_display %}
 <div class="card">
   <div class="card-header">Reimbursement {{ reimbursement.pk }} Details</div>
   <div class="card-body">
@@ -9,7 +10,7 @@
       </tr>
       <tr>
         <th>Reimbursement User</th>
-        <td>{{ reimbursement.reimbursement_user.profile.get_name }}</td>
+        <td>{% display_name reimbursement.reimbursement_user.profile %}</td>
       </tr>
       <tr>
         <th>Total Amount</th>

@@ -282,7 +282,7 @@ class TokenSubmitFormView(LoginRequiredMixin, FormView):
 
         if created:
             # user found a new token
-            username = self.request.user.profile.get_public_credit_name
+            username = self.request.user.profile.public_name
             if username == "Unnamed":
                 username = "anonymous_player_{request.user.id}"
 

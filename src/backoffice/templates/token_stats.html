@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bornhack %}
+{% load profile_display %}
 
 {% block title %}
   Token Stats | Backoffice | {{ block.super }}
@@ -15,8 +16,7 @@
         <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
           <thead>
             <tr>
-              <th>Public credit name</th>
-              <th>Username</th>
+              <th>User</th>
               <th>Finds</th>
               <th>Last token found</th>
             </tr>
@@ -24,8 +24,7 @@
           <tbody>
             {% for user in user_list %}
               <tr>
-                <td>{{ user.profile.public_credit_name }}</td>
-                <td>{{ user.username }}</td>
+                <td>{% display_name user.profile %}</td>
                 <td>{{ user.token_find_count }}</td>
                 <td>{{ user.last_token_find }}</td>
               </tr>

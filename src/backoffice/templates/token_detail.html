@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load profile_display %}
 
 {% block title %}
   Token Details | Pos | BackOffice | {{ block.super }}
@@ -51,16 +52,14 @@
       <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
         <thead>
           <tr>
-              <th>Public credit name</th>
-              <th>Username</th>
+            <th>User</th>
             <th>Timestamp</th>
           </tr>
         </thead>
         <tbody>
           {% for tf in token.tokenfind_set.all %}
             <tr>
-              <td>{{ tf.user.profile.public_credit_name }}</td>
-              <td>{{ tf.user.username }}</td>
+              <td>{% display_name tf.user.profile %}</td>
               <td>{{ tf.created }}</td>
             </tr>
           {% endfor %}
