@@ -151,12 +151,29 @@ class ProductLabelsTest(TestCase):
 
     def test_labels_for_product_ending_within_20_days(self):
         """Test the product returns a 'ending_soon' label object."""
+        # Without upper availability
+        available_in = DateTimeTZRange(
+            lower=timezone.now(),
+            upper=None,
+        )
+        product = ProductFactory(available_in=available_in)
+
+        assert len(product.labels) == 0
+
+        # Without lower availability
+        available_in = DateTimeTZRange(
+            lower=None,
+            upper=timezone.now(),
+        )
+        product = ProductFactory(available_in=available_in)
+
+        assert len(product.labels) == 0
+
+        # With stock
         available_in = DateTimeTZRange(
             lower=timezone.now(),
             upper=timezone.now() + timezone.timedelta(6),
         )
-
-        # With stock
         product = ProductFactory(stock_amount=11, available_in=available_in)
 
         result = product.labels[0]
