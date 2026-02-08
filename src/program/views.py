@@ -1085,7 +1085,7 @@ class FrabXmlView(CampViewMixin, View):
             E.version("BornHack Frab XML Generator v2.0"),
             E.conference(
                 E.title(self.camp.title),
-                E.acronym(str(self.camp.camp.lower.year)),
+                E.acronym(str(self.camp.year)),
                 E.start(self.camp.camp.lower.date().isoformat()),
                 E.end(self.camp.camp.upper.date().isoformat()),
                 E.days(len(self.camp.get_days("camp"))),
