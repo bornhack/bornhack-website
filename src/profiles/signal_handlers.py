@@ -88,6 +88,6 @@ def reimbursement_msg_on_login(sender, request, user, **kwargs) -> None:
     if approved_expenses.exists():
         messages.info(
             request,
-            f"You have {approved_expenses.count()} expenses with missing reimbursement"
+            f"NOTE: You have {approved_expenses.count()} expenses with a missing reimbursement. Please create a reimbursement once all your expenses have been approved."
         )
 
