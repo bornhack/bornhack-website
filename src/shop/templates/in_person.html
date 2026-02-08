@@ -9,8 +9,9 @@
 {% block shop_content %}
 
   <h2>Pay In Person</h2>
-  <p>To pay order #{{ order.id }} you need to <strong>locate an organiser</strong> (in person) and make the payment of <b>{{ order.total|currency }}</b> with cash, card or mobilepay. You need to bring the <strong>order id #{{ order.id }}</strong> as well so we can mark your order as paid.</p>
+  <p>To pay order #{{ order.id }} you have to go to <strong>info desk</strong> (in person) and make the payment of <b>{{ order.total|currency }}</b> with cash, card or mobilepay (<strong>you cannot pay website orders in HAX!<strong>). You need to bring the <strong>order id #{{ order.id }}</strong> so we know which order to mark as paid.</p>
+  
+<p>If physically going to the infodesk is impractical for some reason (due to geography or opening hours), and finding an organiser is inconvenient for you, then you should <a href="{% url 'shop:order_detail' pk=order.id %}">go back</a> and pick a different payment method.</p>
 
-  <p>If physically finding an organiser is inconvenient for you (during events you can find us at the Infodesk, but between events geography can make things difficult) you should <a href="{% url 'shop:order_detail' pk=order.id %}">go back</a> and pick a different payment method.</p>
   <p>When your order has been marked as paid you will receive an invoice by email.</p>
 {% endblock %}

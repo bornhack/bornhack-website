@@ -1,11 +1,12 @@
 """Tests for token views."""
 
 from __future__ import annotations
+from zoneinfo import ZoneInfo
 
 from datetime import datetime
 
-import pytz
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.urls import reverse
 
 from tokens.models import Token
@@ -29,7 +30,7 @@ class TestTokenViews(BornhackTestBase):
         # first add users and other basics
         super().setUpTestData()
 
-        tz = pytz.timezone("Europe/Copenhagen")
+        tz = ZoneInfo(settings.TIME_ZONE)
         now = datetime.now(tz)
         year = now.year
 

@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import logging
 
-from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
 
 from camps.models import Camp
 from tickets.models import TicketType
-from shop.models import Product, SubProductRelation
+from shop.models import Product
+from shop.models import SubProductRelation
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -56,16 +56,16 @@ class Command(BaseCommand):
                 print(f"Created new TicketType {newtt}")
             for product in tt.product_set.filter(sub_products__isnull=True):
                 newprod, created = Product.objects.get_or_create(
-                    name=product.name.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
+                    name=product.name.replace(str(fromcamp.year), str(tocamp.year)),
                     ticket_type=newtt,
-                    slug=product.slug.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
+                    slug=product.slug.replace(str(fromcamp.year), str(tocamp.year)),
                     defaults={
                         "price": product.price,
                         "category": product.category,
-                        "description": product.description.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
+                        "description": product.description.replace(str(fromcamp.year), str(tocamp.year)),
                         "available_in": (timezone.now(), tocamp.camp.upper + timedelta(days=30)),
                         "cost": product.cost,
-                        "comment": product.comment.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
+                        "comment": product.comment.replace(str(fromcamp.year), str(tocamp.year)),
                     }
                 )
                 if created:
@@ -77,15 +77,15 @@ class Command(BaseCommand):
             print(product)
             # create bundle product
             newprod, created = Product.objects.get_or_create(
-                name=product.name.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
-                slug=product.slug.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
+                name=product.name.replace(str(fromcamp.year), str(tocamp.year)),
+                slug=product.slug.replace(str(fromcamp.year), str(tocamp.year)),
                 defaults={
                     "price": product.price,
                     "category": product.category,
-                    "description": product.description.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
+                    "description": product.description.replace(str(fromcamp.year), str(tocamp.year)),
                     "available_in": (timezone.now(), tocamp.camp.upper + timedelta(days=30)),
                     "cost": product.cost,
-                    "comment": product.comment.replace(str(fromcamp.camp.lower.year), str(tocamp.camp.lower.year)),
+                    "comment": product.comment.replace(str(fromcamp.year), str(tocamp.year)),
                 }
             )
             for spr in product.sub_product_relations.all():
