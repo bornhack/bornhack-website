@@ -65,6 +65,9 @@ dev = [
 
 test = [
     "bornhack-website[bootstrap]",
+    "pytest==9.0.2",
+    "pytest-xdist==3.8.0",
+    "pytest-django==4.11.1",
     "beautifulsoup4==4.14.3",
     "coverage==7.13.0",
     "hypothesis==6.150.3",
@@ -113,7 +116,6 @@ ignore = [
     "ARG002", # Unused method argument
     "EM101", # Exception must not use a string literal, assign to variable first
     "EM102", # Exception must not use a f-string literal, assign to variable first
-    "PT", # We use django tests, not pytest
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -181,3 +183,5 @@ exclude_also = [
 ############ PYTEST ############
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "bornhack.settings"
+python_files = "tests.py test_*.py"
+pythonpath = ". src"
