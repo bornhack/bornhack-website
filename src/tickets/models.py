@@ -155,6 +155,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
 
     class Meta:
         abstract = True
+        ordering = ["-created"]
 
     camp_filter = "ticket_type__camp"
 
@@ -245,7 +246,7 @@ class TicketGroup(
             return self.annotate(
                 has_used_tickets=Exists(used_tickets_subquery),
                 has_tickets=Exists(tickets),
-            ).distinct("uuid")
+            ).distinct("uuid", "created")
 
     objects = QuerySet.as_manager()
 
@@ -330,7 +331,7 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
         ).hexdigest()
 
     def __str__(self) -> str:
-        return f"Ticket {self.order.user} {self.product}"
+        return f"Ticket {self.pk} {self.product}"
 
     def get_absolute_url(self):
         return str(reverse_lazy("tickets:shopticket_edit", kwargs={"pk": self.pk}))

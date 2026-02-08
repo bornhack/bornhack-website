@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 
 import factory
-import pytz
 from django.contrib.auth.models import User
 from faker import Faker
 
@@ -17,7 +16,6 @@ from utils.bootstrap.functions import output_fake_description
 from utils.bootstrap.functions import output_fake_md_description
 
 fake = Faker()
-tz = pytz.timezone("Europe/Copenhagen")
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 class SpeakerProposalFactory(factory.django.DjangoModelFactory):

@@ -168,7 +168,6 @@ class VillageCreateView(
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                "map_height": "500px",
                 "class": "form-control",
                 "geom_type": "Point",
             },
@@ -229,7 +228,6 @@ class VillageUpdateView(
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                "map_height": "500px",
                 "class": "form-control",
                 "geom_type": "Point",
             },

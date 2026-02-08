@@ -71,7 +71,7 @@ class TokenUpdateView(CampViewMixin, RaisePermissionRequiredMixin, UpdateView):
     permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_form.html"
-    fields = ["token", "category", "description", "active", "valid_when"]
+    fields = ["token", "category", "hint", "description", "active", "valid_when"]
 
 
 class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):

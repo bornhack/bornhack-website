@@ -240,6 +240,11 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     def logo_large_svg(self) -> str:
         return f"img/{self.slug}/logo/{self.slug}-logo-large.svg"
 
+    @property
+    def is_in_progress(self) -> bool:
+        today = timezone.now().date()
+        return True if today in self.camp_days else False
+
     def get_days(self, camppart):
         """Returns a list of DateTimeTZRanges representing the days during the specified part of the camp."""
         if not hasattr(self, camppart):
@@ -316,6 +321,11 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         return self.get_days("teardown")
 
     # convenience properties to access Camp-related stuff easily from the Camp object
+
+    @property
+    def year(self) -> int:
+        """Return the year of this camp."""
+        return self.camp.lower.year
 
     @property
     def event_types(self):

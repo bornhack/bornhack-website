@@ -25,7 +25,7 @@
             <ul class="list-group">
               {% for comment in task.comments.all %}
                 <li class="list-group-item">
-                  <strong>{{ comment.author.user.username }}</strong>: {{ comment.comment }}
+                  <strong>{{ comment.author.user.profile.get_public_credit_name }}</strong>: {{ comment.comment }}
                 </li>
               {% empty %}
                 <li class="list-group-item">

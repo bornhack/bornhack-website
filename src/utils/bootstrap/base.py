@@ -6,11 +6,11 @@ import logging
 import random
 import sys
 import uuid
+from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import timedelta
 
 import factory
-import pytz
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -45,6 +45,7 @@ from economy.factories import ZettleReceiptFactory
 from economy.models import Chain
 from economy.models import Credebtor
 from economy.models import Expense
+from economy.models import Revenue
 from economy.models import Pos
 from economy.models import Reimbursement
 from events.factories import EventProposalFactory
@@ -100,7 +101,7 @@ from villages.models import Village
 from .functions import output_fake_md_description
 
 fake = Faker()
-tz = pytz.timezone("Europe/Copenhagen")
+tz = ZoneInfo(settings.TIME_ZONE)
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
@@ -602,7 +603,7 @@ class Bootstrap:
     def create_camp_ticket_types(self, camp: Camp) -> dict:
         """Create camp ticket types."""
         types = {}
-        self.output(f"Creating tickettypes for {camp.camp.lower.year}...")
+        self.output(f"Creating tickettypes for {camp.year}...")
         types["adult_full_week"] = TicketType.objects.create(
             name="Adult Full Week",
             camp=camp,
@@ -651,8 +652,7 @@ class Bootstrap:
     ) -> dict:
         """Create camp shop products."""
         products = {}
-        year = camp.camp.lower.year
-        camp_prefix = f"BornHack {year}"
+        camp_prefix = f"BornHack {camp.year}"
 
         name = f"{camp_prefix} Standard ticket"
         products["ticket1"] = Product.objects.create(
@@ -661,8 +661,8 @@ class Bootstrap:
             price=1200,
             category=categories["tickets"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-standard-ticket",
             ticket_type=ticket_types["adult_full_week"],
@@ -675,8 +675,8 @@ class Bootstrap:
             price=1337,
             category=categories["tickets"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-hacker-ticket",
             ticket_type=ticket_types["adult_full_week"],
@@ -689,8 +689,8 @@ class Bootstrap:
             price=495,
             category=categories["tickets"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-child-ticket",
             ticket_type=ticket_types["child_full_week"],
@@ -703,8 +703,8 @@ class Bootstrap:
             price=300,
             category=categories["tickets"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-one-day-ticket",
             ticket_type=ticket_types["adult_one_day"],
@@ -717,8 +717,8 @@ class Bootstrap:
             price=165,
             category=categories["tickets"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-one-day-child-ticket",
             ticket_type=ticket_types["child_one_day"],
@@ -731,8 +731,8 @@ class Bootstrap:
             price=3325,
             category=categories["villages"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-village-tent-3x3m-no-floor",
             ticket_type=ticket_types["village"],
@@ -745,8 +745,8 @@ class Bootstrap:
             price=3675,
             category=categories["villages"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-village-tent-3x3m-with-floor",
             ticket_type=ticket_types["village"],
@@ -759,8 +759,8 @@ class Bootstrap:
             price=150,
             category=categories["merchandise"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-tshirt-large",
             ticket_type=ticket_types["merchandise"],
@@ -773,8 +773,8 @@ class Bootstrap:
             price=150,
             category=categories["merchandise"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-tshirt-medium",
             ticket_type=ticket_types["merchandise"],
@@ -787,8 +787,8 @@ class Bootstrap:
             price=150,
             category=categories["merchandise"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-tshirt-small",
             ticket_type=ticket_types["merchandise"],
@@ -801,8 +801,8 @@ class Bootstrap:
             price=100,
             category=categories["facilities"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-100-hax",
             ticket_type=ticket_types["facilities"],
@@ -815,8 +815,8 @@ class Bootstrap:
             price=18000,
             category=categories["packages"],
             available_in=(
-                datetime(year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(year, 12, 20, 12, 0, tzinfo=tz),
+                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-corporate-hackers-small",
         )
@@ -917,11 +917,10 @@ class Bootstrap:
     def create_camp_tracks(self, camp: Camp) -> dict:
         """Create camp event tracks."""
         tracks = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating event_tracks for {year}...")
+        self.output(f"Creating event_tracks for {camp.year}...")
         tracks[1] = EventTrack.objects.create(
             camp=camp,
-            name=f"BornHack {year}",
+            name=f"BornHack {camp.year}",
             slug=camp.slug,
         )
 
@@ -930,8 +929,7 @@ class Bootstrap:
     def create_event_locations(self, camp: Camp) -> dict:
         """Create all event locations."""
         locations = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating event_locations for {year}...")
+        self.output(f"Creating event_locations for {camp.year}...")
         locations["speakers_tent"] = EventLocation.objects.create(
             name="Speakers Tent",
             slug="speakers-tent",
@@ -991,17 +989,16 @@ class Bootstrap:
 
     def create_camp_news(self, camp: Camp) -> None:
         """Create camp news."""
-        year = camp.camp.lower.year
-        self.output(f"Creating news for {year}...")
+        self.output(f"Creating news for {camp.year}...")
         NewsItem.objects.create(
             title=f"Welcome to {camp.title}",
             content="news body here with <b>html</b> support",
-            published_at=datetime(year, 8, 27, 12, 0, tzinfo=tz),
+            published_at=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
         )
         NewsItem.objects.create(
             title=f"{camp.title} is over",
             content="news body here",
-            published_at=datetime(year, 9, 4, 12, 0, tzinfo=tz),
+            published_at=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
         )
 
     def create_camp_event_sessions(
@@ -1098,8 +1095,7 @@ class Bootstrap:
 
     def create_camp_proposals(self, camp: Camp, event_types: dict) -> None:
         """Create camp proposals: talks, workshops and keynotes."""
-        year = camp.camp.lower.year
-        self.output(f"Creating event- and speaker_proposals for {year}...")
+        self.output(f"Creating event- and speaker_proposals for {camp.year}...")
 
         # add 45 talks
         talkproposals = EventProposalFactory.create_batch(
@@ -1163,9 +1159,8 @@ class Bootstrap:
 
     def create_proposal_urls(self, camp: Camp) -> None:
         """Create URL objects for the proposals."""
-        year = camp.camp.lower.year
         self.output(
-            f"Creating URLs for Speaker- and EventProposals for {year}...",
+            f"Creating URLs for Speaker- and EventProposals for {camp.year}...",
         )
         SpeakerProposalUrlFactory.create_batch(
             100,
@@ -1182,9 +1177,8 @@ class Bootstrap:
 
     def generate_speaker_availability(self, camp: Camp) -> None:
         """Create SpeakerAvailability objects for the SpeakerProposals."""
-        year = camp.camp.lower.year
         self.output(
-            f"Generating random SpeakerProposalAvailability for {year}...",
+            f"Generating random SpeakerProposalAvailability for {camp.year}...",
         )
         for sp in camp.speaker_proposals.all():
             # generate a matrix for this speaker_proposals event_types
@@ -1253,8 +1247,7 @@ class Bootstrap:
 
     def create_camp_scheduling(self, camp: Camp, autoschedule: bool) -> None:
         """Create camp scheduling."""
-        year = camp.camp.lower.year
-        self.output(f"Creating scheduling for {year}...")
+        self.output(f"Creating scheduling for {camp.year}...")
 
         # create a lunchbreak daily in speakers tent
         lunch = Event.objects.get(track__camp=camp, title="Lunch break")
@@ -1286,14 +1279,13 @@ class Bootstrap:
                 self.output(f"Got exception while calculating autoschedule: {E}")
             scheduleduration = timezone.now() - schedulestart
             self.output(
-                f"Done running autoscheduler for {year}... It took {scheduleduration}",
+                f"Done running autoscheduler for {camp.year}... It took {scheduleduration}",
             )
 
     def create_camp_speaker_event_conflicts(self, camp: Camp) -> None:
         """Create speaker event conflicts."""
-        year = camp.camp.lower.year
         self.output(
-            f"Generating event_conflicts for SpeakerProposals for {year}...",
+            f"Generating event_conflicts for SpeakerProposals for {camp.year}...",
         )
         # loop over all
         for sp in camp.speaker_proposals.all():
@@ -1310,12 +1302,11 @@ class Bootstrap:
 
     def create_camp_rescheduling(self, camp: Camp, autoschedule: bool) -> None:
         """Reschedule program for this camp."""
-        year = camp.camp.lower.year
         # reapprove all speaker_proposals so the new availability takes effect
         for prop in camp.speaker_proposals.filter(proposal_status="approved"):
             prop.mark_as_approved()
         # exercise the autoscheduler a bit
-        self.output(f"Rescheduling {year}...")
+        self.output(f"Rescheduling {camp.year}...")
         if autoschedule:
             scheduler = AutoScheduler(camp=camp)
             schedulestart = timezone.now()
@@ -1328,12 +1319,11 @@ class Bootstrap:
                 )
                 autoschedule = None
             scheduleduration = timezone.now() - schedulestart
-            self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
+            self.output(f"Done rescheduling for {camp.year}... It took {scheduleduration}.")
 
     def create_camp_villages(self, camp: Camp, users: dict) -> None:
         """Create camp villages."""
-        year = camp.camp.lower.year
-        self.output(f"Creating villages for {year}...")
+        self.output(f"Creating villages for {camp.year}...")
         Village.objects.create(
             contact=users[1],
             camp=camp,
@@ -1369,8 +1359,7 @@ class Bootstrap:
     def create_camp_teams(self, camp: Camp) -> dict:
         """Create camp teams."""
         teams = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating teams for {year}...")
+        self.output(f"Creating teams for {camp.year}...")
         teams["orga"] = Team.objects.create(
             name="Orga",
             description="The Orga team are the main organisers. "
@@ -1441,8 +1430,7 @@ class Bootstrap:
 
     def create_camp_team_tasks(self, camp: Camp, teams: dict) -> None:
         """Create camp team tasks."""
-        year = camp.camp.lower.year
-        self.output(f"Creating TeamTasks for {year}...")
+        self.output(f"Creating TeamTasks for {camp.year}...")
         TeamTask.objects.create(
             team=teams["noc"],
             name="Setup private networks",
@@ -1497,8 +1485,7 @@ class Bootstrap:
     ) -> dict:
         """Create camp team memberships."""
         memberships = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating team memberships for {year}...")
+        self.output(f"Creating team memberships for {camp.year}...")
         # noc team
         memberships["noc"] = {}
         memberships["noc"]["user4"] = TeamMember.objects.create(
@@ -1616,13 +1603,12 @@ class Bootstrap:
     ) -> None:
         """Create camp team shifts."""
         shifts = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating team shifts for {year}...")
+        self.output(f"Creating team shifts for {camp.year}...")
         shifts[0] = TeamShift.objects.create(
             team=teams["shuttle"],
             shift_range=(
-                datetime(year, 8, 27, 2, 0, tzinfo=tz),
-                datetime(year, 8, 27, 8, 0, tzinfo=tz),
+                datetime(camp.year, 8, 27, 2, 0, tzinfo=tz),
+                datetime(camp.year, 8, 27, 8, 0, tzinfo=tz),
             ),
             people_required=1,
         )
@@ -1630,16 +1616,16 @@ class Bootstrap:
         shifts[1] = TeamShift.objects.create(
             team=teams["shuttle"],
             shift_range=(
-                datetime(year, 8, 27, 8, 0, tzinfo=tz),
-                datetime(year, 8, 27, 14, 0, tzinfo=tz),
+                datetime(camp.year, 8, 27, 8, 0, tzinfo=tz),
+                datetime(camp.year, 8, 27, 14, 0, tzinfo=tz),
             ),
             people_required=1,
         )
         shifts[2] = TeamShift.objects.create(
             team=teams["shuttle"],
             shift_range=(
-                datetime(year, 8, 27, 14, 0, tzinfo=tz),
-                datetime(year, 8, 27, 20, 0, tzinfo=tz),
+                datetime(camp.year, 8, 27, 14, 0, tzinfo=tz),
+                datetime(camp.year, 8, 27, 20, 0, tzinfo=tz),
             ),
             people_required=1,
         )
@@ -1647,8 +1633,7 @@ class Bootstrap:
     def create_camp_info_categories(self, camp: Camp, teams: dict) -> dict:
         """Create camp info categories."""
         categories = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating infocategories for {year}...")
+        self.output(f"Creating infocategories for {camp.year}...")
         categories["when"] = InfoCategory.objects.create(
             team=teams["orga"],
             headline="When is BornHack happening?",
@@ -1674,13 +1659,12 @@ class Bootstrap:
 
     def create_camp_info_items(self, camp: Camp, categories: dict) -> None:
         """Create the camp info items."""
-        year = camp.camp.lower.year
-        self.output(f"Creating infoitems for {year}...")
+        self.output(f"Creating infoitems for {camp.year}...")
         InfoItem.objects.create(
             category=categories["when"],
             headline="Opening",
             anchor="opening",
-            body=f"BornHack {year} starts saturday, august 27th, at noon (12:00). "
+            body=f"BornHack {camp.year} starts saturday, august 27th, at noon (12:00). "
             "It will be possible to access the venue before noon if for example you arrive early "
             "in the morning with the ferry. But please dont expect everything to be ready before noon :)",
         )
@@ -1688,7 +1672,7 @@ class Bootstrap:
             category=categories["when"],
             headline="Closing",
             anchor="closing",
-            body=f"BornHack {year} ends saturday, september 3rd, at noon (12:00). "
+            body=f"BornHack {camp.year} ends saturday, september 3rd, at noon (12:00). "
             "Rented village tents must be empty and cleaned at this time, ready to take down. "
             "Participants must leave the site no later than 17:00 on the closing day "
             "(or stay and help us clean up).",
@@ -1739,8 +1723,7 @@ class Bootstrap:
 
     def create_camp_feedback(self, camp: Camp, users: dict[User]) -> None:
         """Create camp feedback."""
-        year = camp.camp.lower.year
-        self.output(f"Creating feedback for {year}...")
+        self.output(f"Creating feedback for {camp.year}...")
         Feedback.objects.create(
             camp=camp,
             user=users[1],
@@ -1764,15 +1747,14 @@ class Bootstrap:
 
     def create_camp_rides(self, camp: Camp, users: dict) -> None:
         """Create camp rides."""
-        year = camp.camp.lower.year
-        self.output(f"Creating rides for {year}...")
+        self.output(f"Creating rides for {camp.year}...")
         Ride.objects.create(
             camp=camp,
             user=users[1],
             seats=2,
             from_location="Copenhagen",
             to_location="BornHack",
-            when=datetime(year, 8, 27, 12, 0, tzinfo=tz),
+            when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
             description="I have space for two people and a little bit of luggage",
         )
         Ride.objects.create(
@@ -1781,7 +1763,7 @@ class Bootstrap:
             seats=2,
             from_location="BornHack",
             to_location="Copenhagen",
-            when=datetime(year, 9, 4, 12, 0, tzinfo=tz),
+            when=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
             description="I have space for two people and a little bit of luggage",
         )
         Ride.objects.create(
@@ -1790,31 +1772,28 @@ class Bootstrap:
             seats=1,
             from_location="Aarhus",
             to_location="BornHack",
-            when=datetime(year, 8, 27, 12, 0, tzinfo=tz),
+            when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
             description="I need a ride and have a large backpack",
         )
 
     def create_camp_cfp(self, camp: Camp) -> None:
         """Create the camp call for participation."""
-        year = camp.camp.lower.year
-        self.output(f"Creating CFP for {year}...")
+        self.output(f"Creating CFP for {camp.year}...")
         camp.call_for_participation_open = True
-        camp.call_for_participation = f"Please give a talk at Bornhack {year}..."
+        camp.call_for_participation = f"Please give a talk at Bornhack {camp.year}..."
         camp.save()
 
     def create_camp_cfs(self, camp: Camp) -> None:
         """Create the camp call for sponsors."""
-        year = camp.camp.lower.year
-        self.output(f"Creating CFS for {year}...")
+        self.output(f"Creating CFS for {camp.year}...")
         camp.call_for_sponsors_open = True
-        camp.call_for_sponsors = f"Please give us ALL the money so that we can make Bornhack {year} the best ever!"
+        camp.call_for_sponsors = f"Please give us ALL the money so that we can make Bornhack {camp.year} the best ever!"
         camp.save()
 
     def create_camp_sponsor_tiers(self, camp: Camp) -> dict:
         """Create the camp sponsor tiers."""
         tiers = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating sponsor tiers for {year}...")
+        self.output(f"Creating sponsor tiers for {camp.year}...")
         tiers["platinum"] = SponsorTier.objects.create(
             name="Platinum sponsors",
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- "
@@ -1853,9 +1832,8 @@ class Bootstrap:
 
     def create_camp_sponsors(self, camp: Camp, tiers: dict) -> list:
         """Create the camp sponsors."""
-        year = camp.camp.lower.year
         sponsors = []
-        self.output(f"Creating sponsors for {year}...")
+        self.output(f"Creating sponsors for {camp.year}...")
         sponsors.append(
             Sponsor.objects.create(
                 name="PROSA",
@@ -1912,8 +1890,7 @@ class Bootstrap:
         ticket_types: dict,
     ) -> None:
         """Create tickets for camp sponsors"""
-        year = camp.camp.lower.year
-        self.output(f"Creating sponsor tickets for {year}...")
+        self.output(f"Creating sponsor tickets for {camp.year}...")
         for sponsor in sponsors:
             if sponsor.tier == tiers["platinum"] or sponsor.tier == tiers["gold"]:
                 for _ in range(10):
@@ -1936,8 +1913,7 @@ class Bootstrap:
 
     def create_token_categories(self, camp: Camp) -> dict[str, TokenCategory]:
         """Create the camp tokens."""
-        year = camp.camp.lower.year
-        self.output(f"Creating token categories for {year}...")
+        self.output(f"Creating token categories for {camp.year}...")
         categories = {}
         categories["physical"], _ = TokenCategory.objects.get_or_create(
             name="Physical",
@@ -1964,8 +1940,7 @@ class Bootstrap:
     def create_camp_tokens(self, camp: Camp, categories: dict) -> dict[Token]:
         """Create the camp tokens."""
         tokens = {}
-        year = camp.camp.lower.year
-        self.output(f"Creating tokens for {year}...")
+        self.output(f"Creating tokens for {camp.year}...")
         tokens[0] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
@@ -2003,7 +1978,7 @@ class Bootstrap:
             token=get_random_string(length=32),
             category=categories["physical"],
             hint="Gadget",
-            description=f"Token on the back of the BornHack {year} badge",
+            description=f"Token on the back of the BornHack {camp.year} badge",
             active=True,
         )
         tokens[5] = Token.objects.create(
@@ -2024,8 +1999,7 @@ class Bootstrap:
         users: dict[User],
     ) -> None:
         """Create the camp token finds."""
-        year = camp.camp.lower.year
-        self.output(f"Creating token finds for {year}...")
+        self.output(f"Creating token finds for {camp.year}...")
         TokenFind.objects.create(token=tokens[3], user=users[4])
         TokenFind.objects.create(token=tokens[5], user=users[4])
         TokenFind.objects.create(token=tokens[2], user=users[7])
@@ -2037,8 +2011,7 @@ class Bootstrap:
 
     def create_prize_ticket(self, camp: Camp, ticket_types: dict) -> None:
         """Create prize tickets"""
-        year = camp.camp.lower.year
-        self.output(f"Creating prize tickets for {year}...")
+        self.output(f"Creating prize tickets for {camp.year}...")
         PrizeTicket.objects.create(
             user=self.users[5],
             comment="Prize winner",
@@ -2048,8 +2021,7 @@ class Bootstrap:
     def create_camp_expenses(self, camp: Camp) -> None:
         """Create camp expenses."""
         self.output(f"Creating expenses for {camp}...")
-        for team in Team.objects.filter(camp=camp):
-            ExpenseFactory.create_batch(10, camp=camp, responsible_team=team)
+        ExpenseFactory.create_batch(200, camp=camp)
 
     def create_camp_reimbursements(self, camp: Camp) -> None:
         """Create camp reimbursements."""
@@ -2058,7 +2030,7 @@ class Bootstrap:
             id__in=Expense.objects.filter(
                 camp=camp,
                 reimbursement__isnull=True,
-                paid_by_bornhack=False,
+                payment_status="PAID_NEEDS_REIMBURSEMENT",
                 approved=True,
             )
             .values_list("user", flat=True)
@@ -2069,8 +2041,16 @@ class Bootstrap:
                 user=user,
                 approved=True,
                 reimbursement__isnull=True,
-                paid_by_bornhack=False,
+                payment_status="PAID_NEEDS_REIMBURSEMENT",
             )
+            revenues = Revenue.objects.filter(
+                user=user,
+                approved=True,
+                reimbursement__isnull=True,
+                payment_status="PAID_NEEDS_REDISBURSEMENT",
+            )
+            if not expenses and not revenues:
+                continue
             reimbursement = Reimbursement.objects.create(
                 camp=camp,
                 user=user,
@@ -2080,12 +2060,14 @@ class Bootstrap:
                 paid=random.choice([True, True, False]),  # noqa: S311
             )
             expenses.update(reimbursement=reimbursement)
-            reimbursement.create_payback_expense()
+            revenues.update(reimbursement=reimbursement)
+            if reimbursement.paid:
+                reimbursement.mark_as_paid()
 
     def create_camp_revenues(self, camp: Camp) -> None:
         """Method for creating revenue."""
         self.output(f"Creating revenues for {camp}...")
-        RevenueFactory.create_batch(20, camp=camp)
+        RevenueFactory.create_batch(200, camp=camp)
 
     def add_team_permissions(self, camp: Camp) -> None:
         """Assign member permissions to the team groups for this camp."""
@@ -2332,8 +2314,7 @@ class Bootstrap:
         self.create_product_categories()
         teams = {}
         for camp, read_only in self.camps:
-            year = camp.camp.lower.year
-            if year <= settings.UPCOMING_CAMP_YEAR:
+            if camp.year <= settings.UPCOMING_CAMP_YEAR:
                 ticket_types = self.create_camp_ticket_types(camp)
                 camp_products = self.create_camp_products(
                     camp,
@@ -2352,8 +2333,8 @@ class Bootstrap:
                 self.create_prize_ticket(camp, ticket_types)
                 self.create_camp_tracks(camp)
 
-            teams[year] = self.create_camp_teams(camp)
-            self.create_camp_team_memberships(camp, teams[year], self.users)
+            teams[camp.year] = self.create_camp_teams(camp)
+            self.create_camp_team_memberships(camp, teams[camp.year], self.users)
             camp.read_only = read_only
             camp.call_for_participation_open = not read_only
             camp.call_for_sponsors_open = not read_only
@@ -2361,7 +2342,7 @@ class Bootstrap:
 
         self.camp = self.camps[1][0]
         self.add_team_permissions(self.camp)
-        self.teams = teams[self.camp.camp.lower.year]
+        self.teams = teams[self.camp.year]
         for member in TeamMember.objects.filter(team__camp=self.camp):
             member.save()
 
@@ -2371,10 +2352,10 @@ class Bootstrap:
         self.teams = {}
         for camp, read_only in self.camps:
             self.output(
-                f"----------[ Bornhack {camp.camp.lower.year} ]----------",
+                f"----------[ Bornhack {camp.year} ]----------",
             )
 
-            if camp.camp.lower.year <= timezone.now().year:
+            if camp.year <= timezone.now().year:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
@@ -2392,7 +2373,7 @@ class Bootstrap:
                 self.create_camp_news(camp)
 
                 teams = self.create_camp_teams(camp)
-                self.teams[camp.camp.lower.year] = teams
+                self.teams[camp.year] = teams
 
                 if not read_only and not permissions_added:
                     # add permissions for the first camp that is not read_only
@@ -2494,7 +2475,7 @@ class Bootstrap:
             camp.save()
 
             # Update team permissions.
-            if camp.camp.lower.year == settings.UPCOMING_CAMP_YEAR:
+            if camp.year == settings.UPCOMING_CAMP_YEAR:
                 for member in TeamMember.objects.filter(team__camp=camp):
                     member.save()
 

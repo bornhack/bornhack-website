@@ -71,6 +71,7 @@ class UUIDModel(CleanedModel):
 class CreatedUpdatedModel(CleanedModel):
     class Meta:
         abstract = True
+        ordering = ["-created"]
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -79,6 +80,7 @@ class CreatedUpdatedModel(CleanedModel):
 class CreatedUpdatedUUIDModel(CleanedModel):
     class Meta:
         abstract = True
+        ordering = ["-created"]
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -94,6 +96,7 @@ class CampRelatedModel(CreatedUpdatedModel):
 
     class Meta:
         abstract = True
+        ordering = ["-created"]
 
     def save(self, **kwargs) -> None:
         if self.camp.read_only:

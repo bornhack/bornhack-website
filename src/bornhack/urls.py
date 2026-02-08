@@ -25,6 +25,7 @@ from maps.views import UserLocationUpdateView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
+from sponsors.views import CallForSponsorsView
 from utils.views import csrfview
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
@@ -160,6 +161,7 @@ urlpatterns = [
                 path("info/", CampInfoView.as_view(), name="info"),
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
+                path("sponsors/call-for-sponsors/", CallForSponsorsView.as_view(), name="call_for_sponsors"),
                 path(
                     "map/",
                     include(

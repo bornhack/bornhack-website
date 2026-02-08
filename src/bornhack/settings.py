@@ -131,6 +131,7 @@ ACCOUNT_EMAIL_VERIFICATION = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[bornhack] "
 ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "gender"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
 
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
@@ -177,7 +178,6 @@ if DEBUG_TOOLBAR_ENABLED:  # noqa: F405
         "debug_toolbar.panels.templates.TemplatesPanel",
         "debug_toolbar.panels.cache.CachePanel",
         "debug_toolbar.panels.signals.SignalsPanel",
-        "debug_toolbar.panels.logging.LoggingPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
 

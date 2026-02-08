@@ -1,19 +1,21 @@
 {% load bornhack %}
 <div class="card">
-  <div class="card-header">Reimbursement Details for {{ reimbursement.pk }} for {{ reimbursement.reimbursement_user }}</div>
+  <div class="card-header">Reimbursement {{ reimbursement.pk }} Details</div>
   <div class="card-body">
     <table class="table">
+      <tr>
+        <th>Reimbursement ID</th>
+        <td>{{ reimbursement.pk }}</td>
+      </tr>
       <tr>
         <th>Reimbursement User</th>
         <td>{{ reimbursement.reimbursement_user.profile.get_name }}</td>
       </tr>
       <tr>
-        <th>Created By</th>
-        <td>{{ reimbursement.user.profile.get_name }}</td>
-      </tr>
-      <tr>
         <th>Total Amount</th>
-        <td>{{ reimbursement.amount }} DKK</td>
+        <td>{{ reimbursement.amount }} DKK<br>
+            <i>Note: a negative number here means {% if request.resolver_match.app_name == "backoffice" %}the participant owes{% else %}you owe{% endif %} BornHack money, while a positive number means that BornHack owes {% if request.resolver_match.app_name == "backoffice" %}the participant{% else %}you{% endif %} money.</i>
+        </td>
       </tr>
       <tr>
         <th>Bank Account</th>
@@ -30,18 +32,40 @@
       {% if request.resolver_match.app_name == "backoffice" %}
         <tr>
           <th>Payback Expense</th>
+          {% if reimbursement.payback_expense %}
           <td><a href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=reimbursement.payback_expense.pk %}">{{ reimbursement.payback_expense.pk }}</a></td>
+          {% else %}
+          <td>N/A</td>
+          {% endif %}
+        </tr>
+        <tr>
+          <th>Payback Revenue</th>
+          {% if reimbursement.payback_revenue %}
+          <td><a href="{% url 'backoffice:revenue_detail' camp_slug=camp.slug pk=reimbursement.payback_revenue.pk %}">{{ reimbursement.payback_revenue.pk }}</a></td>
+          {% else %}
+          <td>N/A</td>
+          {% endif %}
         </tr>
       {% endif %}
       <tr>
         <th>Created</th>
         <td>{{ reimbursement.created }} by {{ reimbursement.user }}</td>
       </tr>
+      {% if reimbursement.covered_expenses.exists %}
       <tr>
         <th>Expenses covered by this Reimbursement</th>
         <td>
           {% include 'includes/expense_list_panel.html' with expense_list=reimbursement.covered_expenses.all %}
         </td>
+      </tr>
+      {% endif %}
+      {% if reimbursement.covered_revenues.exists %}
+      <tr>
+        <th>Revenues covered by this Reimbursement</th>
+        <td>
+          {% include 'includes/revenue_list_panel.html' with revenue_list=reimbursement.covered_revenues.all %}
+        </td>
+      {% endif %}
       </tr>
     </table>
   </div>

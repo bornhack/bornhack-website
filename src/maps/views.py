@@ -466,7 +466,6 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                "map_height": "500px",
                 "geom_type": "Point",
                 "class": "form-control",
             },
@@ -517,7 +516,6 @@ class UserLocationUpdateView(
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                "map_height": "500px",
                 "geom_type": "Point",
                 "class": "form-control",
             },
