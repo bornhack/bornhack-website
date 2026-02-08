@@ -95,6 +95,9 @@ class DectRegistration(
         self.check_unique_ipei()
         super().save(*args, **kwargs)
 
+    def __str__(self) -> str:
+        return f"{self.number or self.letters} ({self.user.profile.get_name})"
+
     def check_unique_ipei(self) -> None:
         """Check IPEI is unique."""
         if (

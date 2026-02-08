@@ -9,19 +9,21 @@
 
   <div class="card">
     <div class="card-header">
-      <div class="btn-group pull-right">
-        <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
-           class="btn btn-secondary"
-           target="_blank">
-          Print
-        </a>
-        {% if request.user in team.leads.all %}
-          <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Edit</a>
-        {% endif %}
+      <div class="d-flex justify-content-between">
+        <h4>
+          Guide / Howto for {{ team.name }}
+        </h4>
+        <div class="btn-group pull-right">
+          <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
+             class="btn btn-secondary"
+             target="_blank">
+            Print
+          </a>
+          {% if request.user in team.leads.all %}
+            <a href="{% url 'teams:settings' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Edit</a>
+          {% endif %}
+        </div>
       </div>
-      <h4>
-        Guide / Howto for {{ team.name }}
-      </h4>
     </div>
     <div class="card-body">
       <p>

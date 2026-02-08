@@ -55,11 +55,11 @@ class TeamBaseMemberViewTest(BornhackTestBase):
         response = self.client.get(path=url)
         assert response.status_code == 200
 
-    def test_team_manage_view(self) -> None:
-        """Test the team manage view."""
+    def test_team_settings_view(self) -> None:
+        """Test the team settings view."""
         self.client.force_login(self.users[4])
         url = reverse(
-            "teams:manage",
+            "teams:settings",
             kwargs={
                 "team_slug": self.teams["noc"].slug,
                 "camp_slug": self.camp.slug,
