@@ -615,7 +615,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
                 "text": "Bundle",
             })
 
-        if self.stock_amount is not None:
+        if self.left_in_stock is not None:
             if self.left_in_stock < 1 or not self.is_time_available:
                 labels.insert(0, {
                     "type": "sold_out",
@@ -631,11 +631,12 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
                     "text": f"Only {self.left_in_stock} left!",
                 })
 
-        if self.available_for_days < 20:
-            labels.append({
-                "type": "ending_soon",
-                "text": f"Sales end in {self.available_for_days} days!",
-            })
+        if self.available_for_days is not None:
+            if self.available_for_days > 0 and self.available_for_days < 20:
+                labels.append({
+                    "type": "ending_soon",
+                    "text": f"Sales end in {self.available_for_days} days!",
+                })
 
         return labels
 
