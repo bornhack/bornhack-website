@@ -13,7 +13,7 @@ classifiers = [
 ########## DEPENDENCIES ##########
 
 dependencies = [
-    "Django==5.2.9",
+    "Django==5.2.11",
     "channels==4.3.2",
     "channels-redis==4.3.0",
     "commonmark==0.9.1",
