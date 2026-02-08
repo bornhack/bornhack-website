@@ -38,6 +38,7 @@ class MapProxyViewTest(TestCase):
 
         self.allowed_endpoints = [
             "/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS",
+            "/GeoDanmarkOrto/orto_foraar/1.0.0/WMS",
             "/Dkskaermkort/topo_skaermkort/1.0.0/wms",
             "/DHMNedboer/dhm/1.0.0/wms",
         ]
@@ -53,12 +54,14 @@ class MapProxyViewTest(TestCase):
         """Test allowed endpoints."""
         for endpoint in self.allowed_endpoints:
             fix_request = self.rf.get("/maps/kfproxy" + endpoint)
-            with self.subTest(request=fix_request):
-                with mock.patch("maps.views.requests") as mock_req:
-                    mock_req.get.return_value.status_code = 200
-                    result = MapProxyView.as_view()(fix_request)
+            # Bug: pytest with pytest-xdist can't serialize objects, fixed in pytest v9.1
+            # https://github.com/pytest-dev/pytest-xdist/issues/1273#issuecomment-3677708056
+            # with self.subTest(request=fix_request):
+            with mock.patch("maps.views.requests") as mock_req:
+                mock_req.get.return_value.status_code = 200
+                result = MapProxyView.as_view()(fix_request)
 
-                self.assertEqual(result.status_code, 200)
+            self.assertEqual(result.status_code, 200)
 
     def test_sanitizing_path(self):
         """Test sanitization of paths."""
