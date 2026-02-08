@@ -5,12 +5,19 @@ from django.db.models import F
 from django.db.models import Sum
 from django.db.models.functions import ExtractYear
 from django.db.models.functions import Lower
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import ListView
+from django.views.generic import TemplateView
 
 from camps.mixins import CampViewMixin
 
 from .models import Sponsor
+
+
+class CallForSponsorsView(CampViewMixin, TemplateView):
+    template_name = "call_for_sponsors.html"
 
 
 class SponsorsView(CampViewMixin, ListView):
@@ -21,6 +28,13 @@ class SponsorsView(CampViewMixin, ListView):
     def get_queryset(self, **kwargs):
         queryset = super().get_queryset()
         return queryset.filter(tier__camp=self.camp).order_by("tier__weight", "name")
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        if self.object_list.count() < 1:
+            url = reverse("call_for_sponsors", kwargs={"camp_slug": self.camp.slug})
+            return redirect(url)
+        return super().get(request, *args, **kwargs)
 
 
 class AllSponsorsView(ListView):

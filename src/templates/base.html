@@ -70,127 +70,142 @@
 
   <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% if request.session.theme and request.session.theme != "default" %} data-bs-theme="{{request.session.theme}}"{% endif %}>
     {% block body %}
+      {% if camp.is_in_progress %}
+      <header class="py-4">
+      {% else %}
       <header class="py-1">
-        <nav class="navbar fixed-top navbar-expand-lg bg-body">
-          <div class="container-xl container-fluid">
-            {% if request.resolver_match.kwargs.camp_slug and camp %}
-              <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="bornhack-logo img-responsive">
-              </a>
-            {% else %}
-              <a class="navbar-brand" href="/">
-                <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="bornhack-logo img-responsive" width="200">
-              </a>
-            {% endif %}
-            <!-- Theme switcher for small screens -->
-            <div class="theme-switch d-lg-none ms-auto me-2 col-1">
-              <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default text-secondary bornhack-hide-dark">
-                <i class="fa fa-moon"></i>
-              </a>
-              <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default text-secondary bornhack-hide-light">
-                <i class="fa fa-sun"></i>
-              </a>
-              {% if request.session.theme and request.session.theme != "default" and request.user.profile.theme != request.session.theme %}
-                <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default text-secondary">
-                  <i class="fa fa-display"></i>
-                </a>
-              {% endif %}
-            </div>
-            <!-- END: Theme switcher for small screens -->
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#top-navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div id="top-navbar" class="collapse navbar-collapse">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0 navbar-nav-scroll">
-                <li class="nav-item"><a class="nav-link" href="{% url 'news:index' %}">News</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'shop:index' %}">Shop</a></li>
-                <li class="nav-item dropdown hide-for-no-js-users">
-                  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2026' %}">BornHack 2026</a></li>
-                    <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2025' %}">BornHack 2025</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{% url 'camp_list' %}">Camp List</a></li>
-                  </ul>
-                </li>
-                <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'camp_list' %}">Camps</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'people' %}">People</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
-
-                {% if request.user.is_staff %}
-                  <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
-                {% endif %}
-
-                {% if user.orders.exists %}
-                  {% url 'shop:order_list' as orders_list_url %}
-                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ orders_list_url }}">Orders</a></li>
-
-                  {% url 'tickets:shopticket_list' as ticket_list_url %}
-                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ ticket_list_url }}">Tickets</a></li>
-
-                  {% if user.creditnotes.exists %}
-                    {% url 'shop:creditnote_list' as creditnote_list_url %}
-                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ creditnote_list_url }}">Credit Notes</a></li>
-                  {% endif %}
-                {% endif %}
-                {% if user.is_authenticated %}
-                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
-                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
-                {% else %}
-                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
-                {% endif %}
-              </ul>
-              <ul class="nav navbar-nav navbar-right d-none d-lg-flex">
-                <!-- normal/big screen switcher -->
-                <li class="nav-item">
-                  <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default bornhack-theme-dark nav-link">
-                    <span class="fa fa-moon"></span>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default bornhack-theme-light nav-link">
-                    <i class="fa fa-sun"></i>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default bornhack-theme-system nav-link">
-                    <i class="fa fa-display"></i>
-                  </a>
-                </li>
-                <!-- end of switcher -->
-                {% if user.is_authenticated %}
-                  <!-- User menu if no-js -->
-                  <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
-                  <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
-                  <!-- END: User menu if no-js -->
-                  <li class="nav-item dropdown hide-for-no-js-users d-none d-lg-flex">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="{% url 'profiles:detail' %}">Profile</a></li>
-                      {% if user.orders.exists %}
-                        {% url 'shop:order_list' as orders_list_url %}
-                        <li><a class="dropdown-item" href="{{ orders_list_url }}">Orders</a></li>
-
-                        {% url 'tickets:shopticket_list' as ticket_list_url %}
-                        <li><a class="dropdown-item" href="{{ ticket_list_url }}">Tickets</a></li>
-
-                        {% if user.creditnotes.exists %}
-                          {% url 'shop:creditnote_list' as creditnote_list_url %}
-                          <li><a class="dropdown-item" href="{{ creditnote_list_url }}">Credit Notes</a></li>
-                        {% endif %}
-                      {% endif %}
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
-                    </ul>
-                  </li>
-                {% else %}
-                  <li><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
-                {% endif %}
-              </ul>
+      {% endif %}
+        <div class="fixed-top bg-body">
+          {% if camp.is_in_progress %}
+          <div class="container">
+            <div class="row d-flex justify-content-center">
+              <div class="col-12 text-center border-bottom border-danger-subtle py-2">
+                <a href="https://live.bornhack.dk" class="no-decoration text-danger "><strong><i class="fa-solid fa-circle-play"></i> Live streaming: live.bornhack.dk</a></strong>
+              </div>
             </div>
           </div>
-        </nav>
+          {% endif %}
+          <nav class="navbar navbar-expand-lg">
+            <div class="container-xl container-fluid">
+              {% if request.resolver_match.kwargs.camp_slug and camp %}
+                <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
+                  <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="bornhack-logo img-responsive">
+                </a>
+              {% else %}
+                <a class="navbar-brand" href="/">
+                  <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="bornhack-logo img-responsive" width="200">
+                </a>
+              {% endif %}
+              <!-- Theme switcher for small screens -->
+              <div class="theme-switch d-lg-none ms-auto me-2 col-1">
+                <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default text-secondary bornhack-hide-dark">
+                  <i class="fa fa-moon"></i>
+                </a>
+                <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default text-secondary bornhack-hide-light">
+                  <i class="fa fa-sun"></i>
+                </a>
+                {% if request.session.theme and request.session.theme != "default" and request.user.profile.theme != request.session.theme %}
+                  <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default text-secondary">
+                    <i class="fa fa-display"></i>
+                  </a>
+                {% endif %}
+              </div>
+              <!-- END: Theme switcher for small screens -->
+              <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#top-navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div id="top-navbar" class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 navbar-nav-scroll">
+                  <li class="nav-item"><a class="nav-link" href="{% url 'news:index' %}">News</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'shop:index' %}">Shop</a></li>
+                  <li class="nav-item dropdown hide-for-no-js-users">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2026' %}">BornHack 2026</a></li>
+                      <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2025' %}">BornHack 2025</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{% url 'camp_list' %}">Camp List</a></li>
+                    </ul>
+                  </li>
+                  <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'camp_list' %}">Camps</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'people' %}">People</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
+
+                  {% if request.user.is_staff %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+                  {% endif %}
+
+                  {% if user.orders.exists %}
+                    {% url 'shop:order_list' as orders_list_url %}
+                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ orders_list_url }}">Orders</a></li>
+
+                    {% url 'tickets:shopticket_list' as ticket_list_url %}
+                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ ticket_list_url }}">Tickets</a></li>
+
+                    {% if user.creditnotes.exists %}
+                      {% url 'shop:creditnote_list' as creditnote_list_url %}
+                      <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                    {% endif %}
+                  {% endif %}
+                  {% if user.is_authenticated %}
+                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
+                  {% else %}
+                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+                  {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right d-none d-lg-flex">
+                  <!-- normal/big screen switcher -->
+                  <li class="nav-item">
+                    <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default bornhack-theme-dark nav-link">
+                      <span class="fa fa-moon"></span>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default bornhack-theme-light nav-link">
+                      <i class="fa fa-sun"></i>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default bornhack-theme-system nav-link">
+                      <i class="fa fa-display"></i>
+                    </a>
+                  </li>
+                  <!-- end of switcher -->
+                  {% if user.is_authenticated %}
+                    <!-- User menu if no-js -->
+                    <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                    <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
+                    <!-- END: User menu if no-js -->
+                    <li class="nav-item dropdown hide-for-no-js-users d-none d-lg-flex">
+                      <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'profiles:detail' %}">Profile</a></li>
+                        {% if user.orders.exists %}
+                          {% url 'shop:order_list' as orders_list_url %}
+                          <li><a class="dropdown-item" href="{{ orders_list_url }}">Orders</a></li>
+
+                          {% url 'tickets:shopticket_list' as ticket_list_url %}
+                          <li><a class="dropdown-item" href="{{ ticket_list_url }}">Tickets</a></li>
+
+                          {% if user.creditnotes.exists %}
+                            {% url 'shop:creditnote_list' as creditnote_list_url %}
+                            <li><a class="dropdown-item" href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                          {% endif %}
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                      </ul>
+                    </li>
+                  {% else %}
+                    <li><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </div>
       </header>
       <div id="main" class="container-xxl overflow-auto">
         {% if camp %}
