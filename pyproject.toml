@@ -69,7 +69,7 @@ test = [
     "pytest-xdist==3.8.0",
     "pytest-django==4.11.1",
     "beautifulsoup4==4.14.3",
-    "coverage==7.13.3",
+    "coverage==7.13.4",
     "hypothesis==6.151.5",
     "tblib==3.2.2",  # used to see backtraces in unit tests
     "unittest-xml-reporting==4.0.0",
