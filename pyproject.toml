@@ -70,7 +70,7 @@ test = [
     "pytest-django==4.11.1",
     "beautifulsoup4==4.14.3",
     "coverage==7.13.3",
-    "hypothesis==6.151.5",
+    "hypothesis==6.151.7",
     "tblib==3.2.2",  # used to see backtraces in unit tests
     "unittest-xml-reporting==4.0.0",
 ]
