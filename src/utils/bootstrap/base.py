@@ -9,7 +9,11 @@ import uuid
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from datetime import timedelta
+from collections import defaultdict
+from itertools import chain
+from psycopg2.extras import DateTimeTZRange
 
+from django.utils.text import slugify
 import factory
 from allauth.account.models import EmailAddress
 from django.conf import settings
@@ -95,7 +99,6 @@ from tickets.models import TicketType
 from tokens.models import Token
 from tokens.models import TokenCategory
 from tokens.models import TokenFind
-from utils.slugs import unique_slugify
 from villages.models import Village
 
 from .functions import output_fake_md_description
@@ -127,20 +130,20 @@ class Bootstrap:
             read_only = camp["read_only"]
             camp_instances.append(
                 (
-                    Camp.objects.create(
+                    Camp(
                         title=f"BornHack {year}",
                         tagline=camp["tagline"],
                         slug=f"bornhack-{year}",
                         shortslug=f"bornhack-{year}",
-                        buildup=(
+                        buildup=DateTimeTZRange(
                             datetime(year, 8, 25, 12, 0, tzinfo=tz),
                             datetime(year, 8, 27, 12, 0, tzinfo=tz),
                         ),
-                        camp=(
+                        camp=DateTimeTZRange(
                             datetime(year, 8, 27, 12, 0, tzinfo=tz),
                             datetime(year, 9, 3, 12, 0, tzinfo=tz),
                         ),
-                        teardown=(
+                        teardown=DateTimeTZRange(
                             datetime(year, 9, 3, 12, 0, tzinfo=tz),
                             datetime(year, 9, 5, 12, 0, tzinfo=tz),
                         ),
@@ -150,7 +153,7 @@ class Bootstrap:
                     read_only,
                 ),
             )
-
+        Camp.objects.bulk_create((c[0] for c in camp_instances))
         self.camps = camp_instances
 
     def create_event_routing_types(self) -> None:
@@ -301,42 +304,43 @@ class Bootstrap:
         """Create facilities."""
         facilities = {}
         self.output("Creating facilities...")
-        facilities["toilet1"] = Facility.objects.create(
+        facilities["toilet1"] = Facility(
             facility_type=facility_types["toilet"],
             name="Toilet NOC East",
             description="Toilet on the east side of the NOC building",
             location=Point(9.939783, 55.387217),
         )
-        facilities["toilet2"] = Facility.objects.create(
+        facilities["toilet2"] = Facility(
             facility_type=facility_types["toilet"],
             name="Toilet NOC West",
             description="Toilet on the west side of the NOC building",
             location=Point(9.93967, 55.387197),
         )
-        facilities["pdp1"] = Facility.objects.create(
+        facilities["pdp1"] = Facility(
             facility_type=facility_types["power"],
             name="PDP1",
             description="In orga area",
             location=Point(9.94079, 55.388022),
         )
-        facilities["pdp2"] = Facility.objects.create(
+        facilities["pdp2"] = Facility(
             facility_type=facility_types["power"],
             name="PDP2",
             description="In bar area",
             location=Point(9.942036, 55.387891),
         )
-        facilities["pdp3"] = Facility.objects.create(
+        facilities["pdp3"] = Facility(
             facility_type=facility_types["power"],
             name="PDP3",
             description="In speaker tent",
             location=Point(9.938416, 55.387109),
         )
-        facilities["pdp4"] = Facility.objects.create(
+        facilities["pdp4"] = Facility(
             facility_type=facility_types["power"],
             name="PDP4",
             description="In food area",
             location=Point(9.940146, 55.386983),
         )
+        Facility.objects.bulk_create(facilities.values())
         return facilities
 
     def create_facility_feedbacks(
@@ -347,44 +351,47 @@ class Bootstrap:
     ) -> None:
         """Create facility feedbacks."""
         self.output("Creating facility feedbacks...")
-        FacilityFeedback.objects.create(
-            user=users[1],
-            facility=facilities["toilet1"],
-            quick_feedback=options["attention"],
-            comment="Something smells wrong",
-            urgent=True,
-        )
-        FacilityFeedback.objects.create(
-            user=users[2],
-            facility=facilities["toilet1"],
-            quick_feedback=options["toiletpaper"],
-            urgent=False,
-        )
-        FacilityFeedback.objects.create(
-            facility=facilities["toilet2"],
-            quick_feedback=options["cleaning"],
-            comment="This place needs cleaning please. Anonymous feedback.",
-            urgent=False,
-        )
-        FacilityFeedback.objects.create(
-            facility=facilities["pdp1"],
-            quick_feedback=options["attention"],
-            comment="Rain cover needs some work, and we need more free plugs! This feedback is submitted anonymously.",
-            urgent=False,
-        )
-        FacilityFeedback.objects.create(
-            user=users[5],
-            facility=facilities["pdp2"],
-            quick_feedback=options["power"],
-            comment="No power, please help",
-            urgent=True,
-        )
+        feedback = [
+            FacilityFeedback(
+                user=users[1],
+                facility=facilities["toilet1"],
+                quick_feedback=options["attention"],
+                comment="Something smells wrong",
+                urgent=True,
+            ),
+            FacilityFeedback(
+                user=users[2],
+                facility=facilities["toilet1"],
+                quick_feedback=options["toiletpaper"],
+                urgent=False,
+            ),
+            FacilityFeedback(
+                facility=facilities["toilet2"],
+                quick_feedback=options["cleaning"],
+                comment="This place needs cleaning please. Anonymous feedback.",
+                urgent=False,
+            ),
+            FacilityFeedback(
+                facility=facilities["pdp1"],
+                quick_feedback=options["attention"],
+                comment="Rain cover needs some work, and we need more free plugs! This feedback is submitted anonymously.",
+                urgent=False,
+            ),
+            FacilityFeedback(
+                user=users[5],
+                facility=facilities["pdp2"],
+                quick_feedback=options["power"],
+                comment="No power, please help",
+                urgent=True,
+            )
+        ]
+        FacilityFeedback.objects.bulk_create(feedback)
 
     def create_event_types(self) -> None:
         """Create event types."""
         types = {}
         self.output("Creating event types...")
-        types["workshop"] = EventType.objects.create(
+        types["workshop"] = EventType(
             name="Workshop",
             slug="workshop",
             color="#ff9900",
@@ -398,7 +405,7 @@ class Bootstrap:
             support_speaker_event_conflicts=True,
         )
 
-        types["talk"] = EventType.objects.create(
+        types["talk"] = EventType(
             name="Talk",
             slug="talk",
             color="#2D9595",
@@ -412,7 +419,7 @@ class Bootstrap:
             support_speaker_event_conflicts=True,
         )
 
-        types["lightning"] = EventType.objects.create(
+        types["lightning"] = EventType(
             name="Lightning Talk",
             slug="lightning-talk",
             color="#ff0000",
@@ -425,7 +432,7 @@ class Bootstrap:
             support_speaker_event_conflicts=True,
         )
 
-        types["music"] = EventType.objects.create(
+        types["music"] = EventType(
             name="Music Act",
             slug="music",
             color="#1D0095",
@@ -439,7 +446,7 @@ class Bootstrap:
             support_speaker_event_conflicts=True,
         )
 
-        types["keynote"] = EventType.objects.create(
+        types["keynote"] = EventType(
             name="Keynote",
             slug="keynote",
             color="#FF3453",
@@ -452,7 +459,7 @@ class Bootstrap:
             support_speaker_event_conflicts=True,
         )
 
-        types["debate"] = EventType.objects.create(
+        types["debate"] = EventType(
             name="Debate",
             slug="debate",
             color="#F734C3",
@@ -466,7 +473,7 @@ class Bootstrap:
             support_speaker_event_conflicts=True,
         )
 
-        types["facility"] = EventType.objects.create(
+        types["facility"] = EventType(
             name="Facilities",
             slug="facilities",
             color="#cccccc",
@@ -479,7 +486,7 @@ class Bootstrap:
             support_speaker_event_conflicts=False,
         )
 
-        types["recreational"] = EventType.objects.create(
+        types["recreational"] = EventType(
             name="Recreational Event",
             slug="recreational-event",
             color="#0000ff",
@@ -492,6 +499,8 @@ class Bootstrap:
             support_autoscheduling=False,
             support_speaker_event_conflicts=True,
         )
+
+        EventType.objects.bulk_create(types.values())
 
         self.event_types = types
 
@@ -573,74 +582,78 @@ class Bootstrap:
         """Create product categories."""
         categories = {}
         self.output("Creating productcategories...")
-        categories["transportation"] = ProductCategory.objects.create(
+        categories["transportation"] = ProductCategory(
             name="Transportation",
             slug="transportation",
         )
-        categories["merchandise"] = ProductCategory.objects.create(
+        categories["merchandise"] = ProductCategory(
             name="Merchandise",
             slug="merchandise",
         )
-        categories["tickets"] = ProductCategory.objects.create(
+        categories["tickets"] = ProductCategory(
             name="Tickets",
             slug="tickets",
         )
-        categories["villages"] = ProductCategory.objects.create(
+        categories["villages"] = ProductCategory(
             name="Villages",
             slug="villages",
         )
-        categories["facilities"] = ProductCategory.objects.create(
+        categories["facilities"] = ProductCategory(
             name="Facilities",
             slug="facilities",
         )
-        categories["packages"] = ProductCategory.objects.create(
+        categories["packages"] = ProductCategory(
             name="Packages",
             slug="packages",
         )
 
+        ProductCategory.objects.bulk_create(categories.values())
         self.product_categories = categories
 
     def create_camp_ticket_types(self, camp: Camp) -> dict:
         """Create camp ticket types."""
         types = {}
         self.output(f"Creating tickettypes for {camp.year}...")
-        types["adult_full_week"] = TicketType.objects.create(
+        types["adult_full_week"] = TicketType(
             name="Adult Full Week",
             camp=camp,
         )
-        camp.ticket_type_full_week_adult = types["adult_full_week"]
-        types["adult_one_day"] = TicketType.objects.create(
+        types["adult_one_day"] = TicketType(
             name="Adult One Day",
             camp=camp,
         )
-        camp.ticket_type_one_day_adult = types["adult_one_day"]
-        types["child_full_week"] = TicketType.objects.create(
+        types["child_full_week"] = TicketType(
             name="Child Full Week",
             camp=camp,
         )
-        camp.ticket_type_full_week_child = types["child_full_week"]
-        types["child_one_day"] = TicketType.objects.create(
+        types["child_one_day"] = TicketType(
             name="Child One Day",
             camp=camp,
         )
-        camp.ticket_type_one_day_child = types["child_one_day"]
-        types["village"] = TicketType.objects.create(
+        types["village"] = TicketType(
             name="Village",
             camp=camp,
         )
-        types["merchandise"] = TicketType.objects.create(
+        types["merchandise"] = TicketType(
             name="Merchandise",
             camp=camp,
         )
-        types["facilities"] = TicketType.objects.create(
+        types["facilities"] = TicketType(
             name="Facilities",
             camp=camp,
             single_ticket_per_product=True,
         )
-        types["transportation"] = TicketType.objects.create(
+        types["transportation"] = TicketType(
             name="Transportation",
             camp=camp,
         )
+
+        TicketType.objects.bulk_create(types.values())
+
+        camp.ticket_type_full_week_adult = types["adult_full_week"]
+        camp.ticket_type_one_day_adult = types["adult_one_day"]
+        camp.ticket_type_full_week_child = types["child_full_week"]
+        camp.ticket_type_one_day_child = types["child_one_day"]
 
         return types
 
@@ -655,7 +668,7 @@ class Bootstrap:
         camp_prefix = f"BornHack {camp.year}"
 
         name = f"{camp_prefix} Standard ticket"
-        products["ticket1"] = Product.objects.create(
+        products["ticket1"] = Product(
             name=name,
             description="A ticket",
             price=1200,
@@ -669,7 +682,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} Hacker ticket"
-        products["ticket2"] = Product.objects.create(
+        products["ticket2"] = Product(
             name=name,
             description="Another ticket",
             price=1337,
@@ -683,7 +696,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} Child Ticket (5-15 year old)"
-        products["child_ticket"] = Product.objects.create(
+        products["child_ticket"] = Product(
             name=name,
             description="A child ticket",
             price=495,
@@ -697,7 +710,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} One day ticket"
-        products["one_day_ticket"] = Product.objects.create(
+        products["one_day_ticket"] = Product(
             name=name,
             description="One day ticket",
             price=300,
@@ -711,7 +724,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} One day ticket child"
-        products["one_day_ticket_child"] = Product.objects.create(
+        products["one_day_ticket_child"] = Product(
             name=name,
             description="One day ticket child",
             price=165,
@@ -725,7 +738,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} Village tent 3x3 meters, no floor"
-        products["tent1"] = Product.objects.create(
+        products["tent1"] = Product(
             name=name,
             description="A description of the tent goes here",
             price=3325,
@@ -739,7 +752,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} Village tent 3x3 meters, with floor"
-        products["tent2"] = Product.objects.create(
+        products["tent2"] = Product(
             name=name,
             description="A description of the tent goes here",
             price=3675,
@@ -753,7 +766,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} T-shirt Large"
-        products["t-shirt-large"] = Product.objects.create(
+        products["t-shirt-large"] = Product(
             name=name,
             description="A description of the t-shirt goes here",
             price=150,
@@ -767,7 +780,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} T-shirt Medium"
-        products["t-shirt-medium"] = Product.objects.create(
+        products["t-shirt-medium"] = Product(
             name=name,
             description="A description of the t-shirt goes here",
             price=150,
@@ -781,7 +794,7 @@ class Bootstrap:
         )
 
         name = f"{camp_prefix} T-shirt Small"
-        products["t-shirt-small"] = Product.objects.create(
+        products["t-shirt-small"] = Product(
             name=name,
             description="A description of the t-shirt goes here",
             price=150,
@@ -795,7 +808,7 @@ class Bootstrap:
         )
 
         name = "100 HAX"
-        products["hax"] = Product.objects.create(
+        products["hax"] = Product(
             name=name,
             description="100 HAX",
             price=100,
@@ -809,7 +822,7 @@ class Bootstrap:
         )
 
         name = "Corporate Hackers Small"
-        products["corporate_hackers_small"] = Product.objects.create(
+        products["corporate_hackers_small"] = Product(
             name=name,
             description="Send your company to BornHack in style with one of our corporate packages!",
             price=18000,
@@ -820,6 +833,9 @@ class Bootstrap:
             ),
             slug=f"{camp.slug}-corporate-hackers-small",
         )
+
+        Product.objects.bulk_create(products.values())
+
         products["corporate_hackers_small"].sub_products.add(
             products["ticket1"],
             through_defaults={
@@ -930,55 +946,57 @@ class Bootstrap:
         """Create all event locations."""
         locations = {}
         self.output(f"Creating event_locations for {camp.year}...")
-        locations["speakers_tent"] = EventLocation.objects.create(
+        locations["speakers_tent"] = EventLocation(
             name="Speakers Tent",
             slug="speakers-tent",
             icon="comment",
             camp=camp,
             capacity=150,
         )
-        locations["workshop_room_1"] = EventLocation.objects.create(
+        locations["workshop_room_1"] = EventLocation(
             name="Workshop room 1 (big)",
             slug="workshop-room-1",
             icon="briefcase",
             camp=camp,
             capacity=50,
         )
-        locations["workshop_room_2"] = EventLocation.objects.create(
+        locations["workshop_room_2"] = EventLocation(
             name="Workshop room 2 (small)",
             slug="workshop-room-2",
             icon="briefcase",
             camp=camp,
             capacity=25,
         )
-        locations["workshop_room_3"] = EventLocation.objects.create(
+        locations["workshop_room_3"] = EventLocation(
             name="Workshop room 3 (small)",
             slug="workshop-room-3",
             icon="briefcase",
             camp=camp,
             capacity=25,
         )
-        locations["bar_area"] = EventLocation.objects.create(
+        locations["bar_area"] = EventLocation(
             name="Bar Area",
             slug="bar-area",
             icon="glass-cheers",
             camp=camp,
             capacity=50,
         )
-        locations["food_area"] = EventLocation.objects.create(
+        locations["food_area"] = EventLocation(
             name="Food Area",
             slug="food-area",
             icon="utensils",
             camp=camp,
             capacity=50,
         )
-        locations["infodesk"] = EventLocation.objects.create(
+        locations["infodesk"] = EventLocation(
             name="Infodesk",
             slug="infodesk",
             icon="info",
             camp=camp,
             capacity=20,
         )
+
+        EventLocation.objects.bulk_create(locations.values())
 
         # add workshop room conflicts (the big root can not be used while either
         # of the small rooms are in use, and vice versa)
@@ -990,16 +1008,19 @@ class Bootstrap:
     def create_camp_news(self, camp: Camp) -> None:
         """Create camp news."""
         self.output(f"Creating news for {camp.year}...")
-        NewsItem.objects.create(
-            title=f"Welcome to {camp.title}",
-            content="news body here with <b>html</b> support",
-            published_at=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
-        )
-        NewsItem.objects.create(
-            title=f"{camp.title} is over",
-            content="news body here",
-            published_at=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
-        )
+        news = [
+            NewsItem(
+                title=f"Welcome to {camp.title}",
+                content="news body here with <b>html</b> support",
+                published_at=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
+            ),
+            NewsItem(
+                title=f"{camp.title} is over",
+                content="news body here",
+                published_at=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
+            )
+        ]
+        NewsItem.objects.bulk_create(news)
 
     def create_camp_event_sessions(
         self,
@@ -1016,9 +1037,10 @@ class Bootstrap:
                 camp=camp,
                 event_type=event_types["talk"],
                 event_location=event_locations["speakers_tent"],
+                event_duration_minutes=60,
                 when=(
                     datetime(start.year, start.month, start.day, 11, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
+                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
                 ),
             )
             EventSession.objects.create(
@@ -1035,6 +1057,7 @@ class Bootstrap:
                 camp=camp,
                 event_type=event_types["music"],
                 event_location=event_locations["bar_area"],
+                event_duration_minutes=180,
                 when=(
                     datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz),
                     datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz) + timedelta(hours=3),
@@ -1044,6 +1067,7 @@ class Bootstrap:
                 camp=camp,
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_1"],
+                event_duration_minutes=360,
                 when=(
                     datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
                     datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
@@ -1053,26 +1077,29 @@ class Bootstrap:
                 camp=camp,
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_2"],
+                event_duration_minutes=360,
                 when=(
                     datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
                     datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
                 ),
             )
             EventSession.objects.create(
-                camp=camp,
-                event_type=event_types["workshop"],
-                event_location=event_locations["workshop_room_3"],
-                when=(
-                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
-                ),
-            )
+                    camp=camp,
+                    event_type=event_types["workshop"],
+                    event_location=event_locations["workshop_room_3"],
+                    event_duration_minutes=360,
+                    when=(
+                        datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
+                        datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
+                    ),
+                )
         # create sessions for the keynotes
         for day in [days[1], days[3], days[5]]:
             EventSession.objects.create(
                 camp=camp,
                 event_type=event_types["keynote"],
                 event_location=event_locations["speakers_tent"],
+                event_duration_minutes=90,
                 when=(
                     datetime(
                         day.lower.year,
@@ -1324,37 +1351,40 @@ class Bootstrap:
     def create_camp_villages(self, camp: Camp, users: dict) -> None:
         """Create camp villages."""
         self.output(f"Creating villages for {camp.year}...")
-        Village.objects.create(
-            contact=users[1],
-            camp=camp,
-            name="Baconsvin",
-            slug="baconsvin",
-            approved=True,
-            location=Point(9.9401295, 55.3881695),
-            description="The camp with the doorbell-pig! Baconsvin is a group of happy people from Denmark "
-            "doing a lot of open source, and are always happy to talk about infosec, hacking, BSD, and much more. "
-            "A lot of the organizers of BornHack live in Baconsvin village. "
-            "Come by and squeeze the pig and sign our guestbook!",
-        )
-        Village.objects.create(
-            contact=users[2],
-            camp=camp,
-            name="NetworkWarriors",
-            slug="networkwarriors",
-            approved=True,
-            description="We will have a tent which house the NOC people, various lab equipment people "
-            "can play with, and have fun. If you want to talk about networking, come by, and if you have "
-            "trouble with the Bornhack network contact us.",
-        )
-        Village.objects.create(
-            contact=users[3],
-            camp=camp,
-            name="TheCamp.dk",
-            slug="the-camp",
-            description="This village is representing TheCamp.dk, an annual danish tech camp held in July. "
-            "The official subjects for this event is open source software, network and security. "
-            "In reality we are interested in anything from computers to illumination soap bubbles and irish coffee",
-        )
+        villages = [
+            Village(
+                contact=users[1],
+                camp=camp,
+                name="Baconsvin",
+                slug="baconsvin",
+                approved=True,
+                location=Point(9.9401295, 55.3881695),
+                description="The camp with the doorbell-pig! Baconsvin is a group of happy people from Denmark "
+                "doing a lot of open source, and are always happy to talk about infosec, hacking, BSD, and much more. "
+                "A lot of the organizers of BornHack live in Baconsvin village. "
+                "Come by and squeeze the pig and sign our guestbook!",
+            ),
+            Village(
+                contact=users[2],
+                camp=camp,
+                name="NetworkWarriors",
+                slug="networkwarriors",
+                approved=True,
+                description="We will have a tent which house the NOC people, various lab equipment people "
+                "can play with, and have fun. If you want to talk about networking, come by, and if you have "
+                "trouble with the Bornhack network contact us.",
+            ),
+            Village(
+                contact=users[3],
+                camp=camp,
+                name="TheCamp.dk",
+                slug="the-camp",
+                description="This village is representing TheCamp.dk, an annual danish tech camp held in July. "
+                "The official subjects for this event is open source software, network and security. "
+                "In reality we are interested in anything from computers to illumination soap bubbles and irish coffee",
+            )
+        ]
+        Village.objects.bulk_create(villages)
 
     def create_camp_teams(self, camp: Camp) -> dict:
         """Create camp teams."""
@@ -1431,51 +1461,64 @@ class Bootstrap:
     def create_camp_team_tasks(self, camp: Camp, teams: dict) -> None:
         """Create camp team tasks."""
         self.output(f"Creating TeamTasks for {camp.year}...")
-        TeamTask.objects.create(
-            team=teams["noc"],
-            name="Setup private networks",
-            description="All the private networks need to be setup",
-        )
-        TeamTask.objects.create(
-            team=teams["noc"],
-            name="Setup public networks",
-            description="All the public networks need to be setup",
-        )
-        TeamTask.objects.create(
-            team=teams["noc"],
-            name="Deploy access points",
-            description="All access points need to be deployed",
-        )
-        TeamTask.objects.create(
-            team=teams["noc"],
-            name="Deploy fiber cables",
-            description="We need the fiber deployed where necessary",
-        )
-        TeamTask.objects.create(
-            team=teams["bar"],
-            name="List of booze",
-            description="A list of the different booze we need to have in the bar durng bornhack",
-        )
-        TeamTask.objects.create(
-            team=teams["bar"],
-            name="Chairs",
-            description="We need a solution for chairs",
-        )
-        TeamTask.objects.create(
-            team=teams["bar"],
-            name="Taps",
-            description="Taps must be ordered",
-        )
-        TeamTask.objects.create(
-            team=teams["bar"],
-            name="Coffee",
-            description="We need to get some coffee for our coffee machine",
-        )
-        TeamTask.objects.create(
-            team=teams["bar"],
-            name="Ice",
-            description="We need ice cubes and crushed ice in the bar",
-        )
+        tasks = [
+            TeamTask(
+                team=teams["noc"],
+                name="Setup private networks",
+                description="All the private networks need to be setup",
+                slug=slugify(f"{camp.year} Setup private networks")
+            ),
+            TeamTask(
+                team=teams["noc"],
+                name="Setup public networks",
+                description="All the public networks need to be setup",
+                slug=slugify(f"{camp.year} Setup public networks")
+            ),
+            TeamTask(
+                team=teams["noc"],
+                name="Deploy access points",
+                description="All access points need to be deployed",
+                slug=slugify(f"{camp.year} Deploy access points")
+            ),
+            TeamTask(
+                team=teams["noc"],
+                name="Deploy fiber cables",
+                description="We need the fiber deployed where necessary",
+                slug=slugify(f"{camp.year} deploy fiber cables"),
+            ),
+            TeamTask(
+                team=teams["bar"],
+                name="List of booze",
+                description="A list of the different booze we need to have in the bar durng bornhack",
+                slug=slugify(f"{camp.year} list of booze"),
+            ),
+            TeamTask(
+                team=teams["bar"],
+                name="Chairs",
+                description="We need a solution for chairs",
+                slug=slugify(f"{camp.year} chairs"),
+            ),
+            TeamTask(
+                team=teams["bar"],
+                name="Taps",
+                description="Taps must be ordered",
+                slug=slugify(f"{camp.year} taps"),
+            ),
+            TeamTask(
+                team=teams["bar"],
+                name="Coffee",
+                description="We need to get some coffee for our coffee machine",
+                slug=slugify(f"{camp.year} coffee"),
+            ),
+            TeamTask(
+                team=teams["bar"],
+                name="Ice",
+                description="We need ice cubes and crushed ice in the bar",
+                slug=slugify(f"{camp.year} ice"),
+            ),
+        ]
+
+        TeamTask.objects.bulk_create(tasks)
 
     def create_camp_team_memberships(
         self,
@@ -1484,115 +1527,148 @@ class Bootstrap:
         users: dict,
     ) -> dict:
         """Create camp team memberships."""
-        memberships = {}
+        memberships = defaultdict(list)
         self.output(f"Creating team memberships for {camp.year}...")
         # noc team
-        memberships["noc"] = {}
-        memberships["noc"]["user4"] = TeamMember.objects.create(
-            team=teams["noc"],
-            user=users[4],
-            approved=True,
-            lead=True,
+        memberships["noc"].append(
+            TeamMember(
+                team=teams["noc"],
+                user=users[4],
+                approved=True,
+                lead=True,
+            )
         )
-        memberships["noc"]["user4"].save()
-        memberships["noc"]["user1"] = TeamMember.objects.create(
-            team=teams["noc"],
-            user=users[1],
-            approved=True,
+        memberships["noc"].append(
+            TeamMember(
+                team=teams["noc"],
+                user=users[1],
+                approved=True,
+            )
         )
-        memberships["noc"]["user5"] = TeamMember.objects.create(
-            team=teams["noc"],
-            user=users[5],
-            approved=True,
+        memberships["noc"].append(
+            TeamMember(
+                team=teams["noc"],
+                user=users[5],
+                approved=True,
+            )
         )
-        memberships["noc"]["user2"] = TeamMember.objects.create(
-            team=teams["noc"],
-            user=users[2],
+        memberships["noc"].append(
+            TeamMember(
+                team=teams["noc"],
+                user=users[2],
+            )
         )
 
         # bar team
-        memberships["bar"] = {}
-        memberships["bar"]["user1"] = TeamMember.objects.create(
-            team=teams["bar"],
-            user=users[1],
-            approved=True,
-            lead=True,
+        memberships["bar"].append(
+            TeamMember(
+                team=teams["bar"],
+                user=users[1],
+                approved=True,
+                lead=True,
+            )
         )
-        memberships["bar"]["user3"] = TeamMember.objects.create(
-            team=teams["bar"],
-            user=users[3],
-            approved=True,
-            lead=True,
+        memberships["bar"].append(
+            TeamMember(
+                team=teams["bar"],
+                user=users[3],
+                approved=True,
+                lead=True,
+            )
         )
-        memberships["bar"]["user2"] = TeamMember.objects.create(
-            team=teams["bar"],
-            user=users[2],
-            approved=True,
+        memberships["bar"].append(
+            TeamMember(
+                team=teams["bar"],
+                user=users[2],
+                approved=True,
+            )
         )
-        memberships["bar"]["user7"] = TeamMember.objects.create(
-            team=teams["bar"],
-            user=users[7],
-            approved=True,
+        memberships["bar"].append(
+            TeamMember(
+                team=teams["bar"],
+                user=users[7],
+                approved=True,
+            )
         )
-        memberships["bar"]["user8"] = TeamMember.objects.create(
-            team=teams["bar"],
-            user=users[8],
-        )
+        memberships["bar"].append(
+            TeamMember(
+                team=teams["bar"],
+                user=users[8],
+            )
 
+        )
         # orga team
-        memberships["orga"] = {}
-        memberships["orga"]["user8"] = TeamMember.objects.create(
-            team=teams["orga"],
-            user=users[8],
-            approved=True,
-            lead=True,
+        memberships["orga"].append(
+            TeamMember(
+                team=teams["orga"],
+                user=users[8],
+                approved=True,
+                lead=True,
+            )
         )
-        memberships["orga"]["user9"] = TeamMember.objects.create(
-            team=teams["orga"],
-            user=users[9],
-            approved=True,
-            lead=True,
+        memberships["orga"].append(
+            TeamMember(
+                team=teams["orga"],
+                user=users[9],
+                approved=True,
+                lead=True,
+            )
         )
-        memberships["orga"]["user4"] = TeamMember.objects.create(
-            team=teams["orga"],
-            user=users[4],
-            approved=True,
-            lead=True,
+        memberships["orga"].append(
+            TeamMember(
+                team=teams["orga"],
+                user=users[4],
+                approved=True,
+                lead=True,
+            )
         )
 
         # shuttle team
-        memberships["shuttle"] = {}
-        memberships["shuttle"]["user7"] = TeamMember.objects.create(
-            team=teams["shuttle"],
-            user=users[7],
-            approved=True,
-            lead=True,
+        memberships["shuttle"].append(
+            TeamMember(
+                team=teams["shuttle"],
+                user=users[7],
+                approved=True,
+                lead=True,
+            )
         )
-        memberships["shuttle"]["user3"] = TeamMember.objects.create(
-            team=teams["shuttle"],
-            user=users[3],
-            approved=True,
+        memberships["shuttle"].append(
+            TeamMember(
+                team=teams["shuttle"],
+                user=users[3],
+                approved=True,
+            )
         )
-        memberships["shuttle"]["user9"] = TeamMember.objects.create(
-            team=teams["shuttle"],
-            user=users[9],
-        )
+        memberships["shuttle"].append(
+            TeamMember(
+                team=teams["shuttle"],
+                user=users[9],
+            )
 
+        )
         # economy team also gets a member
-        TeamMember.objects.create(
-            team=teams["economy"],
-            user=users[0],
-            lead=True,
-            approved=True,
+        memberships["economy"].append(
+            TeamMember(
+                team=teams["economy"],
+                user=users[0],
+                lead=True,
+                approved=True,
+            )
         )
 
         # gis team also gets a member
-        TeamMember.objects.create(
-            team=teams["gis"],
-            user=users[0],
-            lead=True,
-            approved=True,
+        memberships["gis"].append(
+            TeamMember(
+                team=teams["gis"],
+                user=users[0],
+                lead=True,
+                approved=True,
+            )
         )
+
+        all_members = list(chain.from_iterable(memberships.values()))
+        TeamMember.objects.bulk_create(all_members)
+
         return memberships
 
     def create_camp_team_shifts(
@@ -1604,7 +1680,7 @@ class Bootstrap:
         """Create camp team shifts."""
         shifts = {}
         self.output(f"Creating team shifts for {camp.year}...")
-        shifts[0] = TeamShift.objects.create(
+        shifts[0] = TeamShift(
             team=teams["shuttle"],
             shift_range=(
                 datetime(camp.year, 8, 27, 2, 0, tzinfo=tz),
@@ -1612,8 +1688,7 @@ class Bootstrap:
             ),
             people_required=1,
         )
-        shifts[0].team_members.add(team_memberships["shuttle"]["user7"])
-        shifts[1] = TeamShift.objects.create(
+        shifts[1] = TeamShift(
             team=teams["shuttle"],
             shift_range=(
                 datetime(camp.year, 8, 27, 8, 0, tzinfo=tz),
@@ -1621,7 +1696,7 @@ class Bootstrap:
             ),
             people_required=1,
         )
-        shifts[2] = TeamShift.objects.create(
+        shifts[2] = TeamShift(
             team=teams["shuttle"],
             shift_range=(
                 datetime(camp.year, 8, 27, 14, 0, tzinfo=tz),
@@ -1629,152 +1704,164 @@ class Bootstrap:
             ),
             people_required=1,
         )
+        TeamShift.objects.bulk_create(shifts.values())
+        shifts[0].team_members.add(team_memberships["shuttle"][1])
 
     def create_camp_info_categories(self, camp: Camp, teams: dict) -> dict:
         """Create camp info categories."""
         categories = {}
         self.output(f"Creating infocategories for {camp.year}...")
-        categories["when"] = InfoCategory.objects.create(
+        categories["when"] = InfoCategory(
             team=teams["orga"],
             headline="When is BornHack happening?",
             anchor="when",
         )
-        categories["travel"] = InfoCategory.objects.create(
+        categories["travel"] = InfoCategory(
             team=teams["orga"],
             headline="Travel Information",
             anchor="travel",
         )
-        categories["sleep"] = InfoCategory.objects.create(
+        categories["sleep"] = InfoCategory(
             team=teams["orga"],
             headline="Where do I sleep?",
             anchor="sleep",
         )
-        categories["noc"] = InfoCategory.objects.create(
+        categories["noc"] = InfoCategory(
             team=teams["noc"],
             headline="Where do I plug in?",
             anchor="noc",
         )
-
+        InfoCategory.objects.bulk_create(categories.values())
         return categories
 
     def create_camp_info_items(self, camp: Camp, categories: dict) -> None:
         """Create the camp info items."""
         self.output(f"Creating infoitems for {camp.year}...")
-        InfoItem.objects.create(
-            category=categories["when"],
-            headline="Opening",
-            anchor="opening",
-            body=f"BornHack {camp.year} starts saturday, august 27th, at noon (12:00). "
-            "It will be possible to access the venue before noon if for example you arrive early "
-            "in the morning with the ferry. But please dont expect everything to be ready before noon :)",
-        )
-        InfoItem.objects.create(
-            category=categories["when"],
-            headline="Closing",
-            anchor="closing",
-            body=f"BornHack {camp.year} ends saturday, september 3rd, at noon (12:00). "
-            "Rented village tents must be empty and cleaned at this time, ready to take down. "
-            "Participants must leave the site no later than 17:00 on the closing day "
-            "(or stay and help us clean up).",
-        )
-        InfoItem.objects.create(
-            category=categories["travel"],
-            headline="Public Transportation",
-            anchor="public-transportation",
-            body=output_fake_md_description(),
-        )
-        InfoItem.objects.create(
-            category=categories["travel"],
-            headline="Bus to and from BornHack",
-            anchor="bus-to-and-from-bornhack",
-            body="PROSA, the union of IT-professionals in Denmark, has set up a great deal "
-            "for BornHack attendees travelling from Copenhagen to BornHack. For only 125kr, "
-            "about 17 euros, you can be transported to the camp on opening day, and back to "
-            "Copenhagen at the end of the camp!",
-        )
-        InfoItem.objects.create(
-            category=categories["when"],
-            headline="Driving and Parking",
-            anchor="driving-and-parking",
-            body=output_fake_md_description(),
-        )
-        InfoItem.objects.create(
-            category=categories["sleep"],
-            headline="Camping",
-            anchor="camping",
-            body="BornHack is first and foremost a tent camp. You need to bring a tent to sleep in. "
-            "Most people go with some friends and make a camp somewhere at the venue. "
-            "See also the section on Villages - you might be able to find some likeminded people to camp with.",
-        )
-        InfoItem.objects.create(
-            category=categories["sleep"],
-            headline="Cabins",
-            anchor="cabins",
-            body="We rent out a few cabins at the venue with 8 beds each for people who don't want to "
-            "sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), "
-            "but the cabins are there if you want them.",
-        )
-        InfoItem.objects.create(
-            category=categories["noc"],
-            headline="Switches",
-            anchor="switches",
-            body="We have places for you to get your cable plugged in to a switch",
-        )
+        items = [
+            InfoItem(
+                category=categories["when"],
+                headline="Opening",
+                anchor="opening",
+                body=f"BornHack {camp.year} starts saturday, august 27th, at noon (12:00). "
+                "It will be possible to access the venue before noon if for example you arrive early "
+                "in the morning with the ferry. But please dont expect everything to be ready before noon :)",
+            ),
+            InfoItem(
+                category=categories["when"],
+                headline="Closing",
+                anchor="closing",
+                body=f"BornHack {camp.year} ends saturday, september 3rd, at noon (12:00). "
+                "Rented village tents must be empty and cleaned at this time, ready to take down. "
+                "Participants must leave the site no later than 17:00 on the closing day "
+                "(or stay and help us clean up).",
+            ),
+            InfoItem(
+                category=categories["travel"],
+                headline="Public Transportation",
+                anchor="public-transportation",
+                body=output_fake_md_description(),
+            ),
+            InfoItem(
+                category=categories["travel"],
+                headline="Bus to and from BornHack",
+                anchor="bus-to-and-from-bornhack",
+                body="PROSA, the union of IT-professionals in Denmark, has set up a great deal "
+                "for BornHack attendees travelling from Copenhagen to BornHack. For only 125kr, "
+                "about 17 euros, you can be transported to the camp on opening day, and back to "
+                "Copenhagen at the end of the camp!",
+            ),
+            InfoItem(
+                category=categories["when"],
+                headline="Driving and Parking",
+                anchor="driving-and-parking",
+                body=output_fake_md_description(),
+            ),
+            InfoItem(
+                category=categories["sleep"],
+                headline="Camping",
+                anchor="camping",
+                body="BornHack is first and foremost a tent camp. You need to bring a tent to sleep in. "
+                "Most people go with some friends and make a camp somewhere at the venue. "
+                "See also the section on Villages - you might be able to find some likeminded people to camp with.",
+            ),
+            InfoItem(
+                category=categories["sleep"],
+                headline="Cabins",
+                anchor="cabins",
+                body="We rent out a few cabins at the venue with 8 beds each for people who don't want to "
+                "sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), "
+                "but the cabins are there if you want them.",
+            ),
+            InfoItem(
+                category=categories["noc"],
+                headline="Switches",
+                anchor="switches",
+                body="We have places for you to get your cable plugged in to a switch",
+            ),
+        ]
+
+        InfoItem.objects.bulk_create(items)
 
     def create_camp_feedback(self, camp: Camp, users: dict[User]) -> None:
         """Create camp feedback."""
         self.output(f"Creating feedback for {camp.year}...")
-        CampFeedback.objects.create(
-            camp=camp,
-            user=users[1],
-            feedback="Awesome event, will be back next year",
-        )
-        CampFeedback.objects.create(
-            camp=camp,
-            user=users[3],
-            feedback="Very nice, though a bit more hot water would be awesome",
-        )
-        CampFeedback.objects.create(
-            camp=camp,
-            user=users[5],
-            feedback="Is there a token here?",
-        )
-        CampFeedback.objects.create(
-            camp=camp,
-            user=users[9],
-            feedback="That was fun. Thanks!",
-        )
+        feedback = [
+            CampFeedback(
+                camp=camp,
+                user=users[1],
+                feedback="Awesome event, will be back next year",
+            ),
+            CampFeedback(
+                camp=camp,
+                user=users[3],
+                feedback="Very nice, though a bit more hot water would be awesome",
+            ),
+            CampFeedback(
+                camp=camp,
+                user=users[5],
+                feedback="Is there a token here?",
+            ),
+            CampFeedback(
+                camp=camp,
+                user=users[9],
+                feedback="That was fun. Thanks!",
+            ),
+        ]
+        CampFeedback.objects.bulk_create(feedback)
 
     def create_camp_rides(self, camp: Camp, users: dict) -> None:
         """Create camp rides."""
         self.output(f"Creating rides for {camp.year}...")
-        Ride.objects.create(
-            camp=camp,
-            user=users[1],
-            seats=2,
-            from_location="Copenhagen",
-            to_location="BornHack",
-            when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
-            description="I have space for two people and a little bit of luggage",
-        )
-        Ride.objects.create(
-            camp=camp,
-            user=users[1],
-            seats=2,
-            from_location="BornHack",
-            to_location="Copenhagen",
-            when=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
-            description="I have space for two people and a little bit of luggage",
-        )
-        Ride.objects.create(
-            camp=camp,
-            user=users[4],
-            seats=1,
-            from_location="Aarhus",
-            to_location="BornHack",
-            when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
-            description="I need a ride and have a large backpack",
-        )
+        rides = [
+            Ride(
+                camp=camp,
+                user=users[1],
+                seats=2,
+                from_location="Copenhagen",
+                to_location="BornHack",
+                when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
+                description="I have space for two people and a little bit of luggage",
+            ),
+            Ride(
+                camp=camp,
+                user=users[1],
+                seats=2,
+                from_location="BornHack",
+                to_location="Copenhagen",
+                when=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
+                description="I have space for two people and a little bit of luggage",
+            ),
+            Ride(
+                camp=camp,
+                user=users[4],
+                seats=1,
+                from_location="Aarhus",
+                to_location="BornHack",
+                when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
+                description="I need a ride and have a large backpack",
+            ),
+        ]
+        Ride.objects.bulk_create(rides)
 
     def create_camp_cfp(self, camp: Camp) -> None:
         """Create the camp call for participation."""
@@ -1794,7 +1881,7 @@ class Bootstrap:
         """Create the camp sponsor tiers."""
         tiers = {}
         self.output(f"Creating sponsor tiers for {camp.year}...")
-        tiers["platinum"] = SponsorTier.objects.create(
+        tiers["platinum"] = SponsorTier(
             name="Platinum sponsors",
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- "
             "thanks from the podium\n- recruitment area\n- sponsor meeting with organizers\n- "
@@ -1803,7 +1890,7 @@ class Bootstrap:
             weight=0,
             week_tickets=10,
         )
-        tiers["gold"] = SponsorTier.objects.create(
+        tiers["gold"] = SponsorTier(
             name="Gold sponsors",
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- "
             "thanks from the podium\n- recruitment area\n- sponsor meeting with organizers\n- promoted HackMe",
@@ -1811,7 +1898,7 @@ class Bootstrap:
             weight=1,
             week_tickets=10,
         )
-        tiers["silver"] = SponsorTier.objects.create(
+        tiers["silver"] = SponsorTier(
             name="Silver sponsors",
             description="- 5 tickets\n- logo on website\n- physical banner in the speaker's tent\n- "
             "thanks from the podium\n- recruitment area\n- sponsor meeting with organizers",
@@ -1819,7 +1906,7 @@ class Bootstrap:
             weight=2,
             week_tickets=5,
         )
-        tiers["sponsor"] = SponsorTier.objects.create(
+        tiers["sponsor"] = SponsorTier(
             name="Sponsors",
             description="- 2 tickets\n- logo on website\n- physical banner in the speaker's tent\n- "
             "thanks from the podium\n- recruitment area",
@@ -1827,7 +1914,7 @@ class Bootstrap:
             weight=3,
             week_tickets=2,
         )
-
+        SponsorTier.objects.bulk_create(tiers.values())
         return tiers
 
     def create_camp_sponsors(self, camp: Camp, tiers: dict) -> list:
@@ -1835,7 +1922,7 @@ class Bootstrap:
         sponsors = []
         self.output(f"Creating sponsors for {camp.year}...")
         sponsors.append(
-            Sponsor.objects.create(
+            Sponsor(
                 name="PROSA",
                 tier=tiers["platinum"],
                 description="Bus Trip",
@@ -1844,7 +1931,7 @@ class Bootstrap:
             ),
         )
         sponsors.append(
-            Sponsor.objects.create(
+            Sponsor(
                 name="DKUUG",
                 tier=tiers["platinum"],
                 description="Speakers tent",
@@ -1853,7 +1940,7 @@ class Bootstrap:
             ),
         )
         sponsors.append(
-            Sponsor.objects.create(
+            Sponsor(
                 name="LetsGo",
                 tier=tiers["silver"],
                 description="Shuttle",
@@ -1862,7 +1949,7 @@ class Bootstrap:
             ),
         )
         sponsors.append(
-            Sponsor.objects.create(
+            Sponsor(
                 name="Saxo Bank",
                 tier=tiers["gold"],
                 description="Cash Sponsorship",
@@ -1871,7 +1958,7 @@ class Bootstrap:
             ),
         )
         sponsors.append(
-            Sponsor.objects.create(
+            Sponsor(
                 name="CSIS",
                 tier=tiers["sponsor"],
                 description="Cash Sponsorship",
@@ -1879,7 +1966,7 @@ class Bootstrap:
                 url="https://csis.dk",
             ),
         )
-
+        Sponsor.objects.bulk_create(sponsors)
         return sponsors
 
     def create_camp_sponsor_tickets(
@@ -1915,25 +2002,31 @@ class Bootstrap:
         """Create the camp tokens."""
         self.output(f"Creating token categories for {camp.year}...")
         categories = {}
-        categories["physical"], _ = TokenCategory.objects.get_or_create(
+        categories["physical"] = TokenCategory(
             name="Physical",
             description="Tokens exist in the physical space",
         )
-        categories["phone"], _ = TokenCategory.objects.get_or_create(
+        categories["phone"] = TokenCategory(
             name="Phone",
             description="Tokens exist in a phoney space",
         )
-        categories["electrical"], _ = TokenCategory.objects.get_or_create(
+        categories["electrical"] = TokenCategory(
             name="Electrical",
             description="Tokens with power",
         )
-        categories["internet"], _ = TokenCategory.objects.get_or_create(
+        categories["internet"] = TokenCategory(
             name="Internet",
             description="Tokens exist in the virtual space",
         )
-        categories["website"], _ = TokenCategory.objects.get_or_create(
+        categories["website"] = TokenCategory(
             name="Website",
             description="Tokens exist on the bornhack website",
+        )
+        TokenCategory.objects.bulk_create(
+            categories.values(),
+            update_conflicts=True,
+            update_fields=["description"],
+            unique_fields=["name"],
         )
         return categories
 
@@ -1941,7 +2034,7 @@ class Bootstrap:
         """Create the camp tokens."""
         tokens = {}
         self.output(f"Creating tokens for {camp.year}...")
-        tokens[0] = Token.objects.create(
+        tokens[0] = Token(
             camp=camp,
             token=get_random_string(length=32),
             category=categories["physical"],
@@ -1949,7 +2042,7 @@ class Bootstrap:
             description="Token in the back of the speakers tent (in binary)",
             active=True,
         )
-        tokens[1] = Token.objects.create(
+        tokens[1] = Token(
             camp=camp,
             token=get_random_string(length=32),
             category=categories["internet"],
@@ -1957,7 +2050,7 @@ class Bootstrap:
             description="Mastodon",
             active=True,
         )
-        tokens[2] = Token.objects.create(
+        tokens[2] = Token(
             camp=camp,
             token=get_random_string(length=32),
             category=categories["website"],
@@ -1965,7 +2058,7 @@ class Bootstrap:
             description="Token hidden in the X-Secret-Token HTTP header on the BornHack website",
             active=True,
         )
-        tokens[3] = Token.objects.create(
+        tokens[3] = Token(
             camp=camp,
             token=get_random_string(length=32),
             category=categories["physical"],
@@ -1973,7 +2066,7 @@ class Bootstrap:
             description="Token in infodesk (QR code)",
             active=True,
         )
-        tokens[4] = Token.objects.create(
+        tokens[4] = Token(
             camp=camp,
             token=get_random_string(length=32),
             category=categories["physical"],
@@ -1981,7 +2074,7 @@ class Bootstrap:
             description=f"Token on the back of the BornHack {camp.year} badge",
             active=True,
         )
-        tokens[5] = Token.objects.create(
+        tokens[5] = Token(
             camp=camp,
             token=get_random_string(length=32),
             category=categories["website"],
@@ -1989,7 +2082,7 @@ class Bootstrap:
             description="Token hidden in EXIF data in the logo posted on the website sunday",
             active=True,
         )
-
+        Token.objects.bulk_create(tokens.values())
         return tokens
 
     def create_camp_token_finds(
@@ -2000,14 +2093,18 @@ class Bootstrap:
     ) -> None:
         """Create the camp token finds."""
         self.output(f"Creating token finds for {camp.year}...")
-        TokenFind.objects.create(token=tokens[3], user=users[4])
-        TokenFind.objects.create(token=tokens[5], user=users[4])
-        TokenFind.objects.create(token=tokens[2], user=users[7])
-        TokenFind.objects.create(token=tokens[1], user=users[3])
-        TokenFind.objects.create(token=tokens[4], user=users[2])
-        TokenFind.objects.create(token=tokens[5], user=users[6])
+        finds = [
+            TokenFind(token=tokens[3], user=users[4]),
+            TokenFind(token=tokens[5], user=users[4]),
+            TokenFind(token=tokens[2], user=users[7]),
+            TokenFind(token=tokens[1], user=users[3]),
+            TokenFind(token=tokens[4], user=users[2]),
+            TokenFind(token=tokens[5], user=users[6]),
+        ]
         for i in range(6):
-            TokenFind.objects.create(token=tokens[i], user=users[1])
+            finds.append(TokenFind(token=tokens[i], user=users[1]))
+
+        TokenFind.objects.bulk_create(finds)
 
     def create_prize_ticket(self, camp: Camp, ticket_types: dict) -> None:
         """Create prize tickets"""
@@ -2126,9 +2223,10 @@ class Bootstrap:
             group=group,
             public=False,
             responsible_team=team,
-        )
+        ),
         layer = Layer.objects.create(
             name="Team Area",
+            slug="teamarea",
             description="Team areas",
             icon="fa fa-list-ul",
             group=group,
@@ -2160,16 +2258,19 @@ class Bootstrap:
 
     def create_camp_pos(self, teams: dict[Team]) -> None:
         """Create POS locations for camp."""
-        Pos.objects.create(
-            name="Infodesk",
-            team=teams["info"],
-            external_id="HHR9izotB6HLzgT6k",
-        )
-        Pos.objects.create(
-            name="Bar",
-            team=teams["bar"],
-            external_id="bTasxE2YYXZh35wtQ",
-        )
+        pos = [
+            Pos(
+                name="Infodesk",
+                team=teams["info"],
+                external_id="HHR9izotB6HLzgT6k",
+            ),
+            Pos(
+                name="Bar",
+                team=teams["bar"],
+                external_id="bTasxE2YYXZh35wtQ",
+            )
+        ]
+        Pos.objects.bulk_create(pos)
 
     def output(self, message: str) -> None:
         """Method for logging the output."""
