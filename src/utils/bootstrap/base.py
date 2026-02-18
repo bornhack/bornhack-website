@@ -181,7 +181,7 @@ class Bootstrap:
         t, created = Type.objects.get_or_create(name="public_credit_name_changed")
         t, created = Type.objects.get_or_create(name="ticket_created")
 
-    def create_users(self, amount: int) -> None:
+    def create_users(self, amount: int = 16) -> None:
         """Create users."""
         self.output("Creating users...")
 
@@ -2296,11 +2296,10 @@ class Bootstrap:
         dataset = []
         default_camp = {'colour': '#424242', 'tagline': 'Undecided'}
 
-        for year in range(years_range[0], years_range[1] + 1):
+        for year in years_range:
             camp = default_camp.copy()
             camp["year"] = year
             camp["read_only"] = False if year in writable_range else True
-
             predefined = CAMP_MAP.get(year)
             if predefined is not None:
                 camp.update(predefined)
@@ -2309,37 +2308,43 @@ class Bootstrap:
 
         return dataset
 
-    def bootstrap_global_data(self) -> None:
+    def bootstrap_global_data(self, prepared_camps: list) -> None:
         """Bootstrap global data for the application."""
         self.output("----------[ Creating global data ]----------")
 
         self.create_event_routing_types()
         self.create_event_types()
-
-        self.create_users(16)
-
-        self.create_news()
-
         self.create_url_types()
 
-        self.create_product_categories()
+        self.create_users()
+        self.create_camps(prepared_camps)
 
-        self.create_token_categories()
+        self.create_news()
 
         self.create_quickfeedback_options()
 
         self.create_maps_layer_generic()
 
+        self.create_credebtors()
+
         self.create_mobilepay_transactions()
         self.create_clearhaus_settlements()
-        self.create_credebtors()
+        self.create_epay_transactions()
+
         self.create_bank_stuff()
         self.create_coinify_stuff()
-        self.create_epay_transactions()
+
+        self.create_product_categories()
+        self.create_token_categories()
 
         self.output("----------[ Finished creating global data ]----------")
 
-    def bootstrap_camp(self, camp: Camp, autoschedule: bool=True) -> None:
+    def bootstrap_camp(
+        self,
+        camp: Camp,
+        autoschedule: bool = True,
+        read_only: bool = True
+    ) -> None:
         """Bootstrap camp related entities."""
         permissions_added = False
         self.teams = {}
@@ -2457,7 +2462,17 @@ class Bootstrap:
 
         self.create_camp_map_layer(camp)
 
-    def post_bootstrap(self, writable_range: list):
+        if read_only:
+            self.output(f"Set {camp.title} to read-only...")
+            camp.read_only = True
+            camp.save(update_fields=["read_only"])
+
+        if camp.year == timezone.now().year:
+            self.output("Update team permissions...")
+            for member in TeamMember.objects.filter(team__camp=camp):
+                member.save()
+
+    def post_bootstrap(self):
         """Make the last changes after the bootstrapping is done."""
         self.output("----------[ Finishing up ]----------")
 
@@ -2472,29 +2487,13 @@ class Bootstrap:
             eventtype=Type.objects.get(name="ticket_created"),
         )
 
-        # TODO (unicorn): Find out why it update team permissions.
-        #
-        # It now updates permissions for current year
-        # instead of using `UPCOMING_CAMP_YEAR` variable
-
-        for camp in self.camps:
-            if camp.year not in writable_range:
-                self.output(f"Set {camp.title} to read-only...")
-                camp.read_only = True
-            if camp.year == timezone.now().year:
-                self.output("Update team permissions...")
-                for member in TeamMember.objects.filter(team__camp=camp):
-                    member.save()
-
-        Camp.objects.bulk_update(self.camps, fields=["read_only"])
-
     def bootstrap_tests(self) -> None:
         """Method for bootstrapping the test database."""
         year = timezone.now().year
         year_range = [(year -1), year, (year + 1)]
         camps = self.prepare_camp_list(year_range, [year])
         self.create_camps(camps)
-        self.create_users(16)
+        self.create_users()
         self.create_event_types()
         self.create_product_categories()
         teams = {}

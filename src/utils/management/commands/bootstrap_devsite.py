@@ -11,6 +11,7 @@ from django.db import connections
 from django.db import transaction
 from django.utils import timezone
 
+from camps.models import Camp
 from utils.bootstrap.base import Bootstrap
 
 logger = logging.getLogger(f"bornhack.{__name__}")
@@ -27,8 +28,8 @@ class Command(BaseCommand):
             "-t",
             "--threads",
             type=int,
-            default=4,
-            help="Specify amount of threads to be used. Default: 4",
+            default=2,
+            help="Specify amount of threads to be used. Default: 2",
         )
         parser.add_argument(
             "-s",
@@ -54,7 +55,8 @@ class Command(BaseCommand):
     def _years(self, value: str) -> list[int]:
         """Transform str argument to list of years or raise exception."""
         try:
-            return [int(year.strip()) for year in value.split(",")]
+            years = [int(year.strip()) for year in value.split(",")]
+            return [year for year in range(years[0], years[-1] + 1)]
         except ValueError:
             raise ArgumentTypeError(
                 "Years must be comma separated integers (e.g. 2026,2027)"
@@ -90,25 +92,24 @@ class Command(BaseCommand):
 
         years = options["years"]
         if years is not None:
-            if years[0] < 2016:
+            if min(years) < 2016:
                 raise CommandError("When specifying years the lower limit is 2016")
 
-        writable_years = options["writable_years"]
-        if writable_years is not None:
-            if writable_years[0] < years[0] or writable_years[1] > years[1]:
+        writables = options["writable_years"]
+        if writables is not None:
+            if min(writables) < min(years) or max(writables) > max(years):
                 raise CommandError(
                     "When specifying writable years stay within range of years"
                 )
 
-    def run(self, bootstrap:Bootstrap, options: dict):
+    def run(self, bootstrap: Bootstrap, options: dict):
         """Bootstrap data using threading."""
         self.decorated_output(f"Running bootstrap_devsite", self.style.SUCCESS)
 
         years = options["years"]
         writable_years = options["writable_years"]
         prepared_camps = bootstrap.prepare_camp_list(years, writable_years)
-        camps = bootstrap.create_camps(prepared_camps)
-        bootstrap.bootstrap_global_data()
+        bootstrap.bootstrap_global_data(prepared_camps)
 
         threads = options["threads"]
         self.decorated_output(
@@ -117,41 +118,52 @@ class Command(BaseCommand):
         )
 
         # Don't bootstrap above last writable camp
-        BOOTSTRAP_LIMIT = writable_years[1]
+        BOOTSTRAP_LIMIT = writable_years[-1]
         limit_logs = []
-        schedule = (not options["skip_auto_scheduler"])
         with ThreadPoolExecutor(max_workers=threads) as executor:
-            for camp in camps:
+            for camp in bootstrap.camps:
                 if camp.year > BOOTSTRAP_LIMIT:
                     limit_logs.append(f"Not bootstrapping {camp.title}")
                 else:
-                    executor.submit(self.worker_job, bootstrap, camp, schedule)
+                    executor.submit(
+                        self.worker_job,
+                        bootstrap,
+                        camp,
+                        (not options["skip_auto_scheduler"]),
+                        False if camp.year in writable_years else True
+                    )
 
-        bootstrap.post_bootstrap(writable_years)
+        bootstrap.post_bootstrap()
 
         for msg in limit_logs:
             self.decorated_output(msg, self.style.WARNING)
 
-    def worker_job(self, bootstrap: Bootstrap, camp, autoschedule: bool):
+    def worker_job(
+        self,
+        bootstrap: Bootstrap,
+        camp: Camp,
+        schedule: bool,
+        read_only: bool
+    ):
         """Execute concurrent bootstrapping atomically
         and always close the db connection.
         """
         try:
             with transaction.atomic():
-                bootstrap.bootstrap_camp(camp, autoschedule)
+                bootstrap.bootstrap_camp(camp, schedule, read_only)
         finally:
             connections.close()
+
+    def decorated_output(self, msg, style=None):
+        """Decorate the stdout format with color and ascii art."""
+        msg = f"----------[ {msg} ]----------"
+        if style:
+            msg = style(msg)
+        self.output(msg)
 
     def output(self, message) -> None:
         """Format the stdout format for command."""
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
-
-    def decorated_output(self, msg, style=None):
-        """Decorate the stdout format with color and ascii art"""
-        msg = f"----------[ {msg} ]----------"
-        if style:
-            msg = style(msg)
-        self.output(msg)
 

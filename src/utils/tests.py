@@ -28,17 +28,17 @@ class TestBootstrapDevsiteCommand:
         return {
             "threads": 4,
             "skip_auto_scheduler": False,
-            "writable_years": [year, (year + 1), (year + 2)],
-            "years": [2016, year + 6],
+            "writable_years": [i for i in range(year, year + 3)],
+            "years": [i for i in range(2016, year + 6)],
         }
 
     def test_custom_years_type(self):
         """Test custom argument type for parsing years and returning a list."""
         cmd = bootstrap_devsite.Command()
         year = timezone.now().year
-        expected = [year, (year + 1)]
+        expected = [year for year in range(year, (year + 3))]
 
-        result = cmd._years(f"{year},{year + 1}")
+        result = cmd._years(f"{year},{year + 2}")
 
         assert result == expected
 
@@ -84,11 +84,18 @@ class TestBootstrapDevsiteCommand:
             cmd.validate(lower)
 
         with pytest.raises(CommandError):
-            call_command("bootstrap_devsite", years=lower["writable_years"])
+            call_command(
+                "bootstrap_devsite",
+                writable_years=lower["writable_years"],
+                years=lower["years"]
+            )
 
         # Test upper limit
         upper = deepcopy(options)
-        upper["writable_years"][1] = (options["years"][1] + 1)
+        upper["writable_years"] = [
+            i for i in
+            range(min(upper["years"]), max(upper["years"]) + 2)
+        ]
 
         with pytest.raises(CommandError):
             cmd.validate(upper)
@@ -96,7 +103,8 @@ class TestBootstrapDevsiteCommand:
         with pytest.raises(CommandError):
             call_command(
                 "bootstrap_devsite",
-                writable_years=upper["writable_years"]
+                writable_years=upper["writable_years"],
+                years=upper["years"]
             )
 
 
