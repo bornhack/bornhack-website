@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import logging
-from concurrent.futures import ThreadPoolExecutor
 from argparse import ArgumentTypeError
+from concurrent.futures import ThreadPoolExecutor
 
-from django.core.management import call_command
 from django.core.management import CommandError
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connections
 from django.db import transaction
@@ -22,8 +22,10 @@ VERBOSITY_LOG_LEVELS = {
     3: logging.DEBUG,
 }
 
+
 class Command(BaseCommand):
     """Class for `bootstrap_devsite` command."""
+
     args = "none"
     help = "Create mock data for development instances"
 
@@ -64,16 +66,16 @@ class Command(BaseCommand):
             return [year for year in range(min(years), max(years) + 1)]
         except ValueError:
             raise ArgumentTypeError(
-                "Years must be comma separated integers (e.g. 2026,2027)"
+                "Years must be comma separated integers (e.g. 2026,2027)",
             )
 
     def handle(self, *args, **options) -> None:
         """Flush database and run bootstrapper."""
         start = timezone.now()
-        self.decorated_output(f"Running bootstrap_devsite", "cyan")
+        self.decorated_output("Running bootstrap_devsite", "cyan")
 
         logging.getLogger(
-            "bornhack"
+            "bornhack",
         ).setLevel(VERBOSITY_LOG_LEVELS.get(options["verbosity"], 1))
 
         self.validate(options)
@@ -88,7 +90,7 @@ class Command(BaseCommand):
         duration = timezone.now() - start
         self.decorated_output(
             f"Finished bootstrap_devsite in {duration}!",
-            "cyan"
+            "cyan",
         )
 
     def validate(self, options: dict):
@@ -106,7 +108,7 @@ class Command(BaseCommand):
         if min(writables) < min(years) or max(writables) > max(years):
             raise CommandError(
                 "Writable years is not within range of camp years."
-                "\nUse (-w/--writable-years YYYY,YYYY) for manual override."
+                "\nUse (-w/--writable-years YYYY,YYYY) for manual override.",
             )
 
     def run(self, bootstrap: Bootstrap, options: dict):
@@ -122,7 +124,7 @@ class Command(BaseCommand):
         threads = options["threads"]
         self.decorated_output(
             f"Bootstrap camp data using {threads} threads",
-            "purple"
+            "purple",
         )
 
         # Don't bootstrap above last writable camp
@@ -132,7 +134,7 @@ class Command(BaseCommand):
             for camp in bootstrap.camps:
                 if camp.year > BOOTSTRAP_LIMIT:
                     bootstrap_logs.append(
-                        (f"Skipping bootstrap for {camp.title}", "yellow")
+                        (f"Skipping bootstrap for {camp.title}", "yellow"),
                     )
                 else:
                     executor.submit(
@@ -140,10 +142,10 @@ class Command(BaseCommand):
                         bootstrap,
                         camp,
                         (not options["skip_auto_scheduler"]),
-                        False if camp.year in writable_years else True
+                        False if camp.year in writable_years else True,
                     )
                     bootstrap_logs.append(
-                        (f"Completed bootstrapping of {camp.title}", "green")
+                        (f"Completed bootstrapping of {camp.title}", "green"),
                     )
 
         self.decorated_output("Running post bootstrap tasks", "purple")
@@ -158,7 +160,7 @@ class Command(BaseCommand):
         bootstrap: Bootstrap,
         camp: Camp,
         schedule: bool,
-        read_only: bool
+        read_only: bool,
     ):
         """Execute concurrent bootstrapping atomically
         and always close the db connection.
@@ -181,14 +183,14 @@ class Command(BaseCommand):
             "red": self.style.ERROR,
             "yellow": self.style.WARNING,
             "green": self.style.SUCCESS,
-            "white": self.style.HTTP_INFO, # DEFAULT/FALLBACK
+            "white": self.style.HTTP_INFO,  # DEFAULT/FALLBACK
             "cyan": self.style.MIGRATE_HEADING,
             "purple": self.style.HTTP_SERVER_ERROR,
         }
         color = color_map.get(color, self.style.HTTP_INFO)
         self.stdout.write(
             "{}: {}".format(
-                timezone.now().strftime("%Y-%m-%d %H:%M:%S"), color(msg)
+                timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+                color(msg),
             ),
         )
-

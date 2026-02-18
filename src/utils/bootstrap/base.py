@@ -6,14 +6,12 @@ import logging
 import random
 import sys
 import uuid
-from zoneinfo import ZoneInfo
+from collections import defaultdict
 from datetime import datetime
 from datetime import timedelta
-from collections import defaultdict
 from itertools import chain
-from psycopg2.extras import DateTimeTZRange
+from zoneinfo import ZoneInfo
 
-from django.utils.text import slugify
 import factory
 from allauth.account.models import EmailAddress
 from django.conf import settings
@@ -26,7 +24,9 @@ from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 from faker import Faker
+from psycopg2.extras import DateTimeTZRange
 
 from camps.models import Camp
 from camps.models import Permission as CampPermission
@@ -49,9 +49,9 @@ from economy.factories import ZettleReceiptFactory
 from economy.models import Chain
 from economy.models import Credebtor
 from economy.models import Expense
-from economy.models import Revenue
 from economy.models import Pos
 from economy.models import Reimbursement
+from economy.models import Revenue
 from events.factories import EventProposalFactory
 from events.factories import EventProposalUrlFactory
 from events.factories import SpeakerProposalFactory
@@ -107,22 +107,22 @@ fake = Faker()
 tz = ZoneInfo(settings.TIME_ZONE)
 logger = logging.getLogger(f"bornhack.{__name__}")
 CAMP_MAP = {
-    2016: {'colour': '#004dff', 'tagline': 'Initial Commit'},
-    2017: {'colour': '#750787', 'tagline': 'Make Tradition'},
-    2018: {'colour': '#008026', 'tagline': 'scale it'},
-    2019: {'colour': '#ffed00', 'tagline': 'a new /home', 'light_text': False},
-    2020: {'colour': '#ff8c00', 'tagline': 'Make Clean'},
-    2021: {'colour': '#e40303', 'tagline': 'Continuous Delivery'},
-    2022: {'colour': '#000000', 'tagline': 'black ~/hack'},
-    2023: {'colour': '#613915', 'tagline': 'make legacy'},
-    2024: {'colour': '#73d7ee', 'tagline': 'Feature Creep', 'light_text': False},
-    2025: {'colour': '#ffafc7', 'tagline': '10 Badges', 'light_text': False},
-    2026: {'colour': '#ffffff', 'tagline': 'Undecided', 'light_text': False},
-    2027: {'colour': '#004dff', 'tagline': 'Undecided'},
-    2028: {'colour': '#750787', 'tagline': 'Undecided'},
-    2029: {'colour': '#008026', 'tagline': 'Undecided'},
-    2030: {'colour': '#ffed00', 'tagline': 'Undecided', 'light_text': False},
-    2031: {'colour': '#ff8c00', 'tagline': 'Undecided'}
+    2016: {"colour": "#004dff", "tagline": "Initial Commit"},
+    2017: {"colour": "#750787", "tagline": "Make Tradition"},
+    2018: {"colour": "#008026", "tagline": "scale it"},
+    2019: {"colour": "#ffed00", "tagline": "a new /home", "light_text": False},
+    2020: {"colour": "#ff8c00", "tagline": "Make Clean"},
+    2021: {"colour": "#e40303", "tagline": "Continuous Delivery"},
+    2022: {"colour": "#000000", "tagline": "black ~/hack"},
+    2023: {"colour": "#613915", "tagline": "make legacy"},
+    2024: {"colour": "#73d7ee", "tagline": "Feature Creep", "light_text": False},
+    2025: {"colour": "#ffafc7", "tagline": "10 Badges", "light_text": False},
+    2026: {"colour": "#ffffff", "tagline": "Undecided", "light_text": False},
+    2027: {"colour": "#004dff", "tagline": "Undecided"},
+    2028: {"colour": "#750787", "tagline": "Undecided"},
+    2029: {"colour": "#008026", "tagline": "Undecided"},
+    2030: {"colour": "#ffed00", "tagline": "Undecided", "light_text": False},
+    2031: {"colour": "#ff8c00", "tagline": "Undecided"},
 }
 
 
@@ -403,7 +403,7 @@ class Bootstrap:
                 quick_feedback=options["power"],
                 comment="No power, please help",
                 urgent=True,
-            )
+            ),
         ]
         FacilityFeedback.objects.bulk_create(feedback)
 
@@ -680,7 +680,7 @@ class Bootstrap:
                 "ticket_type_one_day_adult",
                 "ticket_type_full_week_child",
                 "ticket_type_one_day_child",
-            ]
+            ],
         )
 
         return types
@@ -1046,7 +1046,7 @@ class Bootstrap:
                 title=f"{camp.title} is over",
                 content="news body here",
                 published_at=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
-            )
+            ),
         ]
         NewsItem.objects.bulk_create(news)
 
@@ -1112,15 +1112,15 @@ class Bootstrap:
                 ),
             )
             EventSession.objects.create(
-                    camp=camp,
-                    event_type=event_types["workshop"],
-                    event_location=event_locations["workshop_room_3"],
-                    event_duration_minutes=360,
-                    when=(
-                        datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
-                        datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
-                    ),
-                )
+                camp=camp,
+                event_type=event_types["workshop"],
+                event_location=event_locations["workshop_room_3"],
+                event_duration_minutes=360,
+                when=(
+                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
+                    datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
+                ),
+            )
         # create sessions for the keynotes
         for day in [days[1], days[3], days[5]]:
             EventSession.objects.create(
@@ -1410,7 +1410,7 @@ class Bootstrap:
                 description="This village is representing TheCamp.dk, an annual danish tech camp held in July. "
                 "The official subjects for this event is open source software, network and security. "
                 "In reality we are interested in anything from computers to illumination soap bubbles and irish coffee",
-            )
+            ),
         ]
         Village.objects.bulk_create(villages)
 
@@ -1494,19 +1494,19 @@ class Bootstrap:
                 team=teams["noc"],
                 name="Setup private networks",
                 description="All the private networks need to be setup",
-                slug=slugify(f"{camp.year} Setup private networks")
+                slug=slugify(f"{camp.year} Setup private networks"),
             ),
             TeamTask(
                 team=teams["noc"],
                 name="Setup public networks",
                 description="All the public networks need to be setup",
-                slug=slugify(f"{camp.year} Setup public networks")
+                slug=slugify(f"{camp.year} Setup public networks"),
             ),
             TeamTask(
                 team=teams["noc"],
                 name="Deploy access points",
                 description="All access points need to be deployed",
-                slug=slugify(f"{camp.year} Deploy access points")
+                slug=slugify(f"{camp.year} Deploy access points"),
             ),
             TeamTask(
                 team=teams["noc"],
@@ -1564,27 +1564,27 @@ class Bootstrap:
                 user=users[4],
                 approved=True,
                 lead=True,
-            )
+            ),
         )
         memberships["noc"].append(
             TeamMember(
                 team=teams["noc"],
                 user=users[1],
                 approved=True,
-            )
+            ),
         )
         memberships["noc"].append(
             TeamMember(
                 team=teams["noc"],
                 user=users[5],
                 approved=True,
-            )
+            ),
         )
         memberships["noc"].append(
             TeamMember(
                 team=teams["noc"],
                 user=users[2],
-            )
+            ),
         )
 
         # bar team
@@ -1594,7 +1594,7 @@ class Bootstrap:
                 user=users[1],
                 approved=True,
                 lead=True,
-            )
+            ),
         )
         memberships["bar"].append(
             TeamMember(
@@ -1602,28 +1602,27 @@ class Bootstrap:
                 user=users[3],
                 approved=True,
                 lead=True,
-            )
+            ),
         )
         memberships["bar"].append(
             TeamMember(
                 team=teams["bar"],
                 user=users[2],
                 approved=True,
-            )
+            ),
         )
         memberships["bar"].append(
             TeamMember(
                 team=teams["bar"],
                 user=users[7],
                 approved=True,
-            )
+            ),
         )
         memberships["bar"].append(
             TeamMember(
                 team=teams["bar"],
                 user=users[8],
-            )
-
+            ),
         )
         # orga team
         memberships["orga"].append(
@@ -1632,7 +1631,7 @@ class Bootstrap:
                 user=users[8],
                 approved=True,
                 lead=True,
-            )
+            ),
         )
         memberships["orga"].append(
             TeamMember(
@@ -1640,7 +1639,7 @@ class Bootstrap:
                 user=users[9],
                 approved=True,
                 lead=True,
-            )
+            ),
         )
         memberships["orga"].append(
             TeamMember(
@@ -1648,7 +1647,7 @@ class Bootstrap:
                 user=users[4],
                 approved=True,
                 lead=True,
-            )
+            ),
         )
 
         # shuttle team
@@ -1658,21 +1657,20 @@ class Bootstrap:
                 user=users[7],
                 approved=True,
                 lead=True,
-            )
+            ),
         )
         memberships["shuttle"].append(
             TeamMember(
                 team=teams["shuttle"],
                 user=users[3],
                 approved=True,
-            )
+            ),
         )
         memberships["shuttle"].append(
             TeamMember(
                 team=teams["shuttle"],
                 user=users[9],
-            )
-
+            ),
         )
         # economy team also gets a member
         memberships["economy"].append(
@@ -1681,7 +1679,7 @@ class Bootstrap:
                 user=users[0],
                 lead=True,
                 approved=True,
-            )
+            ),
         )
 
         # gis team also gets a member
@@ -1691,7 +1689,7 @@ class Bootstrap:
                 user=users[0],
                 lead=True,
                 approved=True,
-            )
+            ),
         )
 
         all_members = list(chain.from_iterable(memberships.values()))
@@ -2028,7 +2026,7 @@ class Bootstrap:
 
     def create_token_categories(self) -> None:
         """Create the camp tokens."""
-        self.output(f"Creating token categories...")
+        self.output("Creating token categories...")
         categories = {}
         categories["physical"] = TokenCategory(
             name="Physical",
@@ -2238,15 +2236,17 @@ class Bootstrap:
         """Create map layers for camp."""
         group = MapGroup.objects.get(name="Generic")
         team = Team.objects.get(name="Orga", camp=camp)
-        Layer.objects.create(
-            name="Non public layer",
-            slug="hiddenlayer",
-            description="Hidden layer",
-            icon="fa fa-list-ul",
-            group=group,
-            public=False,
-            responsible_team=team,
-        ),
+        (
+            Layer.objects.create(
+                name="Non public layer",
+                slug="hiddenlayer",
+                description="Hidden layer",
+                icon="fa fa-list-ul",
+                group=group,
+                public=False,
+                responsible_team=team,
+            ),
+        )
         layer = Layer.objects.create(
             name="Team Area",
             slug="teamarea",
@@ -2291,7 +2291,7 @@ class Bootstrap:
                 name="Bar",
                 team=teams["bar"],
                 external_id="bTasxE2YYXZh35wtQ",
-            )
+            ),
         ]
         Pos.objects.bulk_create(pos)
 
@@ -2302,7 +2302,7 @@ class Bootstrap:
     def prepare_camp_list(self, years_range: list, writable_range: list) -> list:
         """Prepare camp dataset for bootstrapping."""
         dataset = []
-        template = {'colour': '#424242', 'tagline': 'Undecided'}
+        template = {"colour": "#424242", "tagline": "Undecided"}
 
         for year in years_range:
             camp = template.copy()
@@ -2347,7 +2347,7 @@ class Bootstrap:
         self,
         camp: Camp,
         autoschedule: bool = True,
-        read_only: bool = True
+        read_only: bool = True,
     ) -> None:
         """Bootstrap camp related entities."""
         permissions_added = False
@@ -2406,8 +2406,7 @@ class Bootstrap:
             self.approve_speaker_proposals(camp)
         except ValidationError:
             self.output(
-                "Name collision, bad luck. Run the bootstrap script again! "
-                "PRs to make this less annoying welcome :)",
+                "Name collision, bad luck. Run the bootstrap script again! PRs to make this less annoying welcome :)",
             )
             sys.exit(1)
 
@@ -2491,7 +2490,7 @@ class Bootstrap:
     def bootstrap_tests(self) -> None:
         """Method for bootstrapping the test database."""
         year = timezone.now().year
-        year_range = [(year -1), year, (year + 1)]
+        year_range = [(year - 1), year, (year + 1)]
         camps = self.prepare_camp_list(year_range, [year])
         self.create_camps(camps)
         self.create_users()
@@ -2529,4 +2528,3 @@ class Bootstrap:
         self.teams = teams[self.camp.year]
         for member in TeamMember.objects.filter(team__camp=self.camp):
             member.save()
-

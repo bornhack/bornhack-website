@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 import logging
-import pytest
 from argparse import ArgumentTypeError
+from copy import deepcopy
 
+import pytest
+from django.core.management import CommandError
+from django.core.management import call_command
 from django.test import Client
 from django.test import TestCase
-from django.core.management import CommandError, call_command
 from django.utils import timezone
 
 from camps.models import Camp
@@ -21,7 +22,7 @@ from utils.management.commands import bootstrap_devsite
 class TestBootstrapDevsiteCommand:
     """Test bootstrap_devsite command."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def options(self) -> dict:
         """Fixture for default options."""
         year = timezone.now().year
@@ -78,7 +79,7 @@ class TestBootstrapDevsiteCommand:
 
         # Test lower limit
         lower = deepcopy(options)
-        lower["writable_years"][0] = (options["years"][0] - 1)
+        lower["writable_years"][0] = options["years"][0] - 1
 
         with pytest.raises(CommandError):
             cmd.validate(lower)
@@ -87,15 +88,12 @@ class TestBootstrapDevsiteCommand:
             call_command(
                 "bootstrap_devsite",
                 writable_years=lower["writable_years"],
-                years=lower["years"]
+                years=lower["years"],
             )
 
         # Test upper limit
         upper = deepcopy(options)
-        upper["writable_years"] = [
-            i for i in
-            range(min(upper["years"]), max(upper["years"]) + 2)
-        ]
+        upper["writable_years"] = [i for i in range(min(upper["years"]), max(upper["years"]) + 2)]
 
         with pytest.raises(CommandError):
             cmd.validate(upper)
@@ -104,7 +102,7 @@ class TestBootstrapDevsiteCommand:
             call_command(
                 "bootstrap_devsite",
                 writable_years=upper["writable_years"],
-                years=upper["years"]
+                years=upper["years"],
             )
 
 
