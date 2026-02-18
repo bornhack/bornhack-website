@@ -11,6 +11,7 @@ from .signal_handlers import create_profile
 from .signal_handlers import profile_pre_save
 from .signal_handlers import set_session_on_login
 from .signal_handlers import reimbursement_msg_on_login
+from .signal_handlers import redisbursement_msg_on_login
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -41,4 +42,9 @@ class ProfilesConfig(AppConfig):
             reimbursement_msg_on_login,
             sender=User,
             dispatch_uid="reimbursement_msg_on_login_signal",
+        )
+        user_logged_in.connect(
+            redisbursement_msg_on_login,
+            sender=User,
+            dispatch_uid="redisbursement_msg_on_login_signal",
         )

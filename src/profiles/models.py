@@ -9,6 +9,8 @@ from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
+from economy.models import Expense
+from economy.models import Revenue
 
 
 class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDModel):
@@ -104,3 +106,24 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         if self.name:
             return self.name
         return self.user.username
+
+    @property
+    def paid_expenses_needs_reimbursement(self):
+        """The paid_expense_needs_reimbursement property."""
+        return Expense.objects.filter(
+            user=self.user,
+            approved=True,
+            reimbursement__isnull=True,
+            payment_status="PAID_NEEDS_REIMBURSEMENT",
+        )
+
+    @property
+    def paid_revenues_needs_redisbursement(self):
+        """The paid_revenues_needs_redisbursement property."""
+        return Revenue.objects.filter(
+            user=self.user,
+            approved=True,
+            reimbursement__isnull=True,
+            payment_status="PAID_NEEDS_REDISBURSEMENT",
+        )
+
