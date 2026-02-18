@@ -674,6 +674,14 @@ class Bootstrap:
         camp.ticket_type_one_day_adult = types["adult_one_day"]
         camp.ticket_type_full_week_child = types["child_full_week"]
         camp.ticket_type_one_day_child = types["child_one_day"]
+        camp.save(
+            update_fields=[
+                "ticket_type_full_week_adult",
+                "ticket_type_one_day_adult",
+                "ticket_type_full_week_child",
+                "ticket_type_one_day_child",
+            ]
+        )
 
         return types
 
@@ -2458,7 +2466,7 @@ class Bootstrap:
         self.create_camp_map_layer(camp)
 
         if read_only:
-            self.output(f"Updating {camp.title} to read-only...")
+            self.output(f"Updatin {camp.title} to read-only...")
             camp.read_only = True
             camp.save(update_fields=["read_only"])
 
