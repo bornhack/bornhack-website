@@ -102,4 +102,3 @@ def redisbursement_msg_on_login(sender, request, user, **kwargs) -> None:
             "revenue(s) have been approved."
         )
         messages.info(request, msg)
-

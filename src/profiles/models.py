@@ -7,10 +7,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
-from utils.models import CreatedUpdatedModel
-from utils.models import UUIDModel
 from economy.models import Expense
 from economy.models import Revenue
+from utils.models import CreatedUpdatedModel
+from utils.models import UUIDModel
 
 
 class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDModel):
@@ -78,22 +78,22 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
     )
 
     @property
-    def email(self):
+    def email(self) -> str:
         return self.user.email
 
     def __str__(self) -> str:
         return self.user.username
 
     def approve_public_credit_name(self) -> None:
-        """This method just sets profile.public_credit_name_approved=True and calls save()
-        It is used in an admin action.
+        """This method just sets profile.public_credit_name_approved=True
+        and calls save(). It is used in an admin action.
         """
         self.public_credit_name_approved = True
         self.save()
 
     @property
-    def get_public_credit_name(self):
-        """Convenience method to return profile.public_credit_name if it is approved,
+    def get_public_credit_name(self) -> str:
+        """Convenience method to return profile.public_credit_name if approved,
         and the string "Unnamed" otherwise.
         """
         if self.public_credit_name_approved:
@@ -101,14 +101,14 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         return "Unnamed"
 
     @property
-    def get_name(self):
+    def get_name(self) -> str:
         """Convenience method to return profile.name if set, otherwise username."""
         if self.name:
             return self.name
         return self.user.username
 
     @property
-    def paid_expenses_needs_reimbursement(self):
+    def paid_expenses_needs_reimbursement(self) -> models.QuerySet:
         """The paid_expense_needs_reimbursement property."""
         return Expense.objects.filter(
             user=self.user,
@@ -118,7 +118,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         )
 
     @property
-    def paid_revenues_needs_redisbursement(self):
+    def paid_revenues_needs_redisbursement(self) -> models.QuerySet:
         """The paid_revenues_needs_redisbursement property."""
         return Revenue.objects.filter(
             user=self.user,
@@ -126,4 +126,3 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
             reimbursement__isnull=True,
             payment_status="PAID_NEEDS_REDISBURSEMENT",
         )
-

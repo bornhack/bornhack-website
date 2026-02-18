@@ -6,8 +6,8 @@ import magic
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Prefetch
 from django.core.exceptions import ValidationError
+from django.db.models import Prefetch
 from django.db.models import Q
 from django.db.models import Sum
 from django.http import HttpResponse
