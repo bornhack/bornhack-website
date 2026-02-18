@@ -2310,8 +2310,6 @@ class Bootstrap:
 
     def bootstrap_global_data(self, prepared_camps: list) -> None:
         """Bootstrap global data for the application."""
-        self.output("----------[ Creating global data ]----------")
-
         self.create_event_routing_types()
         self.create_event_types()
         self.create_url_types()
@@ -2337,8 +2335,6 @@ class Bootstrap:
         self.create_product_categories()
         self.create_token_categories()
 
-        self.output("----------[ Finished creating global data ]----------")
-
     def bootstrap_camp(
         self,
         camp: Camp,
@@ -2348,7 +2344,6 @@ class Bootstrap:
         """Bootstrap camp related entities."""
         permissions_added = False
         self.teams = {}
-        self.output(f"----------[ Bornhack {camp.year} ]----------")
 
         if camp.year > timezone.now().year:
             self.output("Not creating anything for this year yet")
@@ -2463,20 +2458,18 @@ class Bootstrap:
         self.create_camp_map_layer(camp)
 
         if read_only:
-            self.output(f"Set {camp.title} to read-only...")
+            self.output(f"Updating {camp.title} to read-only...")
             camp.read_only = True
             camp.save(update_fields=["read_only"])
 
         if camp.year == timezone.now().year:
-            self.output("Update team permissions...")
+            self.output("Updating team permissions...")
             for member in TeamMember.objects.filter(team__camp=camp):
                 member.save()
 
     def post_bootstrap(self):
         """Make the last changes after the bootstrapping is done."""
-        self.output("----------[ Finishing up ]----------")
-
-        self.output("Adding event routing...")
+        self.output("Creating event routing...")
         teams = self.teams[next(reversed(self.teams.keys()))]
         Routing.objects.create(
             team=teams["orga"],

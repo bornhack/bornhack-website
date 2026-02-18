@@ -15,7 +15,12 @@ from camps.models import Camp
 from utils.bootstrap.base import Bootstrap
 
 logger = logging.getLogger(f"bornhack.{__name__}")
-
+VERBOSITY_LOG_LEVELS = {
+    0: logging.ERROR,
+    1: logging.WARNING,
+    2: logging.INFO,
+    3: logging.DEBUG,
+}
 
 class Command(BaseCommand):
     """Class for `bootstrap_devsite` command."""
@@ -48,7 +53,7 @@ class Command(BaseCommand):
             "-y",
             "--years",
             type=self._years,
-            default=[i for i in range(2016, 2032)],
+            default=[i for i in range(2016, timezone.now().year + 6)],
             help="Comma separated range of camp years. Example: 2016,2032",
         )
 
@@ -65,9 +70,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:
         """Flush database and run bootstrapper."""
         start = timezone.now()
+        self.decorated_output(f"Running bootstrap_devsite", "cyan")
+
+        logging.getLogger(
+            "bornhack"
+        ).setLevel(VERBOSITY_LOG_LEVELS.get(options["verbosity"], 1))
 
         self.validate(options)
-        self.decorated_output("Flush all data from database", "yellow")
+
+        self.decorated_output("Flush all data from database", "purple")
         call_command("flush", "--noinput")
 
         bootstrap = Bootstrap()
@@ -77,7 +88,7 @@ class Command(BaseCommand):
         duration = timezone.now() - start
         self.decorated_output(
             f"Finished bootstrap_devsite in {duration}!",
-            "green"
+            "cyan"
         )
 
     def validate(self, options: dict):
@@ -88,31 +99,30 @@ class Command(BaseCommand):
                 raise CommandError("When specifying threads it must be above 0")
 
         years = options["years"]
-        if years is not None:
-            if min(years) < 2016:
-                raise CommandError("When specifying years the lower limit is 2016")
+        if min(years) < 2016:
+            raise CommandError("When specifying years the lower limit is 2016")
 
         writables = options["writable_years"]
-        if writables is not None:
-            if min(writables) < min(years) or max(writables) > max(years):
-                raise CommandError(
-                    "When specifying writable years stay within range of years"
-                )
+        if min(writables) < min(years) or max(writables) > max(years):
+            raise CommandError(
+                "Writable years is not within range of camp years."
+                "\nUse (-w/--writable-years YYYY,YYYY) for manual override."
+            )
 
     def run(self, bootstrap: Bootstrap, options: dict):
         """Bootstrap data using threading."""
-        self.decorated_output(f"Running bootstrap_devsite", "green")
-
         years = options["years"]
         writable_years = options["writable_years"]
         prepared_camps = bootstrap.prepare_camp_list(years, writable_years)
+
+        self.decorated_output("Creating global data", "green")
         bootstrap.bootstrap_global_data(prepared_camps)
-        self.decorated_output(years, "red")
+        self.decorated_output("Finished creating global data", "green")
 
         threads = options["threads"]
         self.decorated_output(
             f"Bootstrap camp data using {threads} threads",
-            "green"
+            "purple"
         )
 
         # Don't bootstrap above last writable camp
@@ -136,7 +146,9 @@ class Command(BaseCommand):
                         (f"Completed bootstrapping of {camp.title}", "green")
                     )
 
+        self.decorated_output("Running post bootstrap tasks", "purple")
         bootstrap.post_bootstrap()
+        self.decorated_output("Finished post bootstrap tasks", "purple")
 
         for msg, style in bootstrap_logs:
             self.decorated_output(msg, style)
@@ -151,28 +163,32 @@ class Command(BaseCommand):
         """Execute concurrent bootstrapping atomically
         and always close the db connection.
         """
+        self.decorated_output(f"Executing worker job: {camp.title}", "cyan")
         try:
             with transaction.atomic():
                 bootstrap.bootstrap_camp(camp, schedule, read_only)
         finally:
             connections.close()
 
-    def decorated_output(self, msg, style=None):
-        """Decorate the stdout format with color and ascii art."""
+    def decorated_output(self, msg, color="white"):
+        """Decorate stdout with colored text and ascii art."""
         msg = f"----------[ {msg} ]----------"
-        if style:
-            color_map = {
-                "red": self.style.ERROR,
-                "yellow": self.style.WARNING,
-                "green": self.style.SUCCESS,
-            }
-            color = color_map.get(style, self.style.NOTICE)
-            msg = color(msg)
-        self.output(msg)
+        self.output(msg, color)
 
-    def output(self, message) -> None:
-        """Format the stdout format for command."""
+    def output(self, msg, color="white") -> None:
+        """Formatting stdout with colored text options."""
+        color_map = {
+            "red": self.style.ERROR,
+            "yellow": self.style.WARNING,
+            "green": self.style.SUCCESS,
+            "white": self.style.HTTP_INFO, # DEFAULT/FALLBACK
+            "cyan": self.style.MIGRATE_HEADING,
+            "purple": self.style.HTTP_SERVER_ERROR,
+        }
+        color = color_map.get(color, self.style.HTTP_INFO)
         self.stdout.write(
-            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
+            "{}: {}".format(
+                timezone.now().strftime("%Y-%m-%d %H:%M:%S"), color(msg)
+            ),
         )
 
