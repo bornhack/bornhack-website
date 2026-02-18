@@ -2037,18 +2037,8 @@ class Bootstrap:
             .distinct(),
         )
         for user in users:
-            expenses = Expense.objects.filter(
-                user=user,
-                approved=True,
-                reimbursement__isnull=True,
-                payment_status="PAID_NEEDS_REIMBURSEMENT",
-            )
-            revenues = Revenue.objects.filter(
-                user=user,
-                approved=True,
-                reimbursement__isnull=True,
-                payment_status="PAID_NEEDS_REDISBURSEMENT",
-            )
+            expenses = user.profile.paid_expenses_needs_reimbursement
+            revenues = user.profile.paid_revenues_needs_redisbursement
             if not expenses and not revenues:
                 continue
             reimbursement = Reimbursement.objects.create(
