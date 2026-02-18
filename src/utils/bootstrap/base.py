@@ -138,7 +138,7 @@ class Bootstrap:
     quickfeedback_options: dict
 
     def create_camps(self, camps_list: list) -> list[Camp]:
-        """Creates all camps from a list of camps."""
+        """Create camps from a list."""
         self.output("Creating camps...")
 
         camp_instances = []
@@ -2294,10 +2294,10 @@ class Bootstrap:
     def prepare_camp_list(self, years_range: list, writable_range: list) -> list:
         """Prepare camp dataset for bootstrapping."""
         dataset = []
-        default_camp = {'colour': '#424242', 'tagline': 'Undecided'}
+        template = {'colour': '#424242', 'tagline': 'Undecided'}
 
         for year in years_range:
-            camp = default_camp.copy()
+            camp = template.copy()
             camp["year"] = year
             camp["read_only"] = False if year in writable_range else True
             predefined = CAMP_MAP.get(year)

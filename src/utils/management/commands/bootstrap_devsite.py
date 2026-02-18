@@ -48,7 +48,7 @@ class Command(BaseCommand):
             "-y",
             "--years",
             type=self._years,
-            default=[2016, timezone.now().year + 6],
+            default=[i for i in range(2016, 2032)],
             help="Comma separated range of camp years. Example: 2016,2032",
         )
 
@@ -56,7 +56,7 @@ class Command(BaseCommand):
         """Transform str argument to list of years or raise exception."""
         try:
             years = [int(year.strip()) for year in value.split(",")]
-            return [year for year in range(years[0], years[-1] + 1)]
+            return [year for year in range(min(years), max(years) + 1)]
         except ValueError:
             raise ArgumentTypeError(
                 "Years must be comma separated integers (e.g. 2026,2027)"
@@ -67,10 +67,7 @@ class Command(BaseCommand):
         start = timezone.now()
 
         self.validate(options)
-        self.decorated_output(
-            "Flush all data from database",
-            self.style.WARNING
-        )
+        self.decorated_output("Flush all data from database", "yellow")
         call_command("flush", "--noinput")
 
         bootstrap = Bootstrap()
@@ -80,7 +77,7 @@ class Command(BaseCommand):
         duration = timezone.now() - start
         self.decorated_output(
             f"Finished bootstrap_devsite in {duration}!",
-            self.style.SUCCESS
+            "green"
         )
 
     def validate(self, options: dict):
@@ -104,26 +101,29 @@ class Command(BaseCommand):
 
     def run(self, bootstrap: Bootstrap, options: dict):
         """Bootstrap data using threading."""
-        self.decorated_output(f"Running bootstrap_devsite", self.style.SUCCESS)
+        self.decorated_output(f"Running bootstrap_devsite", "green")
 
         years = options["years"]
         writable_years = options["writable_years"]
         prepared_camps = bootstrap.prepare_camp_list(years, writable_years)
         bootstrap.bootstrap_global_data(prepared_camps)
+        self.decorated_output(years, "red")
 
         threads = options["threads"]
         self.decorated_output(
             f"Bootstrap camp data using {threads} threads",
-            self.style.SUCCESS
+            "green"
         )
 
         # Don't bootstrap above last writable camp
         BOOTSTRAP_LIMIT = writable_years[-1]
-        limit_logs = []
+        bootstrap_logs = []
         with ThreadPoolExecutor(max_workers=threads) as executor:
             for camp in bootstrap.camps:
                 if camp.year > BOOTSTRAP_LIMIT:
-                    limit_logs.append(f"Not bootstrapping {camp.title}")
+                    bootstrap_logs.append(
+                        (f"Skipping bootstrap for {camp.title}", "yellow")
+                    )
                 else:
                     executor.submit(
                         self.worker_job,
@@ -132,11 +132,14 @@ class Command(BaseCommand):
                         (not options["skip_auto_scheduler"]),
                         False if camp.year in writable_years else True
                     )
+                    bootstrap_logs.append(
+                        (f"Completed bootstrapping of {camp.title}", "green")
+                    )
 
         bootstrap.post_bootstrap()
 
-        for msg in limit_logs:
-            self.decorated_output(msg, self.style.WARNING)
+        for msg, style in bootstrap_logs:
+            self.decorated_output(msg, style)
 
     def worker_job(
         self,
@@ -158,7 +161,13 @@ class Command(BaseCommand):
         """Decorate the stdout format with color and ascii art."""
         msg = f"----------[ {msg} ]----------"
         if style:
-            msg = style(msg)
+            color_map = {
+                "red": self.style.ERROR,
+                "yellow": self.style.WARNING,
+                "green": self.style.SUCCESS,
+            }
+            color = color_map.get(style, self.style.NOTICE)
+            msg = color(msg)
         self.output(msg)
 
     def output(self, message) -> None:
