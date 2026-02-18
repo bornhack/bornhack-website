@@ -106,6 +106,24 @@ from .functions import output_fake_md_description
 fake = Faker()
 tz = ZoneInfo(settings.TIME_ZONE)
 logger = logging.getLogger(f"bornhack.{__name__}")
+CAMP_MAP = {
+    2016: {'colour': '#004dff', 'tagline': 'Initial Commit'},
+    2017: {'colour': '#750787', 'tagline': 'Make Tradition'},
+    2018: {'colour': '#008026', 'tagline': 'scale it'},
+    2019: {'colour': '#ffed00', 'tagline': 'a new /home', 'light_text': False},
+    2020: {'colour': '#ff8c00', 'tagline': 'Make Clean'},
+    2021: {'colour': '#e40303', 'tagline': 'Continuous Delivery'},
+    2022: {'colour': '#000000', 'tagline': 'black ~/hack'},
+    2023: {'colour': '#613915', 'tagline': 'make legacy'},
+    2024: {'colour': '#73d7ee', 'tagline': 'Feature Creep', 'light_text': False},
+    2025: {'colour': '#ffafc7', 'tagline': '10 Badges', 'light_text': False},
+    2026: {'colour': '#ffffff', 'tagline': 'Undecided', 'light_text': False},
+    2027: {'colour': '#004dff', 'tagline': 'Undecided'},
+    2028: {'colour': '#750787', 'tagline': 'Undecided'},
+    2029: {'colour': '#008026', 'tagline': 'Undecided'},
+    2030: {'colour': '#ffed00', 'tagline': 'Undecided', 'light_text': False},
+    2031: {'colour': '#ff8c00', 'tagline': 'Undecided'}
+}
 
 
 class Bootstrap:
@@ -119,42 +137,44 @@ class Bootstrap:
     product_categories: dict
     quickfeedback_options: dict
 
-    def create_camps(self, camps: dict) -> None:
-        """Creates all camps from a dict of camps."""
+    def create_camps(self, camps_list: list) -> list[Camp]:
+        """Creates all camps from a list of camps."""
         self.output("Creating camps...")
 
         camp_instances = []
+        for data in camps_list:
+            year = data["year"]
+            read_only = data["read_only"]
 
-        for camp in camps:
-            year = camp["year"]
-            read_only = camp["read_only"]
-            camp_instances.append(
-                (
-                    Camp(
-                        title=f"BornHack {year}",
-                        tagline=camp["tagline"],
-                        slug=f"bornhack-{year}",
-                        shortslug=f"bornhack-{year}",
-                        buildup=DateTimeTZRange(
-                            datetime(year, 8, 25, 12, 0, tzinfo=tz),
-                            datetime(year, 8, 27, 12, 0, tzinfo=tz),
-                        ),
-                        camp=DateTimeTZRange(
-                            datetime(year, 8, 27, 12, 0, tzinfo=tz),
-                            datetime(year, 9, 3, 12, 0, tzinfo=tz),
-                        ),
-                        teardown=DateTimeTZRange(
-                            datetime(year, 9, 3, 12, 0, tzinfo=tz),
-                            datetime(year, 9, 5, 12, 0, tzinfo=tz),
-                        ),
-                        colour=camp["colour"],
-                        light_text=camp.get("light_text", True),
-                    ),
-                    read_only,
+            camp = Camp(
+                title=f"BornHack {year}",
+                tagline=data["tagline"],
+                slug=f"bornhack-{year}",
+                shortslug=f"bornhack-{year}",
+                call_for_participation_open=(not read_only),
+                call_for_sponsors_open=(not read_only),
+                buildup=DateTimeTZRange(
+                    datetime(year, 8, 25, 12, 0, tzinfo=tz),
+                    datetime(year, 8, 27, 12, 0, tzinfo=tz),
                 ),
+                camp=DateTimeTZRange(
+                    datetime(year, 8, 27, 12, 0, tzinfo=tz),
+                    datetime(year, 9, 3, 12, 0, tzinfo=tz),
+                ),
+                teardown=DateTimeTZRange(
+                    datetime(year, 9, 3, 12, 0, tzinfo=tz),
+                    datetime(year, 9, 5, 12, 0, tzinfo=tz),
+                ),
+                colour=data["colour"],
+                light_text=data.get("light_text", True),
             )
-        Camp.objects.bulk_create((c[0] for c in camp_instances))
+
+            camp_instances.append(camp)
+
+        Camp.objects.bulk_create(camp_instances)
         self.camps = camp_instances
+
+        return camp_instances
 
     def create_event_routing_types(self) -> None:
         """Create event routing types."""
@@ -1998,9 +2018,9 @@ class Bootstrap:
                         ticket_type=ticket_types["adult_full_week"],
                     )
 
-    def create_token_categories(self, camp: Camp) -> dict[str, TokenCategory]:
+    def create_token_categories(self) -> None:
         """Create the camp tokens."""
-        self.output(f"Creating token categories for {camp.year}...")
+        self.output(f"Creating token categories...")
         categories = {}
         categories["physical"] = TokenCategory(
             name="Physical",
@@ -2028,16 +2048,16 @@ class Bootstrap:
             update_fields=["description"],
             unique_fields=["name"],
         )
-        return categories
+        self.token_categories = categories
 
-    def create_camp_tokens(self, camp: Camp, categories: dict) -> dict[Token]:
+    def create_camp_tokens(self, camp: Camp) -> dict[Token]:
         """Create the camp tokens."""
         tokens = {}
         self.output(f"Creating tokens for {camp.year}...")
         tokens[0] = Token(
             camp=camp,
             token=get_random_string(length=32),
-            category=categories["physical"],
+            category=self.token_categories["physical"],
             hint="Token in a tent",
             description="Token in the back of the speakers tent (in binary)",
             active=True,
@@ -2045,7 +2065,7 @@ class Bootstrap:
         tokens[1] = Token(
             camp=camp,
             token=get_random_string(length=32),
-            category=categories["internet"],
+            category=self.token_categories["internet"],
             hint="Social media",
             description="Mastodon",
             active=True,
@@ -2053,7 +2073,7 @@ class Bootstrap:
         tokens[2] = Token(
             camp=camp,
             token=get_random_string(length=32),
-            category=categories["website"],
+            category=self.token_categories["website"],
             hint="Web server",
             description="Token hidden in the X-Secret-Token HTTP header on the BornHack website",
             active=True,
@@ -2061,7 +2081,7 @@ class Bootstrap:
         tokens[3] = Token(
             camp=camp,
             token=get_random_string(length=32),
-            category=categories["physical"],
+            category=self.token_categories["physical"],
             hint="QR Code",
             description="Token in infodesk (QR code)",
             active=True,
@@ -2069,7 +2089,7 @@ class Bootstrap:
         tokens[4] = Token(
             camp=camp,
             token=get_random_string(length=32),
-            category=categories["physical"],
+            category=self.token_categories["physical"],
             hint="Gadget",
             description=f"Token on the back of the BornHack {camp.year} badge",
             active=True,
@@ -2077,7 +2097,7 @@ class Bootstrap:
         tokens[5] = Token(
             camp=camp,
             token=get_random_string(length=32),
-            category=categories["website"],
+            category=self.token_categories["website"],
             hint="EXIF",
             description="Token hidden in EXIF data in the logo posted on the website sunday",
             active=True,
@@ -2085,24 +2105,19 @@ class Bootstrap:
         Token.objects.bulk_create(tokens.values())
         return tokens
 
-    def create_camp_token_finds(
-        self,
-        camp: Camp,
-        tokens: dict[Token],
-        users: dict[User],
-    ) -> None:
+    def create_camp_token_finds(self, camp: Camp, tokens: dict) -> None:
         """Create the camp token finds."""
         self.output(f"Creating token finds for {camp.year}...")
         finds = [
-            TokenFind(token=tokens[3], user=users[4]),
-            TokenFind(token=tokens[5], user=users[4]),
-            TokenFind(token=tokens[2], user=users[7]),
-            TokenFind(token=tokens[1], user=users[3]),
-            TokenFind(token=tokens[4], user=users[2]),
-            TokenFind(token=tokens[5], user=users[6]),
+            TokenFind(token=tokens[3], user=self.users[4]),
+            TokenFind(token=tokens[5], user=self.users[4]),
+            TokenFind(token=tokens[2], user=self.users[7]),
+            TokenFind(token=tokens[1], user=self.users[3]),
+            TokenFind(token=tokens[4], user=self.users[2]),
+            TokenFind(token=tokens[5], user=self.users[6]),
         ]
         for i in range(6):
-            finds.append(TokenFind(token=tokens[i], user=users[1]))
+            finds.append(TokenFind(token=tokens[i], user=self.users[1]))
 
         TokenFind.objects.bulk_create(finds)
 
@@ -2276,347 +2291,174 @@ class Bootstrap:
         """Method for logging the output."""
         logger.info(message)
 
-    def bootstrap_full(self, options: dict) -> None:
-        """Bootstrap a full devsite with all the years."""
-        camps = [
-            {
-                "year": 2016,
-                "tagline": "Initial Commit",
-                "colour": "#004dff",
-                "read_only": True,
-            },
-            {
-                "year": 2017,
-                "tagline": "Make Tradition",
-                "colour": "#750787",
-                "read_only": True,
-            },
-            {
-                "year": 2018,
-                "tagline": "scale it",
-                "colour": "#008026",
-                "read_only": True,
-            },
-            {
-                "year": 2019,
-                "tagline": "a new /home",
-                "colour": "#ffed00",
-                "read_only": True,
-                "light_text": False,
-            },
-            {
-                "year": 2020,
-                "tagline": "Make Clean",
-                "colour": "#ff8c00",
-                "read_only": True,
-            },
-            {
-                "year": 2021,
-                "tagline": "Continuous Delivery",
-                "colour": "#e40303",
-                "read_only": True,
-            },
-            {
-                "year": 2022,
-                "tagline": "black ~/hack",
-                "colour": "#000000",
-                "read_only": True,
-            },
-            {
-                "year": 2023,
-                "tagline": "make legacy",
-                "colour": "#613915",
-                "read_only": True,
-            },
-            {
-                "year": 2024,
-                "tagline": "Feature Creep",
-                "colour": "#73d7ee",
-                "read_only": False,
-                "light_text": False,
-            },
-            {
-                "year": 2025,
-                "tagline": "10 Badges",
-                "colour": "#ffafc7",
-                "read_only": False,
-                "light_text": False,
-            },
-            {
-                "year": 2026,
-                "tagline": "Undecided",
-                "colour": "#ffffff",
-                "read_only": False,
-                "light_text": False,
-            },
-            {
-                "year": 2027,
-                "tagline": "Undecided",
-                "colour": "#004dff",
-                "read_only": True,
-            },
-            {
-                "year": 2028,
-                "tagline": "Undecided",
-                "colour": "#750787",
-                "read_only": True,
-            },
-            {
-                "year": 2029,
-                "tagline": "Undecided",
-                "colour": "#008026",
-                "read_only": True,
-            },
-            {
-                "year": 2030,
-                "tagline": "Undecided",
-                "colour": "#ffed00",
-                "read_only": True,
-                "light_text": False,
-            },
-            {
-                "year": 2031,
-                "tagline": "Undecided",
-                "colour": "#ff8c00",
-                "read_only": True,
-            },
-        ]
-        self.create_camps(camps)
-        self.bootstrap_base(options)
+    def prepare_camp_list(self, years_range: list, writable_range: list) -> list:
+        """Prepare camp dataset for bootstrapping."""
+        dataset = []
+        default_camp = {'colour': '#424242', 'tagline': 'Undecided'}
 
-    def bootstrap_tests(self) -> None:
-        """Method for bootstrapping the test database."""
-        camps = [
-            {
-                "year": 2024,
-                "tagline": "Feature Creep",
-                "colour": "#73d7ee",
-                "read_only": True,
-                "light_text": False,
-            },
-            {
-                "year": 2025,
-                "tagline": "Undecided",
-                "colour": "#ffafc7",
-                "read_only": False,
-                "light_text": False,
-            },
-            {
-                "year": 2026,
-                "tagline": "Undecided",
-                "colour": "#ffffff",
-                "read_only": False,
-                "light_text": False,
-            },
-        ]
-        self.create_camps(camps)
-        self.create_users(16)
-        self.create_event_types()
-        self.create_product_categories()
-        teams = {}
-        for camp, read_only in self.camps:
-            if camp.year <= settings.UPCOMING_CAMP_YEAR:
-                ticket_types = self.create_camp_ticket_types(camp)
-                camp_products = self.create_camp_products(
-                    camp,
-                    self.product_categories,
-                    ticket_types,
-                )
-                self.create_orders(self.users, camp_products)
-                sponsor_tiers = self.create_camp_sponsor_tiers(camp)
-                camp_sponsors = self.create_camp_sponsors(camp, sponsor_tiers)
-                self.create_camp_sponsor_tickets(
-                    camp,
-                    camp_sponsors,
-                    sponsor_tiers,
-                    ticket_types,
-                )
-                self.create_prize_ticket(camp, ticket_types)
-                self.create_camp_tracks(camp)
+        for year in range(years_range[0], years_range[1] + 1):
+            camp = default_camp.copy()
+            camp["year"] = year
+            camp["read_only"] = False if year in writable_range else True
 
-            teams[camp.year] = self.create_camp_teams(camp)
-            self.create_camp_team_memberships(camp, teams[camp.year], self.users)
-            camp.read_only = read_only
-            camp.call_for_participation_open = not read_only
-            camp.call_for_sponsors_open = not read_only
-            camp.save()
+            predefined = CAMP_MAP.get(year)
+            if predefined is not None:
+                camp.update(predefined)
 
-        self.camp = self.camps[1][0]
-        self.add_team_permissions(self.camp)
-        self.teams = teams[self.camp.year]
-        for member in TeamMember.objects.filter(team__camp=self.camp):
-            member.save()
+            dataset.append(camp)
 
-    def bootstrap_camp(self, options: dict) -> None:
-        """Bootstrap camp related entities."""
-        permissions_added = False
-        self.teams = {}
-        for camp, read_only in self.camps:
-            self.output(
-                f"----------[ Bornhack {camp.year} ]----------",
-            )
+        return dataset
 
-            if camp.year <= timezone.now().year:
-                ticket_types = self.create_camp_ticket_types(camp)
-
-                camp_products = self.create_camp_products(
-                    camp,
-                    self.product_categories,
-                    ticket_types,
-                )
-
-                self.create_orders(self.users, camp_products)
-
-                self.create_camp_tracks(camp)
-
-                locations = self.create_event_locations(camp)
-
-                self.create_camp_news(camp)
-
-                teams = self.create_camp_teams(camp)
-                self.teams[camp.year] = teams
-
-                if not read_only and not permissions_added:
-                    # add permissions for the first camp that is not read_only
-                    self.add_team_permissions(camp)
-                    permissions_added = True
-
-                self.create_camp_team_tasks(camp, teams)
-
-                team_memberships = self.create_camp_team_memberships(
-                    camp,
-                    teams,
-                    self.users,
-                )
-
-                self.create_camp_team_shifts(camp, teams, team_memberships)
-
-                self.create_camp_pos(teams)
-
-                self.create_camp_cfp(camp)
-
-                self.create_camp_proposals(camp, self.event_types)
-
-                self.create_proposal_urls(camp)
-
-                self.create_camp_event_sessions(camp, self.event_types, locations)
-
-                self.generate_speaker_availability(camp)
-
-                try:
-                    self.approve_speaker_proposals(camp)
-                except ValidationError:
-                    self.output(
-                        "Name collision, bad luck. Run the bootstrap script again! "
-                        "PRs to make this less annoying welcome :)",
-                    )
-                    sys.exit(1)
-
-                self.approve_event_proposals(camp)
-
-                self.create_camp_scheduling(camp, not options["skip_auto_scheduler"])
-
-                # shuffle it up - delete and create new random availability
-                self.generate_speaker_availability(camp)
-
-                # and create some speaker<>event conflicts
-                self.create_camp_speaker_event_conflicts(camp)
-
-                # recalculate the autoschedule
-                self.create_camp_rescheduling(camp, not options["skip_auto_scheduler"])
-
-                self.create_camp_villages(camp, self.users)
-
-                facility_types = self.create_facility_types(
-                    teams,
-                    self.quickfeedback_options,
-                )
-
-                facilities = self.create_facilities(facility_types)
-
-                self.create_facility_feedbacks(
-                    facilities,
-                    self.quickfeedback_options,
-                    self.users,
-                )
-
-                info_categories = self.create_camp_info_categories(camp, teams)
-
-                self.create_camp_info_items(camp, info_categories)
-
-                self.create_camp_feedback(camp, self.users)
-
-                self.create_camp_rides(camp, self.users)
-
-                self.create_camp_cfs(camp)
-
-                sponsor_tiers = self.create_camp_sponsor_tiers(camp)
-
-                camp_sponsors = self.create_camp_sponsors(camp, sponsor_tiers)
-
-                categories = self.create_token_categories(camp)
-
-                tokens = self.create_camp_tokens(camp, categories)
-
-                self.create_camp_token_finds(camp, tokens, self.users)
-
-                self.create_camp_expenses(camp)
-
-                self.create_camp_reimbursements(camp)
-
-                self.create_camp_revenues(camp)
-
-                self.create_camp_map_layer(camp)
-            else:
-                self.output("Not creating anything for this year yet")
-
-            camp.read_only = read_only
-            camp.call_for_participation_open = not read_only
-            camp.call_for_sponsors_open = not read_only
-            camp.save()
-
-            # Update team permissions.
-            if camp.year == settings.UPCOMING_CAMP_YEAR:
-                for member in TeamMember.objects.filter(team__camp=camp):
-                    member.save()
-
-    def bootstrap_base(self, options: dict) -> None:
-        """Bootstrap the data for the application."""
-        self.output(
-            "----------[ Running bootstrap_devsite ]----------",
-        )
-
-        self.output("----------[ Global stuff ]----------")
+    def bootstrap_global_data(self) -> None:
+        """Bootstrap global data for the application."""
+        self.output("----------[ Creating global data ]----------")
 
         self.create_event_routing_types()
+        self.create_event_types()
+
         self.create_users(16)
 
         self.create_news()
-
-        self.create_event_types()
 
         self.create_url_types()
 
         self.create_product_categories()
 
+        self.create_token_categories()
+
         self.create_quickfeedback_options()
-
-        self.create_mobilepay_transactions()
-
-        self.create_clearhaus_settlements()
-
-        self.create_credebtors()
-
-        self.create_bank_stuff()
-
-        self.create_coinify_stuff()
-
-        self.create_epay_transactions()
 
         self.create_maps_layer_generic()
 
-        self.bootstrap_camp(options)
+        self.create_mobilepay_transactions()
+        self.create_clearhaus_settlements()
+        self.create_credebtors()
+        self.create_bank_stuff()
+        self.create_coinify_stuff()
+        self.create_epay_transactions()
 
+        self.output("----------[ Finished creating global data ]----------")
+
+    def bootstrap_camp(self, camp: Camp, autoschedule: bool=True) -> None:
+        """Bootstrap camp related entities."""
+        permissions_added = False
+        self.teams = {}
+        self.output(f"----------[ Bornhack {camp.year} ]----------")
+
+        if camp.year > timezone.now().year:
+            self.output("Not creating anything for this year yet")
+
+        ticket_types = self.create_camp_ticket_types(camp)
+
+        camp_products = self.create_camp_products(
+            camp,
+            self.product_categories,
+            ticket_types,
+        )
+
+        self.create_orders(self.users, camp_products)
+
+        self.create_camp_tracks(camp)
+
+        locations = self.create_event_locations(camp)
+
+        self.create_camp_news(camp)
+
+        teams = self.create_camp_teams(camp)
+        self.teams[camp.year] = teams
+
+        if not camp.read_only and not permissions_added:
+            # add permissions for the first camp that is not read_only
+            self.add_team_permissions(camp)
+            permissions_added = True
+
+        self.create_camp_team_tasks(camp, teams)
+
+        team_memberships = self.create_camp_team_memberships(
+            camp,
+            teams,
+            self.users,
+        )
+
+        self.create_camp_team_shifts(camp, teams, team_memberships)
+
+        self.create_camp_pos(teams)
+
+        self.create_camp_cfp(camp)
+
+        self.create_camp_proposals(camp, self.event_types)
+
+        self.create_proposal_urls(camp)
+
+        self.create_camp_event_sessions(camp, self.event_types, locations)
+
+        self.generate_speaker_availability(camp)
+
+        try:
+            self.approve_speaker_proposals(camp)
+        except ValidationError:
+            self.output(
+                "Name collision, bad luck. Run the bootstrap script again! "
+                "PRs to make this less annoying welcome :)",
+            )
+            sys.exit(1)
+
+        self.approve_event_proposals(camp)
+
+        self.create_camp_scheduling(camp, autoschedule)
+
+        # shuffle it up - delete and create new random availability
+        self.generate_speaker_availability(camp)
+
+        # and create some speaker<>event conflicts
+        self.create_camp_speaker_event_conflicts(camp)
+
+        # recalculate the autoschedule
+        self.create_camp_rescheduling(camp, autoschedule)
+
+        self.create_camp_villages(camp, self.users)
+
+        facility_types = self.create_facility_types(
+            teams,
+            self.quickfeedback_options,
+        )
+
+        facilities = self.create_facilities(facility_types)
+
+        self.create_facility_feedbacks(
+            facilities,
+            self.quickfeedback_options,
+            self.users,
+        )
+
+        info_categories = self.create_camp_info_categories(camp, teams)
+
+        self.create_camp_info_items(camp, info_categories)
+
+        self.create_camp_feedback(camp, self.users)
+
+        self.create_camp_rides(camp, self.users)
+
+        self.create_camp_cfs(camp)
+
+        sponsor_tiers = self.create_camp_sponsor_tiers(camp)
+
+        self.create_camp_sponsors(camp, sponsor_tiers)
+
+        tokens = self.create_camp_tokens(camp)
+
+        self.create_camp_token_finds(camp, tokens)
+
+        self.create_camp_expenses(camp)
+
+        self.create_camp_reimbursements(camp)
+
+        self.create_camp_revenues(camp)
+
+        self.create_camp_map_layer(camp)
+
+    def post_bootstrap(self, writable_range: list):
+        """Make the last changes after the bootstrapping is done."""
         self.output("----------[ Finishing up ]----------")
 
         self.output("Adding event routing...")
@@ -2630,4 +2472,61 @@ class Bootstrap:
             eventtype=Type.objects.get(name="ticket_created"),
         )
 
-        self.output("done!")
+        # TODO (unicorn): Find out why it update team permissions.
+        #
+        # It now updates permissions for current year
+        # instead of using `UPCOMING_CAMP_YEAR` variable
+
+        for camp in self.camps:
+            if camp.year not in writable_range:
+                self.output(f"Set {camp.title} to read-only...")
+                camp.read_only = True
+            if camp.year == timezone.now().year:
+                self.output("Update team permissions...")
+                for member in TeamMember.objects.filter(team__camp=camp):
+                    member.save()
+
+        Camp.objects.bulk_update(self.camps, fields=["read_only"])
+
+    def bootstrap_tests(self) -> None:
+        """Method for bootstrapping the test database."""
+        year = timezone.now().year
+        year_range = [(year -1), year, (year + 1)]
+        camps = self.prepare_camp_list(year_range, [year])
+        self.create_camps(camps)
+        self.create_users(16)
+        self.create_event_types()
+        self.create_product_categories()
+        teams = {}
+        for camp in self.camps:
+            if camp.year > year:
+                continue
+
+            ticket_types = self.create_camp_ticket_types(camp)
+            camp_products = self.create_camp_products(
+                camp,
+                self.product_categories,
+                ticket_types,
+            )
+            self.create_orders(self.users, camp_products)
+            sponsor_tiers = self.create_camp_sponsor_tiers(camp)
+            camp_sponsors = self.create_camp_sponsors(camp, sponsor_tiers)
+            self.create_camp_sponsor_tickets(
+                camp,
+                camp_sponsors,
+                sponsor_tiers,
+                ticket_types,
+            )
+            self.create_prize_ticket(camp, ticket_types)
+            self.create_camp_tracks(camp)
+
+            teams[camp.year] = self.create_camp_teams(camp)
+            self.create_camp_team_memberships(camp, teams[camp.year], self.users)
+            camp.save()
+
+        self.camp = self.camps[1]
+        self.add_team_permissions(self.camp)
+        self.teams = teams[self.camp.year]
+        for member in TeamMember.objects.filter(team__camp=self.camp):
+            member.save()
+

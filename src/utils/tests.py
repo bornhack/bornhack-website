@@ -2,25 +2,102 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import logging
-from unittest import skip
+import pytest
+from argparse import ArgumentTypeError
 
-from django.core.management import call_command
 from django.test import Client
 from django.test import TestCase
+from django.core.management import CommandError, call_command
+from django.utils import timezone
 
 from camps.models import Camp
 from teams.models import Team
 from utils.bootstrap.base import Bootstrap
+from utils.management.commands import bootstrap_devsite
 
 
-class TestBootstrapScript(TestCase):
-    """Test bootstrap_devsite script (touching many codepaths)"""
+class TestBootstrapDevsiteCommand:
+    """Test bootstrap_devsite command."""
 
-    @skip
-    def test_bootstrap_script(self):
-        """If no orders have been made, the product is still available."""
-        call_command("bootstrap_devsite")
+    @pytest.fixture()
+    def options(self) -> dict:
+        """Fixture for default options."""
+        year = timezone.now().year
+        return {
+            "threads": 4,
+            "skip_auto_scheduler": False,
+            "writable_years": [year, (year + 1), (year + 2)],
+            "years": [2016, year + 6],
+        }
+
+    def test_custom_years_type(self):
+        """Test custom argument type for parsing years and returning a list."""
+        cmd = bootstrap_devsite.Command()
+        year = timezone.now().year
+        expected = [year, (year + 1)]
+
+        result = cmd._years(f"{year},{year + 1}")
+
+        assert result == expected
+
+    def test_custom_years_wrong_formatting(self):
+        """Test raising exception when wrongly formatted."""
+        cmd = bootstrap_devsite.Command()
+
+        with pytest.raises(ArgumentTypeError):
+            cmd._years("wrong format")
+
+        with pytest.raises(ArgumentTypeError):
+            cmd._years("2020-2021")
+
+    def test_validating_threads_argument(self, options):
+        """Test validating the `threads` arg."""
+        cmd = bootstrap_devsite.Command()
+        options["threads"] = 0
+
+        with pytest.raises(CommandError):
+            cmd.validate(options)
+
+    def test_validating_years_is_not_below_2016(self, options):
+        """Test validating `years` is not below 2016."""
+        cmd = bootstrap_devsite.Command()
+        copy = deepcopy(options)
+        copy["years"][0] = 2015
+
+        with pytest.raises(CommandError):
+            cmd.validate(copy)
+
+        with pytest.raises(CommandError):
+            call_command("bootstrap_devsite", years=copy["years"])
+
+    def test_validating_writable_years_is_within_range(self, options):
+        """Validate writable years is within range of camp years."""
+        cmd = bootstrap_devsite.Command()
+
+        # Test lower limit
+        lower = deepcopy(options)
+        lower["writable_years"][0] = (options["years"][0] - 1)
+
+        with pytest.raises(CommandError):
+            cmd.validate(lower)
+
+        with pytest.raises(CommandError):
+            call_command("bootstrap_devsite", years=lower["writable_years"])
+
+        # Test upper limit
+        upper = deepcopy(options)
+        upper["writable_years"][1] = (options["years"][1] + 1)
+
+        with pytest.raises(CommandError):
+            cmd.validate(upper)
+
+        with pytest.raises(CommandError):
+            call_command(
+                "bootstrap_devsite",
+                writable_years=upper["writable_years"]
+            )
 
 
 class BornhackTestBase(TestCase):
