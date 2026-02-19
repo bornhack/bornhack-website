@@ -58,7 +58,7 @@ from facilities.models import Facility
 from facilities.models import FacilityFeedback
 from facilities.models import FacilityQuickFeedback
 from facilities.models import FacilityType
-from feedback.models import Feedback
+from feedback.models import CampFeedback
 from info.models import InfoCategory
 from info.models import InfoItem
 from maps.models import Feature
@@ -1724,22 +1724,22 @@ class Bootstrap:
     def create_camp_feedback(self, camp: Camp, users: dict[User]) -> None:
         """Create camp feedback."""
         self.output(f"Creating feedback for {camp.year}...")
-        Feedback.objects.create(
+        CampFeedback.objects.create(
             camp=camp,
             user=users[1],
             feedback="Awesome event, will be back next year",
         )
-        Feedback.objects.create(
+        CampFeedback.objects.create(
             camp=camp,
             user=users[3],
             feedback="Very nice, though a bit more hot water would be awesome",
         )
-        Feedback.objects.create(
+        CampFeedback.objects.create(
             camp=camp,
             user=users[5],
             feedback="Is there a token here?",
         )
-        Feedback.objects.create(
+        CampFeedback.objects.create(
             camp=camp,
             user=users[9],
             feedback="That was fun. Thanks!",

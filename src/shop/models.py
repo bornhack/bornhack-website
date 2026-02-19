@@ -580,7 +580,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
 
     @property
     def left_in_stock(self):
-        if self.stock_amount:
+        if self.stock_amount is not None:
             # All orders that are not open and not cancelled count towards what has
             # been "reserved" from stock.
             #
@@ -603,6 +603,43 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
             return self.left_in_stock > 0
         # If there is no stock defined the product is generally available.
         return True
+
+    @property
+    def labels(self) -> list:
+        """Return list of label objects for this product."""
+        labels = []
+
+        if self.sub_products.all().exists():
+            labels.append({
+                "type": "bundle",
+                "text": "Bundle",
+            })
+
+        if self.left_in_stock is not None:
+            if self.left_in_stock < 1 or not self.is_time_available:
+                labels.insert(0, {
+                    "type": "sold_out",
+                    "text": "Sold out!",
+                })
+
+                # Sold out is an exclusive state - no further labels apply
+                return labels
+
+            elif self.left_in_stock <= 10:
+                labels.append({
+                    "type": "low_stock",
+                    "text": f"Only {self.left_in_stock} left!",
+                })
+
+        if self.available_for_days is not None:
+            if self.available_for_days > 0 and self.available_for_days < 20:
+                labels.append({
+                    "type": "ending_soon",
+                    "text": f"Sales end in {self.available_for_days} days!",
+                })
+
+        return labels
+
 
 
 class SubProductRelation(
