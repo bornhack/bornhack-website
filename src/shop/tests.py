@@ -98,6 +98,123 @@ class ProductAvailabilityTest(TestCase):
         self.assertTrue(product.is_available())
 
 
+class ProductLabelsTest(TestCase):
+    """Test logic about labels for products."""
+
+    def test_labels_for_product_not_available_by_stock(self):
+        """Test product.labels returns a 'sold_out' label object."""
+        product = ProductFactory(stock_amount=1)
+        OrderProductRelationFactory(product=product, order__open=None)
+
+        result = product.labels[0]
+
+        assert result.get("type") == "sold_out"
+        assert result.get("text") == "Sold out!"
+
+    def test_labels_for_product_avoid_other_labels_when_sold_out(self):
+        """Test product.labels not returning other labels when being sold out."""
+        available_in = DateTimeTZRange(
+            lower=timezone.now(),
+            upper=timezone.now() + timezone.timedelta(6),
+        )
+
+        # With available_in
+        product = ProductFactory(stock_amount=0, available_in=available_in)
+
+        result = product.labels[0]
+
+        assert len(product.labels) == 1
+        assert result.get("type") == "sold_out"
+        assert result.get("text") == "Sold out!"
+
+        # Without available_in
+        product = ProductFactory(stock_amount=0)
+
+        result = product.labels[0]
+
+        assert len(product.labels) == 1
+        assert result.get("type") == "sold_out"
+        assert result.get("text") == "Sold out!"
+
+    def test_labels_for_product_with_stock_below_or_equal_to_10(self):
+        """Test the product.labels returns a 'low_stock' label object."""
+        product = ProductFactory(stock_amount=11)
+
+        # No label with stock_amount=11
+        assert len(product.labels) == 0
+
+        OrderProductRelationFactory(product=product, order__open=None)
+        result = product.labels[0]
+
+        assert result.get("type") == "low_stock"
+        assert result.get("text") == "Only 10 left!"
+
+    def test_labels_for_product_ending_within_20_days(self):
+        """Test the product returns a 'ending_soon' label object."""
+        # Without upper availability
+        available_in = DateTimeTZRange(
+            lower=timezone.now(),
+            upper=None,
+        )
+        product = ProductFactory(available_in=available_in)
+
+        assert len(product.labels) == 0
+
+        # Without lower availability
+        available_in = DateTimeTZRange(
+            lower=None,
+            upper=timezone.now(),
+        )
+        product = ProductFactory(available_in=available_in)
+
+        assert len(product.labels) == 0
+
+        # With stock
+        available_in = DateTimeTZRange(
+            lower=timezone.now(),
+            upper=timezone.now() + timezone.timedelta(6),
+        )
+        product = ProductFactory(stock_amount=11, available_in=available_in)
+
+        result = product.labels[0]
+
+        assert result.get("type") == "ending_soon"
+        assert result.get("text") == "Sales end in 5 days!"
+
+        # Without stock
+        product = ProductFactory(available_in=available_in)
+
+        result = product.labels[0]
+
+        assert result.get("type") == "ending_soon"
+        assert result.get("text") == "Sales end in 5 days!"
+
+    def test_labels_for_product_is_empty_when_no_label_applies(self):
+        """
+        Test the product.labels returns an empty list when no label applies.
+        """
+        product = ProductFactory()
+
+        assert len(product.labels) == 0
+
+    def test_labels_for_product_when_being_a_bundle(self):
+        """Test the product.labels when product has subproduct (bundle)."""
+        bundle_product = ProductFactory()
+        sub_product = ProductFactory(
+            ticket_type=TicketTypeFactory(single_ticket_per_product=False),
+        )
+        bundle_product.sub_products.add(
+            sub_product,
+            through_defaults={"number_of_tickets": 5},
+        )
+
+        result = bundle_product.labels[0]
+
+        assert len(bundle_product.labels) == 1
+        assert result.get("type") == "bundle"
+        assert result.get("text") == "Bundle"
+
+
 class TestOrderProductRelationForm(TestCase):
     def test_clean_quantity_succeeds_when_stock_not_exceeded(self):
         product = ProductFactory(stock_amount=2)

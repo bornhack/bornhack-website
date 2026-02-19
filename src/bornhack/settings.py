@@ -280,7 +280,7 @@ BORNHACK_TEAM_PERMISSIONS = {
     "tasker": "Team Tasker - task management",
 }
 
-FIXTURE_DIRS = ["testdata"]
+FIXTURE_DIR = BASE_DIR / "testdata"
 
 CACHES = {
     "default": {
@@ -288,3 +288,6 @@ CACHES = {
         "LOCATION": "tile-cache",
     },
 }
+
+# Use pytest as test runner for integrating with `./manage.py test`
+TEST_RUNNER = "pytest_django.runner.TestRunner"

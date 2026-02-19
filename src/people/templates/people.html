@@ -35,18 +35,23 @@
                       {{ team.name }} Team
                     </td>
                     <td>
-                      {% for resp in team.leads.all %}
-                        {% display_name resp.profile %}<br>
+                      {% for member in team.teammember_set.all %}
+                      {% if member.approved and member.lead %}
+                        {% display_name member.user.profile %}<br>
+                      {% endif %}
                       {% endfor %}
                     </td>
                     <td>
-                      {% for member in team.regular_members.all %}
-                        {% display_name member.profile %}<br>
+                      {% for member in team.teammember_set.all %}
+                        {% if member.approved and not member.lead and member.user.profile.get_public_credit_name != "Unnamed" %}
+                          {% display_name member.user.profile %}<br>
+                        {% endif %}
                       {% empty %}
                         No team members
                       {% endfor %}
                       {% if team.unnamed_members %}
-                        {% if team.unnamed_members.count < team.regular_members.count %}Plus {% endif %}<b>{{ team.unnamed_members.count }}</b> anonymous member(s).
+                        {% if team.unnamed_members.count < team.regular_members.count %}Plus {% endif %}
+                        <b>{{ team.unnamed_members.count }}</b> anonymous member(s).
                       {% endif %}
                     </td>
                   </tr>
