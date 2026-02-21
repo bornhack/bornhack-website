@@ -2,6 +2,7 @@
 {% load commonmark %}
 {% load teams_tags %}
 {% load static %}
+{% load profile_display %}
 
 {% block title %}
   People | {{ block.super }}
@@ -36,14 +37,14 @@
                     <td>
                       {% for member in team.teammember_set.all %}
                       {% if member.approved and member.lead %}
-                        {{ member.user.profile.get_public_credit_name }}<br>
+                        {% display_name member.user.profile %}<br>
                       {% endif %}
                       {% endfor %}
                     </td>
                     <td>
                       {% for member in team.teammember_set.all %}
                         {% if member.approved and not member.lead and member.user.profile.get_public_credit_name != "Unnamed" %}
-                          {{ member.user.profile.get_public_credit_name }}<br>
+                          {% display_name member.user.profile %}<br>
                         {% endif %}
                       {% empty %}
                         No team members

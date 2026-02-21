@@ -1,4 +1,6 @@
 {% load bornhack %}
+{% load profile_display %}
+
 {% if invoice_list %}
   <table class="table table-hover datatable">
     <thead>
@@ -16,7 +18,7 @@
       {% for invoice in invoice_list %}
         <tr>
           <td>{{ invoice.id }}</td>
-          <td>{% if invoice.order %}{{ invoice.order.user.username }} &lt;{{ invoice.order.user.email }}&gt;{% else %}{{ invoice.customorder.customer }}{% endif %}</td>
+          <td>{% if invoice.order %}{% display_name invoice.order.user.profile %} &lt;{{ invoice.order.user.email }}&gt;{% else %}{{ invoice.customorder.customer }}{% endif %}</td>
           <td data-order="{{ invoice.created|sortable }}">{{ invoice.created|date }}</td>
           <td data-order="{% if invoice.order %}{{ invoice.order.total }}{% else %}{{ invoice.customorder.amount }}{% endif %}">{% if invoice.order %}{{ invoice.order.total }}{% else %}{{ invoice.customorder.amount }}{% endif %}&nbsp;DKK</td>
           <td>{{ invoice.get_order }}</td>

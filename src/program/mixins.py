@@ -59,14 +59,13 @@ class EnsureWritableCampMixin:
 class EnsureUserOwnsProposalMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         # make sure that this proposal belongs to the logged in user
-        if self.get_object().user.username != request.user.username:
-            messages.error(request, "No thanks")
-            return redirect(
-                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
-            )
+        if self.get_object().user is request.user:
+            return super().dispatch(request, *args, **kwargs)
 
-        # alright, continue with the request
-        return super().dispatch(request, *args, **kwargs)
+        messages.error(request, "No thanks")
+        return redirect(
+            reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
+        )
 
 
 class UrlViewMixin:

@@ -1,4 +1,6 @@
 {% load bornhack %}
+{% load profile_display %}
+
 {% if revenue_list %}
   <table class="table table-hover datatable">
     <thead>
@@ -31,7 +33,7 @@
           {% endif %}
 
           <td data-order="{{ revenue.invoice_date|sortable }}">{{ revenue.invoice_date }}</td>
-          <td>{{ revenue.user.profile.get_name }}</td>
+          <td>{% display_name revenue.user.profile %}</td>
           <td>{{ revenue.get_payment_status_display }}</td>
           <td>{{ revenue.debtor }}</td>
           <td data-order="{{ revenue.amount }}">{{ revenue.amount }} DKK</td>
