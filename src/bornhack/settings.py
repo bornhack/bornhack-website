@@ -251,9 +251,6 @@ OAUTH2_PROVIDER = {
     "OAUTH2_VALIDATOR_CLASS": "bornhack.oauth_validators.BornhackOAuth2Validator",
 }
 
-# only used for bootstrap-devsite
-UPCOMING_CAMP_YEAR = 2031
-
 # django-tables2 settings
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5-responsive.html"
 DJANGO_TABLES2_TABLE_ATTRS = {
