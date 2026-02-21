@@ -92,7 +92,7 @@ class ProfileApiView(JsonView, ScopedProtectedResourceView):
             "user_id": self.request.user.id,
         }
         context["profile"] = {
-            "public_credit_name": self.request.user.profile.get_public_credit_name,
+            "public_credit_name": self.request.user.profile.public_name,
             "description": self.request.user.profile.description,
         }
         context["teams"] = [{"team": team.name, "camp": team.camp.title} for team in self.request.user.teams.all()]

@@ -1,4 +1,6 @@
 {% load bornhack %}
+{% load profile_display %}
+
 <table class="table table-hover datatable">
   <thead>
     <tr>
@@ -19,7 +21,7 @@
     {% for refund in refund_list %}
       <tr>
         <td>{{ refund.id }}</td>
-        <td>{{ refund.order.user.username }} &lt;{{ refund.order.user.email }}&gt;</td>
+        <td>{% display_name refund.order.user.profile %} &lt;{{ refund.order.user.email }}&gt;</td>
         <td data-order="{{ refund.amount }}">{{ refund.amount }} DKK</td>
         <td data-order="{{ refund.created|sortable }}">{{ refund.created }}</td>
         <td data-order="{{ refund.updated|sortable }}">{{ refund.updated }}</td>

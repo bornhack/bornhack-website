@@ -27,13 +27,17 @@
                 <td>{{ perm.name }}</td>
                 <td>
                   <table class="table">
-                    <thead><tr><th>Username</th><th>Name</th><th>Public Credit Name</th></tr></thead>
+                    <thead>
+                      <tr>
+                        <th>Private name</th>
+                        <th>Public credit name</th>
+                      </tr>
+                    </thead>
                     <tbody>
                       {% for user in users %}
                         <tr>
-                          <td>{{ user.username }}</td>
-                          <td>{{ user.profile.name }}</td>
-                          <td>{{ user.profile.public_credit_name }}</td>
+                          <td>{{ user.profile.private_name }}</td>
+                          <td>{{ user.profile.public_name }}</td>
                         </tr>
                       {% endfor %}
                     </table>

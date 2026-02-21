@@ -1,4 +1,6 @@
 {% load bornhack %}
+{% load profile_display %}
+
 {% if reimbursement_list %}
   <table class="table table-hover datatable">
     <thead>
@@ -25,8 +27,8 @@
           {% else %}
             <td>{{ reim.camp }}</td>
           {% endif %}
-          <td>{{ reim.user.profile.get_name }}</td>
-          <td>{{ reim.reimbursement_user.profile.get_name }}</td>
+          <td>{% display_name reim.user.profile %}</td>
+          <td>{% display_name reim.reimbursement_user.profile %}</td>
           <td>{{ reim.bank_account|default:"N/A" }}</td>
           <td>{{ reim.notes|default:"N/A" }}</td>
           <td data-order="{{ reim.amount }}">{{ reim.amount }} DKK</td>

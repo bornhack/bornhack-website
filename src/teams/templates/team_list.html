@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 {% load teams_tags %}
+{% load profile_display %}
 
 {% block title %}
   Teams | {{ block.super }}
@@ -77,7 +78,7 @@
 
             <td>
               {% for resp in team.leads.all %}
-                {{ resp.profile.get_public_credit_name }}{% if not forloop.last %},{% endif %}<br>
+                {% display_name resp.profile %}{% if not forloop.last %},{% endif %}<br>
               {% endfor %}
             </td>
 

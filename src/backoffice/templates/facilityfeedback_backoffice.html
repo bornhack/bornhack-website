@@ -16,36 +16,38 @@
         <form method="post">
           {{ formset.management_form }}
           {% csrf_token %}
-          {% for form, feedback in formset|zip:feedback_list %}
+          {% for form in formset %}
             <div class="card">
               <div class="card-header">
-                <h4 class="card-title">Feedback for {{ feedback.facility.name }} by {{ feedback.user.profile.public_credit_name|default:"Anonymous User" }}</h4>
+                <h4 class="card-title">
+                  Feedback for {{ form.instance.facility.name }} by {{ form.instance.user.profile.public_name|default:'Anonymous user' }}
+                </h4>
               </div>
               <div class="card-body">
                 <table class="table">
                   <tr>
-                    <th>Username</th>
-                    <td>{{ feedback.user }}</td>
+                    <th>User</th>
+                    <td>{{ form.instance.user.profile.private_name|default:'Anonymous user' }}</td>
                   </tr>
                   <tr>
                     <th>Created</th>
-                    <td>{{ feedback.created }}</td>
+                    <td>{{ form.instance.created }}</td>
                   </tr>
                   <tr>
                     <th>Facility</th>
-                    <td>{{ feedback.facility }}</td>
+                    <td>{{ form.instance.facility }}</td>
                   </tr>
                   <tr>
                     <th>Quick Feedback</th>
-                    <td><i class="{{ feedback.quick_feedback.icon }} fa-2x"></i> {{ feedback.quick_feedback }}</td>
+                    <td><i class="{{ form.instance.quick_feedback.icon }} fa-2x"></i> {{ form.instance.quick_feedback }}</td>
                   </tr>
                   <tr>
                     <th>Comment</th>
-                    <td>{{ feedback.comment|default:"N/A" }}</td>
+                    <td>{{ form.instance.comment|default:"N/A" }}</td>
                   </tr>
                   <tr>
                     <th>Urgent</th>
-                    <td class="{% if feedback.urgent %}text-bg-danger{% endif %}">{{ feedback.urgent|yesno }}</td>
+                    <td class="{% if form.instance.urgent %}text-bg-danger{% endif %}">{{ form.instance.urgent|yesno }}</td>
                   </tr>
                   <tr>
                     <th>Handled</th>
