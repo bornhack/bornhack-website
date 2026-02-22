@@ -83,22 +83,12 @@ def set_session_on_login(sender, request, user, **kwargs) -> None:
 def reimbursement_msg_on_login(sender, request, user, **kwargs) -> None:
     """Add message for reminding user about missing reimbursement."""
     expenses = user.profile.paid_expenses_needs_reimbursement
-    if expenses.exists():
-        msg = (
-            f"NOTE: You have {expenses.count()} expense(s) with missing "
-            "reimbursement. Please create a reimbursement once all your "
-            "expenses have been approved."
-        )
-        messages.info(request, msg)
-
-
-def redisbursement_msg_on_login(sender, request, user, **kwargs) -> None:
-    """Add message for reminding user about missing redisbursement."""
     revenues = user.profile.paid_revenues_needs_redisbursement
-    if revenues.exists():
+    if expenses.exists() or revenues.exists():
         msg = (
-            f"NOTE: You have {revenues.count()} revenue(s) with missing "
-            "redisbursement. Please create a redisbursement once all your "
-            "revenue(s) have been approved."
+            f"NOTE: You have {expenses.count()} expense(s) and "
+            f"{revenues.count()} revenues(s) with missing "
+            "reimbursement. Please create a reimbursement once all your "
+            "expenses and revenues have been created and approved."
         )
         messages.info(request, msg)
