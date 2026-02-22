@@ -20,8 +20,8 @@
     <table class="table table-hover datatable">
       <thead>
         <tr>
-          <th>Username</th>
-          <th>Public Credit Name</th>
+          <th>Private name</th>
+          <th>Public credit name</th>
           <th>Feedback</th>
           <th>State</th>
           <th>Processed at</th>
@@ -32,8 +32,8 @@
       <tbody>
         {% for feedback in object_list %}
           <tr>
-            <td>{{ feedback.user.username }}</td>
-            <td>{{ feedback.user.profile.public_credit_name }}</td>
+            <td>{{ feedback.user.profile.private_name }}</td>
+            <td>{{ feedback.user.profile.public_name }}</td>
             <td>{{ feedback.feedback|truncatewords:25 }}</td>
             <td>
               <span
