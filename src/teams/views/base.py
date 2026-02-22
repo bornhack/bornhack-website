@@ -93,7 +93,6 @@ class TeamSettingsView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixi
         "private_irc_channel_managed",
         "public_signal_channel_link",
         "private_signal_channel_link",
-        "public_phone_number",
         "public_dect_number",
         "guide",
     )

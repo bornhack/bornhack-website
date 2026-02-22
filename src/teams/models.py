@@ -211,13 +211,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     public_signal_channel_link = models.URLField(null=True, blank=True, default="")
     private_signal_channel_link = models.URLField(null=True, blank=True, default="")
 
-    public_phone_number  = models.CharField(
-        max_length=14, # Allow for "+00 1234567890"
-        blank=True,
-        null=True,
-        help_text="The public phonenumber for this team.",
-    )
-
     public_dect_number = models.ForeignKey(
         DectRegistration,
         on_delete=models.PROTECT,
