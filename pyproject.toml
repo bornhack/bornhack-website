@@ -38,7 +38,7 @@ dependencies = [
     "lxml==6.0.2",
     "nh3==0.3.2",
     "openpyxl==3.1.5",  # used to import excel files in economy backoffice
-    "pandas==3.0.0",
+    "pandas==3.0.1",
     "psycopg2-binary==2.9.11",
     "python-magic==0.4.27",
     "quickpay-api-client==2.0.1",
