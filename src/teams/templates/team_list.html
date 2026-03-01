@@ -100,7 +100,7 @@
                 <div class="btn-group-vertical">
                   <a class="btn btn-sm btn-primary text-nowrap" href="{% url 'teams:general' camp_slug=camp.slug team_slug=team.slug %}"><i class="fas fa-search"></i>&nbsp;Details</a>
                   {% if request.user in team.leads.all %}
-                    <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-sm btn-primary text-nowrap"><i class="fas fa-cog"></i>&nbsp;Manage</a>
+                    <a href="{% url 'teams:settings' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-sm btn-info text-nowrap"><i class="fas fa-cog"></i>&nbsp;Settings</a>
                   {% endif %}
                   {% if request.user in team.members.all %}
                     <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-sm btn-danger text-nowrap"><i class="fas fa-times"></i>&nbsp;Leave</a>
