@@ -9,8 +9,8 @@ from django.db.models.signals import pre_save
 
 from .signal_handlers import create_profile
 from .signal_handlers import profile_pre_save
-from .signal_handlers import set_session_on_login
 from .signal_handlers import reimbursement_msg_on_login
+from .signal_handlers import set_session_on_login
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 

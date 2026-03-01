@@ -79,15 +79,16 @@ def set_session_on_login(sender, request, user, **kwargs) -> None:
     """Signal handler called on_login to set session["theme"] from the user profile."""
     request.session["theme"] = request.user.profile.theme
 
+
 def reimbursement_msg_on_login(sender, request, user, **kwargs) -> None:
-    """
-    Add message when user has approved expenses without matching reimbursement.
-    """
-    approved_expenses = user.expenses.all().filter(approved=True, reimbursement=None)
-
-    if approved_expenses.exists():
-        messages.info(
-            request,
-            f"NOTE: You have {approved_expenses.count()} expenses with a missing reimbursement. Please create a reimbursement once all your expenses have been approved."
+    """Add message for reminding user about missing reimbursement."""
+    expenses = user.profile.paid_expenses_needs_reimbursement
+    revenues = user.profile.paid_revenues_needs_redisbursement
+    if expenses.exists() or revenues.exists():
+        msg = (
+            f"NOTE: You have {expenses.count()} expense(s) and "
+            f"{revenues.count()} revenues(s) with missing "
+            "reimbursement. Please create a reimbursement once all your "
+            "expenses and revenues have been created and approved."
         )
-
+        messages.info(request, msg)

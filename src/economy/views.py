@@ -6,8 +6,8 @@ import magic
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Prefetch
 from django.core.exceptions import ValidationError
+from django.db.models import Prefetch
 from django.db.models import Q
 from django.db.models import Sum
 from django.http import HttpResponse
@@ -415,16 +415,8 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
 
     def dispatch(self, request, *args, **kwargs):
         """Get any approved and un-reimbursed expenses and revenues, or return error."""
-        self.expenses = request.user.expenses.filter(
-            reimbursement__isnull=True,
-            approved=True,
-            payment_status="PAID_NEEDS_REIMBURSEMENT",
-        )
-        self.revenues = request.user.revenues.filter(
-            reimbursement__isnull=True,
-            approved=True,
-            payment_status="PAID_NEEDS_REDISBURSEMENT",
-        )
+        self.expenses = request.user.profile.paid_expenses_needs_reimbursement
+        self.revenues = request.user.profile.paid_revenues_needs_redisbursement
         if not self.expenses and not self.revenues:
             messages.error(
                 request,
@@ -458,28 +450,8 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
                 reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
             )
 
-        # get the expenses for this user
-        expenses = Expense.objects.filter(
-            user=self.request.user,
-            approved=True,
-            reimbursement__isnull=True,
-            payment_status="PAID_NEEDS_REIMBURSEMENT",
-        )
-        expenses_total = expenses.aggregate(Sum("amount"))["amount__sum"] or 0
-
-        # get the revenues for this user
-        revenues = Revenue.objects.filter(
-            user=self.request.user,
-            approved=True,
-            reimbursement__isnull=True,
-            payment_status="PAID_NEEDS_REDISBURSEMENT",
-        )
-        revenues_total = revenues.aggregate(Sum("amount"))["amount__sum"] or 0
-        if not expenses and not revenues:
-            messages.error(self.request, "No approved unhandled expenses or revenues found")
-            return redirect(
-                reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
-            )
+        expenses_total = self.expenses.aggregate(Sum("amount"))["amount__sum"] or 0
+        revenues_total = self.revenues.aggregate(Sum("amount"))["amount__sum"] or 0
 
         # calculate the reimbursement total
         reimbursement_total = expenses_total - revenues_total
@@ -502,12 +474,12 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
         reimbursement.save()
 
         # add all expenses to reimbursement
-        for expense in expenses:
+        for expense in self.expenses:
             expense.reimbursement = reimbursement
             expense.save()
 
         # add all revenues to reimbursement
-        for revenue in revenues:
+        for revenue in self.revenues:
             revenue.reimbursement = reimbursement
             revenue.save()
 

@@ -7,6 +7,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
+from economy.models import Expense
+from economy.models import Revenue
 from camps.models import Camp
 from teams.models import TeamMember
 from utils.models import CreatedUpdatedModel
@@ -81,8 +83,8 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         return self.user.username
 
     def approve_public_credit_name(self) -> None:
-        """This method just sets profile.public_credit_name_approved=True and calls save()
-        It is used in an admin action.
+        """This method just sets profile.public_credit_name_approved=True
+        and calls save(). It is used in an admin action.
         """
         self.public_credit_name_approved = True
         self.save()
@@ -108,6 +110,26 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
             return self.private_name
 
         return self.public_name
+
+    @property
+    def paid_expenses_needs_reimbursement(self) -> models.QuerySet:
+        """The paid_expense_needs_reimbursement property."""
+        return Expense.objects.filter(
+            user=self.user,
+            approved=True,
+            reimbursement__isnull=True,
+            payment_status="PAID_NEEDS_REIMBURSEMENT",
+        )
+
+    @property
+    def paid_revenues_needs_redisbursement(self) -> models.QuerySet:
+        """The paid_revenues_needs_redisbursement property."""
+        return Revenue.objects.filter(
+            user=self.user,
+            approved=True,
+            reimbursement__isnull=True,
+            payment_status="PAID_NEEDS_REDISBURSEMENT",
+        )
 
     @property
     def public_name(self) -> str:

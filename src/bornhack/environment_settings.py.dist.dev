@@ -63,6 +63,10 @@ IRCBOT_CHANNELS = {
 IRCBOT_PUBLIC_CHANNEL = "#my-bornhack-channel"
 IRCBOT_VOLUNTEER_CHANNEL = "#my-bornhack-channel"
 
+ACCOUNTINGSYSTEM_EMAIL = "accounting_system@example.com"
+ECONOMYTEAM_EMAIL = "economy@example.com"
+ECONOMYTEAM_NAME = "Economy"
+
 BANKACCOUNT_IBAN = "LOL"
 BANKACCOUNT_SWIFTBIC = "lol"
 BANKACCOUNT_REG = "lol"
