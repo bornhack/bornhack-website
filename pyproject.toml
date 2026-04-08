@@ -44,7 +44,7 @@ dependencies = [
     "quickpay-api-client==2.0.1",
     "Unidecode==1.4.0",
     # pillow is only here to make old migrations run
-    "Pillow==12.1.0",
+    "Pillow==12.1.1",
     "weasyprint==68.1",
 ]
 
