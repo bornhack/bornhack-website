@@ -1,3 +1,5 @@
+{% load profile_display %}
+
 <div class="card">
   <div class="card-header">Expense Details for {{ expense.pk }}</div>
   <div class="card-body">
@@ -5,7 +7,7 @@
       {% if request.resolver_match.app_name == "backoffice" %}
         <tr>
           <th>Created By</th>
-          <td>{{ expense.user.profile.get_name }}</td>
+          <td>{% display_name expense.user.profile %}</td>
         </tr>
       {% endif %}
       <tr>

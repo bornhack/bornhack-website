@@ -548,7 +548,17 @@ class CoinifyRedirectView(
 
         # create a new coinify invoice if needed
         if not order.coinify_api_payment_intent:
-            coinifyintent = create_coinify_payment_intent(order, request)
+            try:
+                coinifyintent = create_coinify_payment_intent(order, request)
+            except AttributeError:
+                logger.exception("Unable to get Coinify API url")
+                messages.error(
+                    self.request,
+                    "Blockchain payment is not working properly at the moment.",
+                )
+                return HttpResponseRedirect(
+                    reverse_lazy("shop:order_detail", kwargs={"pk": order.pk}),
+                )
             if not coinifyintent:
                 messages.error(
                     request,

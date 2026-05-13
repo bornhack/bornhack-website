@@ -58,43 +58,11 @@
                   {{ product.name }}
                 </a>
 
-
-                {% if product.stock_amount %}
-                  {% if product.left_in_stock <= 0 or not product.is_time_available %}
-                    <div class="label label-danger" style="margin-left: 1em;"><!-- We can replace the style when we upgrade to Bootstrap 5. -->
-                      Sold out!
-                    </div>
-                  {% else %}
-
-                    {% if product.left_in_stock <= 10 %}
-                      <div class="label label-info" style="margin-left: 1em;">
-                        Only {{ product.left_in_stock }} left!
-                      </div>
-                    {% endif %}
-
-                  {% endif %}
-
-                  {% if product.left_in_stock > 0 %}
-                    <div class="label label-info" style="margin-left: 1em;">
-                      Sales end in {{ product.available_for_days }} days!
-                    </dev>
-                  {% endif %}
-
-                {% else %}
-
-                  {% if product.available_for_days < 20 %}
-                    <div class="label label-info" style="margin-left: 1em;">
-                      Sales end in {{ product.available_for_days }} days!
-                    </dev>
-                  {% endif %}
-
-                {% endif %}
-
-                {% if product.has_subproducts %}
-                  <div class="label label-info" style="margin-left: 1em;"><!-- We can replace the style when we upgrade to Bootstrap 5. -->
-                    Bundle
-                  </div>
-                {% endif %}
+                <div class="ms-3">
+                  {% for label in product.labels %}
+                    {% include 'labels/default.html' with label=label %}
+                  {% endfor %}
+                </div>
 
               </td>
               <td>

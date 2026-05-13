@@ -5,6 +5,7 @@ import csv
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
+from django.conf import settings
 
 from .models import Bank
 from .models import BankAccount
@@ -30,13 +31,13 @@ class BankAccountCsvImportTest(TestCase):
         )
 
         # make sure we create 6 transactions
-        with open("testdata/bank.csv", encoding="utf-8-sig") as f:
+        with open(settings.FIXTURE_DIR / "bank.csv", encoding="utf-8-sig") as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
             created = account.import_csv(reader)
             self.assertEqual(created, 6)
 
         # make sure we create 0 if we load the same file again
-        with open("testdata/bank.csv", encoding="utf-8-sig") as f:
+        with open(settings.FIXTURE_DIR / "bank.csv", encoding="utf-8-sig") as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
             created = account.import_csv(reader)
             self.assertEqual(created, 0)
@@ -49,7 +50,7 @@ class BankAccountCsvImportTest(TestCase):
             ValidationError,
             msg="Transaction on 2021-09-01 is before the bank accounts start_date. Transaction text is 'c051c94d-0762-422b-a453-e14402' and amount is -250.00",
         ):
-            with open("testdata/bank.csv", encoding="utf-8-sig") as f:
+            with open(settings.FIXTURE_DIR / "bank.csv", encoding="utf-8-sig") as f:
                 reader = csv.reader(f, delimiter=";", quotechar='"')
                 created = account.import_csv(reader)
 
@@ -58,7 +59,7 @@ class CoinifyCSVImportTest(TestCase):
     def test_coinify_invoice_csv_import(self):
         # make sure we create 4 invoices
         with open(
-            "testdata/coinify-invoices-20200101-20200630.csv",
+            settings.FIXTURE_DIR / "coinify-invoices-20200101-20200630.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
@@ -67,7 +68,7 @@ class CoinifyCSVImportTest(TestCase):
 
         # make sure we create 0 invoices if the same csv is imported again
         with open(
-            "testdata/coinify-invoices-20200101-20200630.csv",
+            settings.FIXTURE_DIR / "coinify-invoices-20200101-20200630.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
@@ -77,7 +78,7 @@ class CoinifyCSVImportTest(TestCase):
     def test_coinify_payout_csv_import(self):
         # make sure we create 2 payouts
         with open(
-            "testdata/coinify-payouts-20210701-20210904.csv",
+            settings.FIXTURE_DIR / "coinify-payouts-20210701-20210904.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
@@ -86,7 +87,7 @@ class CoinifyCSVImportTest(TestCase):
 
         # make sure we create 0 payouts if the same csv is imported again
         with open(
-            "testdata/coinify-payouts-20210701-20210904.csv",
+            settings.FIXTURE_DIR / "coinify-payouts-20210701-20210904.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
@@ -96,7 +97,7 @@ class CoinifyCSVImportTest(TestCase):
     def test_coinify_balance_csv_import(self):
         # make sure we create 66 balances
         with open(
-            "testdata/coinify-account-balances-20210701-20210904.csv",
+            settings.FIXTURE_DIR / "coinify-account-balances-20210701-20210904.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
@@ -105,7 +106,7 @@ class CoinifyCSVImportTest(TestCase):
 
         # make sure we create 0 balances if the same csv is imported again
         with open(
-            "testdata/coinify-account-balances-20210701-20210904.csv",
+            settings.FIXTURE_DIR / "coinify-account-balances-20210701-20210904.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
@@ -116,13 +117,13 @@ class CoinifyCSVImportTest(TestCase):
 class EpayCSVImportTest(TestCase):
     def test_epay_csv_import(self):
         # make sure we create 4 epay transactions
-        with open("testdata/epay_test.csv", encoding="utf-8-sig") as f:
+        with open(settings.FIXTURE_DIR / "epay_test.csv", encoding="utf-8-sig") as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
             created = import_epay_csv(reader)
             self.assertEqual(created, 3)
 
         # make sure we create 0 if the same csv is imported again
-        with open("testdata/epay_test.csv", encoding="utf-8-sig") as f:
+        with open(settings.FIXTURE_DIR / "epay_test.csv", encoding="utf-8-sig") as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
             created = import_epay_csv(reader)
             self.assertEqual(created, 0)
@@ -131,13 +132,13 @@ class EpayCSVImportTest(TestCase):
 class ClearhausCSVImportTest(TestCase):
     def test_clearhaus_csv_import(self):
         # make sure we create 10 clearhaus settlements
-        with open("testdata/clearhaus_settlements.csv", encoding="utf-8-sig") as f:
+        with open(settings.FIXTURE_DIR / "clearhaus_settlements.csv", encoding="utf-8-sig") as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = import_clearhaus_csv(reader)
             self.assertEqual(created, 9)
 
         # make sure we create 0 if the same csv is imported again
-        with open("testdata/clearhaus_settlements.csv", encoding="utf-8-sig") as f:
+        with open(settings.FIXTURE_DIR / "clearhaus_settlements.csv", encoding="utf-8-sig") as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = import_clearhaus_csv(reader)
             self.assertEqual(created, 0)
@@ -145,7 +146,7 @@ class ClearhausCSVImportTest(TestCase):
 
 class ZettleImportTest(TestCase):
     def test_zettle_receipts_import(self):
-        with open("testdata/Zettle-Receipts-Report-20210101-20210910.xlsx", "rb") as f:
+        with open(settings.FIXTURE_DIR / "Zettle-Receipts-Report-20210101-20210910.xlsx", "rb") as f:
             df = ZettleExcelImporter.load_zettle_receipts_excel(f)
         created = ZettleExcelImporter.import_zettle_receipts_df(df)
         self.assertEqual(created, 6)
@@ -154,7 +155,7 @@ class ZettleImportTest(TestCase):
         self.assertEqual(created, 0)
 
     def test_zettle_balances_import(self):
-        with open("testdata/Zettle-Account-Statement-Report-20230901-20250903.xlsx", "rb") as f:
+        with open(settings.FIXTURE_DIR / "Zettle-Account-Statement-Report-20230901-20250903.xlsx", "rb") as f:
             df = ZettleExcelImporter.load_zettle_balances_excel(f)
         created = ZettleExcelImporter.import_zettle_balances_df(df)
         self.assertEqual(created, 4059)
@@ -166,7 +167,7 @@ class ZettleImportTest(TestCase):
 class MobilePayImportTest(TestCase):
     def test_mobilepay_import(self):
         with open(
-            "testdata/MobilePay_Transfer_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            settings.FIXTURE_DIR / "MobilePay_Transfer_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
@@ -175,7 +176,7 @@ class MobilePayImportTest(TestCase):
 
         # make sure we create 0 if the same csv is imported again
         with open(
-            "testdata/MobilePay_Transfer_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            settings.FIXTURE_DIR / "MobilePay_Transfer_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
@@ -184,7 +185,7 @@ class MobilePayImportTest(TestCase):
 
         # now test importing sales CSV, 3 out of 4 lines are already in from above import
         with open(
-            "testdata/MobilePay_Sales_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            settings.FIXTURE_DIR / "MobilePay_Sales_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')
@@ -197,7 +198,7 @@ class MobilePayImportTest(TestCase):
             )
         # make sure we create 0 if the same csv is imported again
         with open(
-            "testdata/MobilePay_Sales_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            settings.FIXTURE_DIR / "MobilePay_Sales_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
             encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=";", quotechar='"')

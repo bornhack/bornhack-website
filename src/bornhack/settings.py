@@ -251,9 +251,6 @@ OAUTH2_PROVIDER = {
     "OAUTH2_VALIDATOR_CLASS": "bornhack.oauth_validators.BornhackOAuth2Validator",
 }
 
-# only used for bootstrap-devsite
-UPCOMING_CAMP_YEAR = 2031
-
 # django-tables2 settings
 DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5-responsive.html"
 DJANGO_TABLES2_TABLE_ATTRS = {
@@ -280,7 +277,7 @@ BORNHACK_TEAM_PERMISSIONS = {
     "tasker": "Team Tasker - task management",
 }
 
-FIXTURE_DIRS = ["testdata"]
+FIXTURE_DIR = BASE_DIR / "testdata"
 
 CACHES = {
     "default": {
@@ -288,3 +285,6 @@ CACHES = {
         "LOCATION": "tile-cache",
     },
 }
+
+# Use pytest as test runner for integrating with `./manage.py test`
+TEST_RUNNER = "pytest_django.runner.TestRunner"

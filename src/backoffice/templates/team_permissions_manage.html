@@ -13,8 +13,7 @@
         <table class="table table-striped datatable">
           <thead>
             <tr>
-              <th>Username</th>
-              <th>Name</th>
+              <th>Private Name</th>
               <th>Public Credit Name</th>
               <th class="text-center">Superuser</th>
               {% for perm in perms %}
@@ -25,9 +24,8 @@
           <tbody>
             {% for member in team.approved_members.all %}
               <tr>
-                <td>{{ member.username }}</td>
-                <td>{{ member.profile.name }}</td>
-                <td>{{ member.profile.public_credit_name }}</td>
+                <td>{{ member.profile.private_name }}</td>
+                <td>{{ member.profile.public_name }}</td>
                 <td class="text-center">{{ member.is_superuser|truefalseicon }}</td>
                 {% for perm in perms %}
                   {% for field in form.visible_fields %}

@@ -9,11 +9,11 @@ from django.views.generic import CreateView
 from camps.mixins import CampViewMixin
 from tokens.models import Token
 
-from .models import Feedback
+from .models import CampFeedback
 
 
-class FeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
-    model = Feedback
+class CampFeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
+    model = CampFeedback
     fields = ["feedback"]
 
     def form_valid(self, form):

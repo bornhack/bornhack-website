@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
+from django.http.request import BadRequest
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -20,7 +21,7 @@ from django.views.generic.edit import FormView
 
 from backoffice.mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
-from feedback.models import Feedback
+from feedback.models import CampFeedback
 from profiles.models import Profile
 from shop.models import OrderProductRelation
 from shop.models import Product
@@ -315,33 +316,52 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
 # FEEDBACK
 
 
-class EventFeedbackListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+class CampFeedbackListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     """View for listing all feedbacks."""
 
-    model = Feedback
+    model = CampFeedback
     template_name = "feedback_list.html"
+    context_object_name = "feedback"
 
 
-class EventFeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
+class CampFeedbackDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     """View for listing all feedbacks."""
 
-    model = Feedback
+    model = CampFeedback
     template_name = "feedback_detail.html"
+    context_object_name = "feedback"
 
 
-class EventFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
-    """View for marking feedback as processed"""
+class CampFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+    """View for processing feedback."""
 
-    model = Feedback
-    fields = ["processed_at", "processed_by"]
-    template_name = "feedback_list_processed_confirm.html"
+    model = CampFeedback
+    fields = ["state"]
+    template_name = "feedback_processed_confirm.html"
+    context_object_name = "feedback"
+
+    def get_context_data(self, *args, **kwargs):
+        """Get `state` from URL and if valid add to context else raise error."""
+        context = super().get_context_data(*args, **kwargs)
+        state_arg = self.kwargs.get("state")
+
+        try:
+            context.update({"state": self.object.StateChoices(state_arg)})
+        except ValueError:
+            raise BadRequest(f"Argument: '{state_arg}' is invalid.")
+
+        return context
 
     def post(self, request, *args, **kwargs):
-        """Mark feedback as processed."""
+        """Process feedback with parsed state."""
         self.object = self.get_object()
-        self.object.processed_by = self.request.user
-        self.object.processed_at = timezone.now()
-        self.object.save()
+        state = kwargs.get("state")
+
+        try:
+            self.object.process_feedback(state, request.user)
+        except ValueError:
+            raise BadRequest(f"Argument: '{state}' is invalid.")
+
         return HttpResponseRedirect(
             reverse("backoffice:feedback_list", kwargs={"camp_slug": self.camp.slug}),
         )

@@ -22,29 +22,6 @@
           </a>
         </li>
 
-        <li class="nav-item">
-          <a class="nav-link {% if view.active_menu == "members" %} active{% endif %}"href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
-            Members
-            {% if request.user in team.leads.all and team.unapproved_members.count %}
-              <span class="badge text-bg-danger">Pending</span>
-            {% endif %}
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link {% if view.active_menu == "tasks" %} active{% endif %}" href="{% url "teams:tasks" camp_slug=team.camp.slug team_slug=team.slug %}">
-            Tasks
-          </a>
-        </li>
-
-        {% if request.user in team.members.all %}
-          <li class="nav-item">
-            <a class="nav-link{% if view.active_menu == "shifts" %} active{% endif %}" href="{% url "teams:shifts" camp_slug=team.camp.slug team_slug=team.slug %}">
-              Shifts
-            </a>
-          </li>
-        {% endif %}
-
         {% if is_team_infopager %}
           <li class="nav-item">
             <a class="nav-link{% if view.active_menu == "info_categories" %} active{% endif %}" href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">
@@ -53,18 +30,49 @@
           </li>
         {% endif %}
 
-        {% if request.user in team.approved_members %}
+        <li class="nav-item">
+          <a class="nav-link {% if view.active_menu == "members" %} active{% endif %}"href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
+            Members
+            {% if team.lead_permission_set in perms and team.unapproved_members.count %}
+              <span class="badge text-bg-danger">Pending</span>
+            {% endif %}
+          </a>
+        </li>
+
+        {% if team.lead_permission_set in perms %}
           <li class="nav-item">
-            <a class="nav-link{% if view.active_menu == "guide" %} active{% endif %}" href="{% url "teams:guide" camp_slug=team.camp.slug team_slug=team.slug %}">
-              Team guide
+            <a class="nav-link" href="{% url "backoffice:team_permission_manage" camp_slug=team.camp.slug team_slug=team.slug %}">
+              Permissions
             </a>
           </li>
         {% endif %}
 
-        {% if request.user in team.leads.all %}
+        {% if team.lead_permission_set in perms %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url "backoffice:team_permission_manage" camp_slug=team.camp.slug team_slug=team.slug %}">
-              Permissions
+            <a class="nav-link{% if view.active_menu == "settings" %} active{% endif %}" href="{% url "teams:settings" camp_slug=team.camp.slug team_slug=team.slug %}">
+              Settings <span class="badge text-bg-info">New</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% if team.member_permission_set in perms %}
+          <li class="nav-item">
+            <a class="nav-link{% if view.active_menu == "shifts" %} active{% endif %}" href="{% url "teams:shifts" camp_slug=team.camp.slug team_slug=team.slug %}">
+              Shifts
+            </a>
+          </li>
+        {% endif %}
+
+        <li class="nav-item">
+          <a class="nav-link {% if view.active_menu == "tasks" %} active{% endif %}" href="{% url "teams:tasks" camp_slug=team.camp.slug team_slug=team.slug %}">
+            Tasks
+          </a>
+        </li>
+
+        {% if team.member_permission_set in perms %}
+          <li class="nav-item">
+            <a class="nav-link{% if view.active_menu == "guide" %} active{% endif %}" href="{% url "teams:guide" camp_slug=team.camp.slug team_slug=team.slug %}">
+              Team guide
             </a>
           </li>
         {% endif %}
@@ -77,10 +85,6 @@
 
         {% if request.user in team.members.all %}
           <p>Your membership status: <b>{% membershipstatus user team %}</b></p>
-
-          {% if request.user in team.leads.all %}
-            <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage Team</a>
-          {% endif %}
 
         {% else %}
           {% if team.needs_members %}

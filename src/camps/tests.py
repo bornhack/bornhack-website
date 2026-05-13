@@ -213,3 +213,10 @@ class TestCampModel(BornhackTestBase):
         child_one_day.save()
 
         assert self.camp.participant_count == 4
+
+    def test_year_of_camp(self) -> None:
+        """Test the property `year` return current year of camp."""
+        expected = self.camp.camp.lower.year
+
+        assert self.camp.year == expected
+

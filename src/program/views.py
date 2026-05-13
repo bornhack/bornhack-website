@@ -101,6 +101,8 @@ class ICSView(CampViewMixin, View):
         cal = icalendar.Calendar()
         cal.add("prodid", "-//BornHack Website iCal Generator//bornhack.dk//")
         cal.add("version", "2.0")
+        cal.add("NAME", self.camp.title)
+        cal.add("X-WR-CALNAME", self.camp.title)
         for slot in event_slots:
             cal.add_component(slot.get_ics_event())
 
@@ -1085,7 +1087,7 @@ class FrabXmlView(CampViewMixin, View):
             E.version("BornHack Frab XML Generator v2.0"),
             E.conference(
                 E.title(self.camp.title),
-                E.acronym(str(self.camp.camp.lower.year)),
+                E.acronym(str(self.camp.year)),
                 E.start(self.camp.camp.lower.date().isoformat()),
                 E.end(self.camp.camp.upper.date().isoformat()),
                 E.days(len(self.camp.get_days("camp"))),

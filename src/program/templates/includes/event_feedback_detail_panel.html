@@ -1,5 +1,7 @@
 {% load django_bootstrap5 %}
 {% load commonmark %}
+{% load profile_display %}
+
 <div class="card">
   <div class="card-header">
     <span class="h3">Feedback for Event: {{ event.title }}</span>
@@ -8,8 +10,8 @@
     <table class="table table-bordered">
       {% if request.resolver_match.url_name == "approve_event_feedback" %}
         <tr>
-          <th>Username (feedback submitter)</th>
-          <td>{{ event_feedback.user.username }}</td>
+          <th>User</th>
+          <td>{% display_name event_feedback.user.profile %}</td>
         </tr>
       {% endif %}
       <tr>

@@ -5,15 +5,15 @@ import logging
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
 
-from camps.models import Permission as CampPermission
+from phonebook.models import DectRegistration
 from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -210,6 +210,15 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     # Signal
     public_signal_channel_link = models.URLField(null=True, blank=True, default="")
     private_signal_channel_link = models.URLField(null=True, blank=True, default="")
+
+    public_dect_number = models.ForeignKey(
+        DectRegistration,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="public_team_numbers",
+        help_text="The public DECT for this team.",
+    )
 
     shifts_enabled = models.BooleanField(
         default=False,

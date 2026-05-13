@@ -15,6 +15,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
 
 from camps.mixins import CampViewMixin
+from phonebook.models import DectRegistration
 from teams.models import Team
 from teams.models import TeamMember
 from utils.mixins import IsTeamPermContextMixin
@@ -76,11 +77,11 @@ class TeamGeneralView(CampViewMixin, IsTeamPermContextMixin, DetailView):
         return context
 
 
-class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
+class TeamSettingsView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
     """View for mananaging team members."""
 
     model = Team
-    template_name = "team_manage.html"
+    template_name = "team_settings.html"
     fields = (
         "description",
         "needs_members",
@@ -92,22 +93,34 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin,
         "private_irc_channel_managed",
         "public_signal_channel_link",
         "private_signal_channel_link",
+        "public_dect_number",
         "guide",
     )
     slug_url_kwarg = "team_slug"
+    active_menu = "settings"
 
     def get_form(self, *args, **kwargs) -> Form:
         """Method for updating form widgets."""
         form = super().get_form(*args, **kwargs)
         form.fields["guide"].widget = MarkdownWidget()
+
+        dect_filter = DectRegistration.objects.filter(
+            camp=self.camp,
+            user__in=self.object.members.all()
+        )
+        form.fields["public_dect_number"].queryset = dect_filter.filter(
+            publish_in_phonebook=True
+        )
+
         return form
 
     def get_success_url(self) -> str:
         """Method for returning the success url."""
-        return reverse_lazy(
-            "teams:general",
-            kwargs={"camp_slug": self.camp.slug, "team_slug": self.get_object().slug},
-        )
+        kwargs = {
+            "camp_slug": self.camp.slug,
+            "team_slug": self.get_object().slug
+        }
+        return reverse_lazy("teams:general", kwargs=kwargs)
 
     def form_valid(self, form: Form) -> HttpResponseRedirect:
         """Method for sending success message if form is valid."""

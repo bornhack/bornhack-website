@@ -403,7 +403,7 @@ class UserLocationLayerView(CampViewMixin, JsonView):
                     "type": location.type.name,
                     "icon": location.type.icon,
                     "marker": location.type.marker,
-                    "user": location.user.profile.get_public_credit_name,
+                    "user": location.user.profile.public_name,
                     "data": location.data,
                 },
             }

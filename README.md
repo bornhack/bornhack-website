@@ -128,7 +128,7 @@ Is this a new installation? Initialize the database:
 Is this for local development? Bootstrap the database with dummy data and users:
 
 ```
-(venv) $ python src/manage.py bootstrap_devsite
+(venv) $ python src/manage.py bootstrap_devsite [--threads <count>] [--years <start,end>] [--writable-years <start,end>] [--verbosity <{0,1,2,3}>]
 ```
 
 This creates some user accounts. Run the following command to see their email
@@ -201,6 +201,7 @@ Then go to the admin interface and add the camp.
 ## Contributors
 * Alexander Færøy https://github.com/ahf
 * Benjamin Bach https://github.com/benjaoming
+* Christian Henriksen https://github.com/0xunicorn
 * coral https://github.com/coral
 * Flemming Jacobsen https://github.com/batmule
 * Florian Klink https://github.com/flokli
