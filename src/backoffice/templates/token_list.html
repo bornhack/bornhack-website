@@ -10,12 +10,14 @@
     <div class="card-header"><h3 class="card-title">Token List - BackOffice</h3></div>
     <div class="card-body">
       <p>This is a list of all tokens for {{ camp.title }}.</p>
+      <div class="mb-2">
+        <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
+      </div>
       {% if not token_list %}
         <p class="lead">No tokens found.</p>
       {% else %}
         <p>
-          <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
-          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
           <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
             <thead>
               <tr>
