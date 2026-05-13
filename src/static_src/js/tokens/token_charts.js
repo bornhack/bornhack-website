@@ -85,6 +85,10 @@ document.addEventListener('DOMContentLoaded', function () {
         },
       },
     },
+    fill: {
+      opacity: 0.8,
+      colors: defaultOptions.theme.monochrome.color
+    },
     yaxis: {
       show: false,
     },
