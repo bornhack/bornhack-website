@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -52,6 +53,16 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     model = Token
     template_name = "token_form.html"
     fields = ["token", "category", "hint", "description", "active", "valid_when"]
+
+    def get_initial(self) -> dict:
+        """Update initial form data with a unique token."""
+        initial = super().get_initial()
+        DEFAULT_LENGTH = 18
+        initial.update({
+            "token": str(uuid.uuid4()).replace("-", "")[:DEFAULT_LENGTH]
+        })
+        return initial
+
 
     def form_valid(self, form):
         token = form.save(commit=False)
