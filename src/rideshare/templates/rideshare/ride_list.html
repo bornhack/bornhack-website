@@ -26,58 +26,67 @@
     <thead>
       <th>
         Author
-        <th>
-          Type
-          <th>
-            Leaving When
-            <th>
-              From Location
-              <th>
-                To Location
-                <th>
-                  Seats Free/Needed
-                  <th>
-                    Actions
-                    <tbody>
-
-                      {% for ride in ride_list %}
-                        <tr>
-                          <td>
-                            {{ ride.author }}
-                            <td>
-                              {% if ride.has_car %}
-                                <i class="fas fa-car"></i> Has car
-                              {% else %}
-                                <i class="fas fa-thumbs-up"></i> Needs ride
-                              {% endif %}
-                              <td data-order="{{ ride.when|date:"YmdHis"}}">
-                                {{ ride.when|date:"c" }}
-                                <td>
-                                  {{ ride.from_location }}
-                                  <td>
-                                    {{ ride.to_location }}
-                                    <td class="text-center">
-                                      <span class="badge">{{ ride.seats }}</span>
-                                      <td>
-                                        {% if request.user == ride.user %}
-                                          <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=ride.pk %}">
-                                            <i class="fas fa-times"></i> Delete
-                                          </a>
-                                          <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=ride.pk %}">
-                                            <i class="fas fa-edit"></i> Update
-                                          </a>
-                                        {% endif %}
-                                        <a class="btn btn-primary pull-right" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
-                                          <i class="fas fa-eye"></i> Details
-                                        </a>
-
-                      {% empty %}
-
-                        <tr>
-                          <td colspan=4>
-                            No rideshares yet!
-
-                      {% endfor %}
-                    </table>
+      </th>
+      <th>
+        Type
+      </th>
+      <th>
+        Leaving When
+      </th>
+      <th>
+        From Location
+      </th>
+      <th>
+        To Location
+      </th>
+      <th>
+        Seats Free/Needed
+      </th>
+      <th>
+        Actions
+      </th>
+    </thead>
+    <tbody>
+    {% for ride in ride_list %}
+      <tr>
+        <td>
+          {{ ride.author }}
+        </td>
+        <td>
+          {% if ride.has_car %}
+            <i class="fas fa-car"></i> Has car
+          {% else %}
+            <i class="fas fa-thumbs-up"></i> Needs ride
+          {% endif %}
+        </td>
+        <td data-order="{{ ride.when|date:"YmdHis"}}">
+          {{ ride.when|date:"c" }}
+        </td>
+        <td>
+          {{ ride.from_location }}
+        </td>
+        <td>
+          {{ ride.to_location }}
+        </td>
+        <td class="text-center">
+          <span class="badge">{{ ride.seats }}</span>
+        </td>
+        <td>
+          {% if request.user == ride.user %}
+            <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=ride.pk %}">
+              <i class="fas fa-times"></i> Delete
+            </a>
+            <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=ride.pk %}">
+              <i class="fas fa-edit"></i> Update
+            </a>
+          {% endif %}
+          <a class="btn btn-primary pull-right" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
+            <i class="fas fa-eye"></i> Details
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 
 {% endblock %}
