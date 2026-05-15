@@ -356,20 +356,22 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         EventSlot = apps.get_model("program", "EventSlot")
         return EventSlot.objects.filter(event_session__in=self.event_sessions.all())
 
-    def checked_in_tickets(self, ticket_type, start_time=None, end_time=None) -> list:
-        """Return the count of one day tickets checked in."""
+    def checked_in_tickets(self, ticket_type, used_before=None, used_after=None) -> list:
+        """Get a concatenated list with all tickets of the specified type
+        and support for filtering before/after time for when a ticket was used.
+        """
         shop_tickets = ShopTicket.objects.filter(ticket_type=ticket_type).exclude(used_at=None)
         sponsor_tickets = SponsorTicket.objects.filter(ticket_type=ticket_type).exclude(used_at=None)
         prize_tickets = PrizeTicket.objects.filter(ticket_type=ticket_type).exclude(used_at=None)
 
-        if start_time:
-            shop_tickets = shop_tickets.filter(used_at__gte=start_time)
-            sponsor_tickets = sponsor_tickets.filter(used_at__gte=start_time)
-            prize_tickets = prize_tickets.filter(used_at__gte=start_time)
-        if end_time:
-            shop_tickets = shop_tickets.filter(used_at__lte=end_time)
-            sponsor_tickets =  sponsor_tickets.filter(used_at__lte=end_time)
-            prize_tickets = prize_tickets.filter(used_at__lte=end_time)
+        if used_before:
+            shop_tickets = shop_tickets.filter(used_at__lte=used_before)
+            sponsor_tickets =  sponsor_tickets.filter(used_at__lte=used_before)
+            prize_tickets = prize_tickets.filter(used_at__lte=used_before)
+        if used_after:
+            shop_tickets = shop_tickets.filter(used_at__gte=used_after)
+            sponsor_tickets = sponsor_tickets.filter(used_at__gte=used_after)
+            prize_tickets = prize_tickets.filter(used_at__gte=used_after)
 
         return list(shop_tickets) + list(sponsor_tickets) + list(prize_tickets)
 
@@ -384,15 +386,15 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         now = timezone.localtime()
         limit = now.replace(hour=6, minute=0, second=0)
         if now < limit:
-            start = limit - timezone.timedelta(days=1)
-            end = limit
+            used_after = limit - timezone.timedelta(days=1)
+            used_before = limit
         else:
-            start = limit
-            end = limit + timezone.timedelta(days=1)
+            used_after = limit
+            used_before = limit + timezone.timedelta(days=1)
 
         return (
             len(self.checked_in_tickets(self.ticket_type_full_week_adult))
             + len(self.checked_in_tickets(self.ticket_type_full_week_child))
-            + len(self.checked_in_tickets(self.ticket_type_one_day_adult, start, end))
-            + len(self.checked_in_tickets(self.ticket_type_one_day_child, start, end))
+            + len(self.checked_in_tickets(self.ticket_type_one_day_adult, used_before, used_after))
+            + len(self.checked_in_tickets(self.ticket_type_one_day_child, used_before, used_after))
         )

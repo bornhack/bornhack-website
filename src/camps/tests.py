@@ -166,7 +166,7 @@ class TestCampModel(BornhackTestBase):
 
         result = self.camp.checked_in_tickets(
             self.camp.ticket_type_one_day_adult,
-            start_time=timezone.localtime().replace(hour=6, minute=0, second=0)
+            used_after=timezone.localtime().replace(hour=6, minute=0, second=0)
         )
 
         assert len(result) == 1
@@ -223,7 +223,7 @@ class TestCampModel(BornhackTestBase):
 
         result = self.camp.checked_in_tickets(
             self.camp.ticket_type_one_day_child,
-            start_time=timezone.localtime().replace(hour=6, minute=0, second=0)
+            used_after=timezone.localtime().replace(hour=6, minute=0, second=0)
         )
 
         assert len(result) == 1
