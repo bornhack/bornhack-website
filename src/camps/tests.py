@@ -69,18 +69,24 @@ class TestCampModel(BornhackTestBase):
             self.full_week_adults["sponsor_tickets"][0],
             self.full_week_adults["prize_tickets"][0],
         ]
+
         for ticket in tickets:
             ticket.used_at = self.camp.camp.lower
             ticket.save()
 
-        assert self.camp.checked_in_full_week_adults == 3
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_full_week_adult)
+
+        assert len(result) == len(tickets)
 
     def test_checked_in_full_week_children_shop_tickets(self) -> None:
         """Test the return value of checked in full week children with shop ticket"""
         ticket = self.full_week_children[0]
         ticket.used_at = self.camp.camp.lower
         ticket.save()
-        assert self.camp.checked_in_full_week_children == 1
+
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_full_week_child)
+
+        assert len(result) == 1
 
     def test_checked_in_full_week_children_with_sponsor_ticket(self) -> None:
         """Test the return value of checked in full week children with sponsor ticket"""
@@ -90,7 +96,10 @@ class TestCampModel(BornhackTestBase):
             ticket_type=self.camp.ticket_type_full_week_child,
             used_at=self.camp.camp.lower,
         )
-        assert self.camp.checked_in_full_week_children == 1
+
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_full_week_child)
+
+        assert len(result) == 1
 
     def test_checked_in_full_week_children_with_prize_ticket(self) -> None:
         """Test the return value of checked in full week children with prize ticket"""
@@ -100,7 +109,10 @@ class TestCampModel(BornhackTestBase):
             comment="Prize winner",
             used_at=self.camp.camp.lower,
         )
-        assert self.camp.checked_in_full_week_children == 1
+
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_full_week_child)
+
+        assert len(result) == 1
 
     def test_checked_in_one_day_adults(self) -> None:
         """Test the return value of checked in one day adults today"""
@@ -108,7 +120,9 @@ class TestCampModel(BornhackTestBase):
             ticket.used_at = timezone.localtime()
             ticket.save()
 
-        assert self.camp.checked_in_one_day_adults == 2
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_one_day_adult)
+
+        assert len(result) == 2
 
     def test_checked_in_one_day_adults_with_sponsor_ticket(self) -> None:
         """Test the return value of checked in one day adults
@@ -121,7 +135,9 @@ class TestCampModel(BornhackTestBase):
             used_at=timezone.localtime(),
         )
 
-        assert self.camp.checked_in_one_day_adults == 1
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_one_day_adult)
+
+        assert len(result) == 1
 
     def test_checked_in_one_day_adults_with_prize_ticket(self) -> None:
         """Test the return value of checked in one day adults
@@ -134,7 +150,9 @@ class TestCampModel(BornhackTestBase):
             used_at=timezone.localtime(),
         )
 
-        assert self.camp.checked_in_one_day_adults == 1
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_one_day_adult)
+
+        assert len(result) == 1
 
     def test_checked_in_one_day_adults_timing(self) -> None:
         """Test check in before 06 yesterday don't count"""
@@ -146,7 +164,12 @@ class TestCampModel(BornhackTestBase):
         not_valid.used_at = timezone.localtime() - timezone.timedelta(days=2)
         not_valid.save()
 
-        assert self.camp.checked_in_one_day_adults == 1
+        result = self.camp.checked_in_tickets(
+            self.camp.ticket_type_one_day_adult,
+            start_time=timezone.localtime().replace(hour=6, minute=0, second=0)
+        )
+
+        assert len(result) == 1
 
     def test_checked_in_one_day_children(self) -> None:
         """Test the return value of checked in one day children today"""
@@ -154,7 +177,9 @@ class TestCampModel(BornhackTestBase):
             ticket.used_at = timezone.localtime()
             ticket.save()
 
-        assert self.camp.checked_in_one_day_children == 2
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_one_day_child)
+
+        assert len(result) == 2
 
     def test_checked_in_one_day_children_with_sponsor_ticket(self) -> None:
         """Test the return value of checked in one day children
@@ -167,7 +192,9 @@ class TestCampModel(BornhackTestBase):
             used_at=timezone.localtime(),
         )
 
-        assert self.camp.checked_in_one_day_children == 1
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_one_day_child)
+
+        assert len(result) == 1
 
     def test_checked_in_one_day_children_with_prize_ticket(self) -> None:
         """Test the return value of checked in one day children
@@ -180,7 +207,9 @@ class TestCampModel(BornhackTestBase):
             used_at=timezone.localtime(),
         )
 
-        assert self.camp.checked_in_one_day_children == 1
+        result = self.camp.checked_in_tickets(self.camp.ticket_type_one_day_child)
+
+        assert len(result) == 1
 
     def test_checked_in_one_day_children_timing(self) -> None:
         """Test check in before 06 yesterday don't count"""
@@ -192,9 +221,14 @@ class TestCampModel(BornhackTestBase):
         not_valid.used_at = timezone.localtime() - timezone.timedelta(days=2)
         not_valid.save()
 
-        assert self.camp.checked_in_one_day_children == 1
+        result = self.camp.checked_in_tickets(
+            self.camp.ticket_type_one_day_child,
+            start_time=timezone.localtime().replace(hour=6, minute=0, second=0)
+        )
 
-    def test_participant_count(self) -> None:
+        assert len(result) == 1
+
+    def test_todays_participant_count(self) -> None:
         """Test the count of all participants"""
         adult_full_week = self.full_week_adults["shop_tickets"][0]
         adult_full_week.used_at = self.camp.camp.lower
@@ -212,7 +246,7 @@ class TestCampModel(BornhackTestBase):
         child_one_day.used_at = timezone.localtime()
         child_one_day.save()
 
-        assert self.camp.participant_count == 4
+        assert self.camp.todays_participant_count == 4
 
     def test_year_of_camp(self) -> None:
         """Test the property `year` return current year of camp."""
