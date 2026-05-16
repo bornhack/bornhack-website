@@ -42,6 +42,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         verbose_name = "Camp"
         verbose_name_plural = "Camps"
         ordering = ["-title"]
+        get_latest_by = "camp"
 
     title = models.CharField(
         verbose_name="Title",
