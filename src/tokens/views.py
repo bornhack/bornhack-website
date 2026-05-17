@@ -27,6 +27,7 @@ from prometheus_client import Gauge
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
+from teams.models import Team
 from tokens.forms import TokenFindSubmitForm
 from utils.models import CampReadOnlyModeError
 
@@ -61,6 +62,10 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Return context containing form, player-statistics, and widgets metrics"""
         context = super().get_context_data(**kwargs)
+        context["game_team"] = Team.objects.filter(
+            camp=self.request.camp,
+            name__icontains="game"
+        ).first()
         context["form"] = TokenFindSubmitForm()
 
         camp_finds = TokenFind.objects.filter(token__camp=self.request.camp.pk)
@@ -68,11 +73,14 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         context["player_stats"] = self.get_player_stats_metrics(player_finds)
         context["widgets"] = {
-            "options": {"camp_colour": self.request.camp.colour},
             "total_players": self.get_total_players_metrics(camp_finds),
             "total_finds": self.get_total_finds_metrics(camp_finds),
             "token_activity": self.get_token_activity_metrics(camp_finds),
             "token_categories": self.get_token_categories_metrics(),
+            "options": {
+                "camp_colour": self.request.camp.colour,
+                "light_text": self.request.camp.light_text,
+            },
         }
 
         return context
@@ -228,6 +236,14 @@ class TokenSubmitFormView(LoginRequiredMixin, FormView):
 
     form_class = TokenFindSubmitForm
     template_name = "token_submit.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Redirect to dashboard when no tokens exist for this camp."""
+        if not request.camp.token_set.all().exists():
+            _kwargs = {"camp_slug": kwargs.get("camp_slug")}
+            return redirect(reverse("tokens:dashboard", kwargs=_kwargs))
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
