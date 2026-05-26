@@ -232,7 +232,7 @@ class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
 class ExpenseUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = Expense
     template_name = "expense_update_backoffice.html"
-    fields = ["notes"]
+    fields = ["notes", "payment_status"]
 
     def form_valid(self, form):
         """We have three submit buttons in this form, Approve, Reject, and Save."""
@@ -273,7 +273,7 @@ class ReimbursementUpdateView(
 ):
     model = Reimbursement
     template_name = "reimbursement_form.html"
-    fields = ["notes"]
+    fields = ["notes", "payment_status"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
