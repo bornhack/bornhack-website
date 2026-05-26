@@ -66,16 +66,19 @@ def reject_expenses(modeladmin, request, queryset) -> None:
 class ExpenseAdmin(admin.ModelAdmin):
     list_filter = [
         "camp",
+        "payment_status",
         "creditor__chain",
         "creditor",
         "approved",
         "user",
     ]
     list_display = [
+        "pk",
         "user",
         "description",
         "invoice_date",
         "amount",
+        "payment_status",
         "camp",
         "creditor",
         "approved",
@@ -107,12 +110,14 @@ def reject_revenues(modeladmin, request, queryset) -> None:
 
 @admin.register(Revenue)
 class RevenueAdmin(admin.ModelAdmin):
-    list_filter = ["camp", "approved", "user"]
+    list_filter = ["camp", "approved", "payment_status", "user"]
     list_display = [
+        "pk",
         "user",
         "description",
         "invoice_date",
         "amount",
+        "payment_status",
         "camp",
         "approved",
     ]
