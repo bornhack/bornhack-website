@@ -212,8 +212,15 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        """Include unapproved expenses seperately."""
+        """Include unpaid and unapproved expenses seperately."""
         context = super().get_context_data(**kwargs)
+        context["unpaid_expenses"] = Expense.objects.filter(
+            camp=self.camp,
+            payment_status="UNPAID_NEEDS_PAYMENT",
+        ).prefetch_related(
+            "creditor",
+            "user",
+        )
         context["unapproved_expenses"] = Expense.objects.filter(
             camp=self.camp,
             approved__isnull=True,
@@ -273,7 +280,7 @@ class ReimbursementUpdateView(
 ):
     model = Reimbursement
     template_name = "reimbursement_form.html"
-    fields = ["notes", "payment_status"]
+    fields = ["notes"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -359,6 +366,10 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         """Include unapproved revenues seperately."""
         context = super().get_context_data(**kwargs)
+        context["unpaid_revenues"] = Revenue.objects.filter(
+            camp=self.camp,
+            payment_status="UNPAID_NEEDS_PAYMENT",
+        )
         context["unapproved_revenues"] = Revenue.objects.filter(
             camp=self.camp,
             approved__isnull=True,
@@ -374,7 +385,7 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
 class RevenueUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = Revenue
     template_name = "revenue_update_backoffice.html"
-    fields = ["notes"]
+    fields = ["notes", "payment_status"]
 
     def form_valid(self, form):
         """We have three submit buttons in this form, Save, Approve and Reject."""

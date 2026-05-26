@@ -11,6 +11,13 @@
 
   <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#economy"><i class="fas fa-undo"></i> BackOffice</a></p>
 
+  {% if unpaid_expenses %}
+    <p class="lead">This table shows all unpaid expenses for {{ camp.title }}.</p>
+    {% include 'includes/expense_list_panel.html' with expense_list=unpaid_expenses %}
+  {% else %}
+    <p class="lead">No unpaid expenses found for {{ camp.title }}.</p>
+  {% endif %}
+
   {% if unapproved_expenses %}
     <p class="lead">This table shows all unapproved expenses for {{ camp.title }}.</p>
     {% include 'includes/expense_list_panel.html' with expense_list=unapproved_expenses %}
