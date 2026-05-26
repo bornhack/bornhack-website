@@ -4,6 +4,12 @@ Your revenue {{ revenue.pk }} for {{ revenue.camp.title }} has been approved. Th
 
 {{ revenue.description }}
 
+{% if revenue.payment_status == "PAID_NEEDS_REDISBURSEMENT" %}
+IMPORTANT: Please visit https://bornhack.dk/{{ expense.camp.slug }}/economy/reimbursements/create/ to create a reimbursement once all your expenses and revenues for this camp have been approved.
+
+If the balance on the reimbursement is in your favour the money will be transferred to your bank account soon after creating the reimbursement.
+{% endif %}
+
 Have a nice day!
 
 The {{ revenue.camp.title }} Economy Team

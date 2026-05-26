@@ -6,14 +6,12 @@ The amount is DKK {{ expense.amount }} and description of the expense is:
 
 {{ expense.description }}
 
-{% if expense.paid_by_bornhack %}
-As this expense was paid for by BornHack no further action will be taken.
-{% else %}
-IMPORTANT: Before we can transfer the money to your bank account, you need to create a reimbursement.
+{% if expense.payment_status == "PAID_NEEDS_REIMBURSEMENT" %}
+IMPORTANT: Please visit https://bornhack.dk/{{ expense.camp.slug }}/economy/reimbursements/create/ to create a reimbursement once all your expenses and revenues for this camp have been approved.
 
-Please visit https://bornhack.dk/{{ expense.camp.slug }}/economy/reimbursements/create/ to create a reimbursement once all your expenses and revenues for this camp have been approved.
-
-The money will be transferred to your bank account with the next batch, after creating the reimbursement.
+If the balance on the reimbursement is in your favour the money will be transferred to your bank account soon after creating the reimbursement.
+{% elif expense.payment_status == "UNPAID_NEEDS_PAYMENT" %}
+The expense is unpaid, it will be paid by the economy team soon.
 {% endif %}
 
 Have a nice day!
