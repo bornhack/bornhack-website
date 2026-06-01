@@ -189,3 +189,17 @@ class TestTokenViews(BornhackTestBase):
         rows = soup.select("div.alert.alert-warning")
         matches = [s for s in rows if "This token is not valid yet" in str(s)]
         self.assertEqual(len(matches), 1, "inactive token find does not return the not valid yet.")
+
+    def test_total_finds_pct_with_no_tokens(self) -> None:
+        """Test calculating percentage with no tokens."""
+        self.client.force_login(self.users[0])
+        Token.objects.all().delete()
+
+        response = self.client.get(self.url_dashboard)
+        result = response.context["widgets"]["total_finds"]["no_js"]["Unique finds"]["pct"]
+
+        assert result == 0.0
+
+        result = response.context["widgets"]["total_finds"]["no_js"]["Not found"]["pct"]
+
+        assert result == 0.0
