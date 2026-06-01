@@ -357,132 +357,45 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         EventSlot = apps.get_model("program", "EventSlot")
         return EventSlot.objects.filter(event_session__in=self.event_sessions.all())
 
-    @property
-    def checked_in_full_week_adults(self) -> int:
-        """Return the count of full week adult tickets checked in"""
-        shop_tickets = (
-            ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_adult,
-            ).exclude(used_at=None)
-        ).count()
-
-        sponsor_tickets = (
-            SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_adult,
-            ).exclude(used_at=None)
-        ).count()
-
-        prize_tickets = (
-            PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_adult,
-            ).exclude(used_at=None)
-        ).count()
-
-        return shop_tickets + sponsor_tickets + prize_tickets
-
-    @property
-    def checked_in_full_week_children(self) -> int:
-        """Return the count of full week children tickets checked in"""
-        shop_tickets = (
-            ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_child,
-            ).exclude(used_at=None)
-        ).count()
-
-        sponsor_tickets = (
-            SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_child,
-            ).exclude(used_at=None)
-        ).count()
-
-        prize_tickets = (
-            PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_child,
-            ).exclude(used_at=None)
-        ).count()
-
-        return shop_tickets + sponsor_tickets + prize_tickets
-
-    @property
-    def checked_in_one_day_adults(self) -> int:
-        """Return the count of todays one day adult tickets checked in.
-
-        Count tickets with a checked in timestamp from 0600-0600 next day.
-        Reason being early arriving participants might get checked in before 10.
+    def checked_in_tickets(self, ticket_type, used_before=None, used_after=None) -> list:
+        """Get a concatenated list with all tickets of the specified type
+        and support for filtering before/after time for when a ticket was used.
         """
-        now = timezone.localtime()
-        today_06_hour = now.replace(hour=6, minute=0, second=0)
-        if now < today_06_hour:
-            start = today_06_hour - timezone.timedelta(days=1)
-            end = today_06_hour
-        else:
-            start = today_06_hour
-            end = today_06_hour + timezone.timedelta(days=1)
+        shop_tickets = ShopTicket.objects.filter(ticket_type=ticket_type).exclude(used_at=None)
+        sponsor_tickets = SponsorTicket.objects.filter(ticket_type=ticket_type).exclude(used_at=None)
+        prize_tickets = PrizeTicket.objects.filter(ticket_type=ticket_type).exclude(used_at=None)
 
-        shop_tickets = (
-            ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_adult,
-            ).filter(used_at__gte=start, used_at__lt=end)
-        ).count()
+        if used_before:
+            shop_tickets = shop_tickets.filter(used_at__lte=used_before)
+            sponsor_tickets =  sponsor_tickets.filter(used_at__lte=used_before)
+            prize_tickets = prize_tickets.filter(used_at__lte=used_before)
+        if used_after:
+            shop_tickets = shop_tickets.filter(used_at__gte=used_after)
+            sponsor_tickets = sponsor_tickets.filter(used_at__gte=used_after)
+            prize_tickets = prize_tickets.filter(used_at__gte=used_after)
 
-        sponsor_tickets = (
-            SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_adult,
-            ).filter(used_at__gte=start, used_at__lt=end)
-        ).count()
-
-        prize_tickets = (
-            PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_adult,
-            ).filter(used_at__gte=start, used_at__lt=end)
-        ).count()
-
-        return shop_tickets + sponsor_tickets + prize_tickets
+        return list(shop_tickets) + list(sponsor_tickets) + list(prize_tickets)
 
     @property
-    def checked_in_one_day_children(self) -> int:
-        """Return the count of todays one day children tickets checked in.
-
-        Count tickets with a checked in timestamp from 0600-0600 next day.
-        Reason being early arriving participants might get checked in before 10.
-        """
-        now = timezone.localtime()
-        today_06_hour = now.replace(hour=6, minute=0, second=0)
-        if now < today_06_hour:
-            start = today_06_hour - timezone.timedelta(days=1)
-            end = today_06_hour
-        else:
-            start = today_06_hour
-            end = today_06_hour + timezone.timedelta(days=1)
-
-        shop_tickets = (
-            ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_child,
-            ).filter(used_at__gte=start, used_at__lt=end)
-        ).count()
-
-        sponsor_tickets = (
-            SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_child,
-            ).filter(used_at__gte=start, used_at__lt=end)
-        ).count()
-
-        prize_tickets = (
-            PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_child,
-            ).filter(used_at__gte=start, used_at__lt=end)
-        ).count()
-
-        return shop_tickets + sponsor_tickets + prize_tickets
-
-    @property
-    def participant_count(self) -> int:
-        """Retrieve the participant count for all used 'full week' tickets
+    def todays_participant_count(self) -> int:
+        """Calculate todays participant count from all used 'full week' tickets
         and todays used 'one day' tickets.
+
+        Count tickets with a checked in timestamp from 0600-0600 next day.
+        Reason being early arriving participants might get checked in before 10.
         """
+        now = timezone.localtime()
+        limit = now.replace(hour=6, minute=0, second=0)
+        if now < limit:
+            used_after = limit - timezone.timedelta(days=1)
+            used_before = limit
+        else:
+            used_after = limit
+            used_before = limit + timezone.timedelta(days=1)
+
         return (
-            self.checked_in_full_week_adults
-            + self.checked_in_full_week_children
-            + self.checked_in_one_day_adults
-            + self.checked_in_one_day_children
+            len(self.checked_in_tickets(self.ticket_type_full_week_adult))
+            + len(self.checked_in_tickets(self.ticket_type_full_week_child))
+            + len(self.checked_in_tickets(self.ticket_type_one_day_adult, used_before, used_after))
+            + len(self.checked_in_tickets(self.ticket_type_one_day_child, used_before, used_after))
         )

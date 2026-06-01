@@ -99,7 +99,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             .last()
         )
         unique_player_count = camp_finds.distinct("user").count()
-        non_player_count = self.request.camp.participant_count
+        non_player_count = self.request.camp.todays_participant_count
 
         if non_player_count:  # Avoid ZeroDivisionError
             players_pct = unique_player_count / (unique_player_count + non_player_count) * 100
