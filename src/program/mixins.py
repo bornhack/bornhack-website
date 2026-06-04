@@ -59,7 +59,7 @@ class EnsureWritableCampMixin:
 class EnsureUserOwnsProposalMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         # make sure that this proposal belongs to the logged in user
-        if self.get_object().user is request.user:
+        if self.get_object().user.pk == request.user.pk:
             return super().dispatch(request, *args, **kwargs)
 
         messages.error(request, "No thanks")
