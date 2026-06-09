@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -52,6 +53,16 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     model = Token
     template_name = "token_form.html"
     fields = ["token", "category", "hint", "description", "active", "valid_when"]
+
+    def get_initial(self) -> dict:
+        """Update initial form data with a unique token."""
+        initial = super().get_initial()
+        DEFAULT_LENGTH = 18
+        initial.update({
+            "token": str(uuid.uuid4()).replace("-", "")[:DEFAULT_LENGTH]
+        })
+        return initial
+
 
     def form_valid(self, form):
         token = form.save(commit=False)
@@ -130,6 +141,13 @@ class TokenCategoryListView(CampViewMixin, RaisePermissionRequiredMixin, ListVie
     model = TokenCategory
     template_name = "token_category_list.html"
 
+    def get_queryset(self):
+        """
+        Get all Categories and annotate count of tokens for the current camp.
+        """
+        camp_tokens = Count("token", filter=Q(token__camp=self.request.camp))
+        return TokenCategory.objects.annotate(token_count=camp_tokens)
+
 
 class TokenCategoryCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     """Create a new token category."""
@@ -157,6 +175,17 @@ class TokenCategoryDetailView(CampViewMixin, RaisePermissionRequiredMixin, Detai
     permission_required = "camps.game_team_member"
     model = TokenCategory
     template_name = "token_category_detail.html"
+
+    def get_context_data(self, **kwargs):
+        """Add all category tokens for the current camp to context."""
+        context = super().get_context_data(**kwargs)
+        context.update({
+            "category_tokens": Token.objects.filter(
+                category=self.object,
+                camp=self.request.camp
+            )
+        })
+        return context
 
 
 class TokenCategoryDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
