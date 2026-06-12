@@ -188,7 +188,7 @@
                   {% endif %}
                 </td>
                 <td>
-                  <a href="{% url 'tickets:shopticket_download' pk=ticket.pk %}" class="btn btn-primary"><i
+                  <a href="{% url 'tickets:ticket_download' pk=ticket.pk %}" class="btn btn-primary"><i
                     class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
                   <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary">
                     {% if ticket.product.ticket_type.camp.read_only %}
