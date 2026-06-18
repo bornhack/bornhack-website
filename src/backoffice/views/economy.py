@@ -217,6 +217,8 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         context["unpaid_expenses"] = Expense.objects.filter(
             camp=self.camp,
             payment_status="UNPAID_NEEDS_PAYMENT",
+        ).exclude(
+            creditor__name="Reimbursement",
         ).prefetch_related(
             "creditor",
             "user",
