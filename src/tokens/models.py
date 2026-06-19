@@ -111,22 +111,10 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         )
 
     @property
-    def valid_now(self) -> bool:
-        """Returns if the token is valid 'now'."""
-        valid = False
-        if not self.valid_when:
-            # no time limit
-            valid = True
-        elif self.valid_when.lower and self.valid_when.lower > timezone.now():
-            # not valid yet
-            valid = False
-        elif self.valid_when.upper and self.valid_when.upper < timezone.now():
-            # not valid anymore
-            valid = False
-        elif self.valid_when.lower and self.valid_when.lower < timezone.now():
-            # is valid
-            valid = True
-        return valid
+    def is_valid_now(self) -> bool:
+        """Returns true if the token is valid 'now'."""
+        now = timezone.now()
+        return self.valid_when is None or now in self.valid_when
 
 
 class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
