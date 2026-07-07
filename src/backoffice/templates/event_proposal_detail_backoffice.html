@@ -6,7 +6,7 @@
   <p><a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to EventProposal List</a></p>
   {% if not event_proposal.can_be_approved %}
     <br>
-    <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
+    <div class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</div>
     <br>
   {% endif %}
   <div class="card">
@@ -77,8 +77,8 @@
     <div class="card-footer">Status: <span class="badge">{{ event_proposal.proposal_status }}</span> | ID: <span class="badge">{{ event_proposal.uuid }}</span></div>
   </div>
 
-  {% if not form.instance.can_be_approved %}
-    <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
+  {% if not event_proposal.can_be_approved %}
+    <div class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</div>
     <br>
   {% endif %}
 
