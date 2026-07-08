@@ -1,0 +1,23 @@
+<div class="p-5 my-4 bg-body-tertiary border shadow">
+  <div class="container-fluid py-5">
+    <h1 class="display-5 fw-bold">Token game is being prepared...</h1>
+    <div class="col-md-7">
+    <p class="fs-5 mt-4">
+      The Game Team is working on new tokens for this years BornHack.
+    </p>
+    <p class="fs-5">
+      Check back later.
+    </p>
+    <p class="fs-5">
+      If you would like to help out, you can join us.
+    </p>
+    {% if game_team %}
+    <p class="fs-5">
+        <a href="{% url 'teams:general' camp_slug=camp.slug team_slug=game_team.slug %}" class="btn btn-outline-success">
+          <i class="fa-regular fa-square-plus me-2"></i> Join Game Team
+        </a>
+    </p>
+    {% endif %}
+    </div>
+  </div>
+</div>
