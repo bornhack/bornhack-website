@@ -13,10 +13,17 @@
 
     <div class="row">
 
-      <div class="col-md-12">
+      <div class="col-md-6">
         <h3>PoS: {{ pos.name }}</h3>
         <h3>Scan the ticket!</h3>
-        <input type="text" class="form-control input-lg" name="ticket_token" id="ticket_token_input" autocomplete="off">
+        <input type="text" 
+               class="form-control input-lg"
+               name="ticket_token"
+               id="ticket_token_input"
+               autocomplete="off">
+        <button type="submit" class="btn btn-lg btn-primary">
+          Find ticket
+        </button>
         <div id="scan_again" hidden>
           Scan again!
           <hr/>
@@ -144,8 +151,11 @@
     </form>
 
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-4 text-center">
         {% qr_code "clear" %}
+        <button class="btn btn-secondary" onclick="window.location.replace(window.location.pathname);">
+            Clear
+        </button>
       </div>
 
       {% if not ticket.used_at %}

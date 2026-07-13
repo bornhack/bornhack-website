@@ -111,8 +111,11 @@ class ScanTicketsView(
             context["ticket"] = self.ticket
 
         elif "ticket_token" in self.request.POST:
+            ticket_token = self.request.POST.get("ticket_token")
+
             # Slice to get rid of the first character which is a '#'
-            ticket_token = self.request.POST.get("ticket_token")[1:]
+            if ticket_token[0] == "#":
+                ticket_token = ticket_token[1:]
 
             ticket: TicketTypeUnion | None = _ticket_getter_by_token(ticket_token)
 
