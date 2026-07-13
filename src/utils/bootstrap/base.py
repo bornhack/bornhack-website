@@ -2268,16 +2268,18 @@ class Bootstrap:
             processing="",
         )
 
-    def create_camp_pos(self, teams: dict[Team]) -> None:
+    def create_camp_pos(self, teams: dict[str, Team]) -> None:
         """Create POS locations for camp."""
         pos = [
             Pos(
                 name="Infodesk",
+                slug="infodesk",
                 team=teams["info"],
                 external_id="HHR9izotB6HLzgT6k",
             ),
             Pos(
                 name="Bar",
+                slug="bar",
                 team=teams["bar"],
                 external_id="bTasxE2YYXZh35wtQ",
             ),

@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (ticket_token_input.value === "#handoutbadge") {
       hand_out_badge_input.checked = true;
       check_in_form.submit();
-    } else if (ticket_token_input.value.length === 65) {
+    } else if (ticket_token_input.value.length === 64 || ticket_token_input.value.length === 65) {
       search_form.submit();
     } else if (ticket_token_input.value.startsWith("#bornhack://opr/")) {
       var oprelement = document.getElementById("opr");
