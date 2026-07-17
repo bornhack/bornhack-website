@@ -94,6 +94,7 @@
             </tr>
           {% endif %}
           {% if ticket.product.category.name == "Merchandise" %}
+            {% if ticket.opr.ready_for_pickup %}
             <tr>
               <td>
                 <strong>ID:</strong>
@@ -102,6 +103,16 @@
                 <h2 id="opr">{{ ticket.opr.id }}</h2>
               </td>
             </tr>
+            {% else %}
+            <tr>
+              <td>
+                &nbsp;
+              </td>
+              <td>
+                <h2 id="opr.ready_for_pickup">Not ready yet</h2>
+              </td>
+            </tr>
+            {% endif %}
           {% endif %}
           <tr>
             <td>
