@@ -60,7 +60,7 @@ dev = [
     "django-debug-toolbar==6.3.0",
     "pipdeptree==2.35.2",
     "pre-commit==4.6.0",
-    "setuptools_scm==10.0.5",
+    "setuptools_scm==10.2.1",
 ]
 
 test = [
