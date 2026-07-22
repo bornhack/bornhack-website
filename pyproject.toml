@@ -59,7 +59,7 @@ dev = [
     "bornhack-website[test]",
     "django-debug-toolbar==6.3.0",
     "pipdeptree==2.35.2",
-    "pre-commit==4.6.0",
+    "pre-commit==4.6.1",
     "setuptools_scm==10.0.5",
 ]
 
