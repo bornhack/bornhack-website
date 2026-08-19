@@ -417,14 +417,14 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
         """Get any approved and un-reimbursed expenses and revenues, or return error."""
         self.expenses = Expense.objects.filter(
             camp=self.camp,
-            user=self.user,
+            user=request.user,
             approved=True,
             reimbursement__isnull=True,
             payment_status="PAID_NEEDS_REIMBURSEMENT",
         )
         self.revenues = Revenue.objects.filter(
             camp=self.camp,
-            user=self.user,
+            user=request.user,
             approved=True,
             reimbursement__isnull=True,
             payment_status="PAID_NEEDS_REDISBURSEMENT",
