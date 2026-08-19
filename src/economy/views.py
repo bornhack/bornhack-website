@@ -415,8 +415,20 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
 
     def dispatch(self, request, *args, **kwargs):
         """Get any approved and un-reimbursed expenses and revenues, or return error."""
-        self.expenses = request.user.profile.paid_expenses_needs_reimbursement
-        self.revenues = request.user.profile.paid_revenues_needs_redisbursement
+        self.expenses = Expense.objects.filter(
+            camp=self.camp,
+            user=self.user,
+            approved=True,
+            reimbursement__isnull=True,
+            payment_status="PAID_NEEDS_REIMBURSEMENT",
+        )
+        self.revenues = Revenue.objects.filter(
+            camp=self.camp,
+            user=self.user,
+            approved=True,
+            reimbursement__isnull=True,
+            payment_status="PAID_NEEDS_REDISBURSEMENT",
+        )
         if not self.expenses and not self.revenues:
             messages.error(
                 request,
