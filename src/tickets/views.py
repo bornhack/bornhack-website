@@ -63,9 +63,10 @@ class TicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
 
     def get(self, request, *args, **kwargs):
         ticket = self.get_object(*args, **kwargs)
+        tt = ticket.ticket_type.name.lower().replace(" ","_")
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = (
-            f'attachment; filename="BornHack_{ticket.ticket_type.camp.year}_{ticket.shortname}_ticket_{ticket.pk}.pdf"'
+            f'attachment; filename="BornHack_{ticket.ticket_type.camp.year}_{tt}_{ticket.shortname}_ticket_{ticket.pk}.pdf"'
         )
         response.write(ticket.generate_pdf().getvalue())
         return response
