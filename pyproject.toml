@@ -32,7 +32,7 @@ dependencies = [
     "django_stubs_ext==6.0.4",
     "django-tables2==2.8.0",
     "django-taggit==6.1.0",
-    "django-weasyprint==2.4.0",
+    "django-weasyprint==2.5.0",
     "icalendar==7.1.0",
     "irc3==1.1.10",
     "lxml==6.1.0",
