@@ -34,7 +34,7 @@ dependencies = [
     "django-taggit==6.1.0",
     "django-weasyprint==2.4.0",
     "icalendar==7.1.0",
-    "irc3==1.1.10",
+    "irc3==1.1.12",
     "lxml==6.1.0",
     "nh3==0.3.5",
     "openpyxl==3.1.5",  # used to import excel files in economy backoffice
