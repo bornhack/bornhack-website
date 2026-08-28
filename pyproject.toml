@@ -16,7 +16,7 @@ dependencies = [
     "Django==5.2.16",
     "channels==4.3.2",
     "channels-redis==4.3.0",
-    "commonmark==0.9.1",
+    "commonmark==0.9.2",
     "conference-scheduler==3.0.1",
     "django-allauth[mfa]==65.16.1",
     "django-bootstrap5==26.2",
