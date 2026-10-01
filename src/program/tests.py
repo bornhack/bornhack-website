@@ -11,6 +11,8 @@ class TestFeedbackCreateView(BornhackTestBase):
         """Test setup."""
         super().setUpTestData()
         cls.bootstrap.create_camp_proposals(cls.camp, cls.bootstrap.event_types)
+        cls.bootstrap.approve_speaker_proposals(cls.camp)
+        cls.bootstrap.approve_event_proposals(cls.camp)
 
     def test_create_feedback_requires_login(self) -> None:
         """Test creating feedback for an event requires user to be signed in"""
