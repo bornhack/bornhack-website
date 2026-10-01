@@ -12,14 +12,7 @@
       {% if not pos_list %}
         <p class="lead">No Pos found.</p>
       {% else %}
-        <p>
-          <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
-          <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos List</a>
-          <a href="{% url 'backoffice:posproduct_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product List</a>
-          <a href="{% url 'backoffice:posproductcost_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product Cost List</a>
-          <a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Transaction List</a>
-          <a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Sales List</a>
-        </p>
+      {% include "includes/pos_nav.html" %}
         <p class="lead">A <i>Pos</i> is a place where we sell stuff for DKK and/or HAX.</p>
         {% include "includes/pos_list_table.html" %}
       {% endif %}

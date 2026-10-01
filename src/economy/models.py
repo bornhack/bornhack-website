@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from django.contrib.postgres.fields.ranges import RangeStartsWith
 import os
 from datetime import datetime
 from decimal import Decimal
@@ -8,6 +9,8 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.fields import RangeOperators
+from django.contrib.postgres.constraints import ExclusionConstraint
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.validators import RegexValidator
@@ -31,7 +34,7 @@ from .email import send_expense_approved_email
 from .email import send_expense_rejected_email
 from .email import send_revenue_approved_email
 from .email import send_revenue_rejected_email
-
+from .managers import PosSaleQuerySet, PosTransactionQuerySet
 
 class ChainManager(models.Manager):
     """ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
@@ -815,6 +818,17 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
 
     class Meta:
         ordering = ["period", "pos"]
+        constraints = [
+            # We do not want overlapping PosReport periods for the same PoS
+            ExclusionConstraint(
+                name="prevent_pos_report_period_overlaps_for_pos",
+                expressions=[
+                    ("period", RangeOperators.OVERLAPS),
+                    ("pos", RangeOperators.EQUAL),
+                ],
+            ),
+        ]
+
 
     pos = models.ForeignKey(
         "economy.Pos",
@@ -824,8 +838,6 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
     )
 
     period = DateTimeRangeField(
-        null=True,
-        blank=True,
         help_text="The time period this report covers",
     )
 
@@ -1248,7 +1260,7 @@ class PosProduct(ExportModelOperationsMixin("pos_product"), UUIDModel):
     expenses = models.ManyToManyField(
         "economy.Expense",
         blank=True,
-        help_text="The related expenses for this PosProduct. Only expenses related to a Pos-team are shown. For products composed of multiple ingredients all relevant expenses should be picked.",
+        help_text="The related expenses for this PosProduct. For products composed of multiple ingredients all relevant expenses should be picked.",
     )
 
     def __str__(self) -> str:
@@ -1262,11 +1274,22 @@ class PosTransaction(
 ):
     """A transaction from the Pos system."""
 
+    objects = PosTransactionQuerySet.as_manager()
+
     pos = models.ForeignKey(
         "economy.Pos",
         on_delete=models.PROTECT,
         related_name="pos_transactions",
         help_text="The Pos this PosTransaction belongs to.",
+    )
+
+    pos_report = models.ForeignKey(
+        "economy.PosReport",
+        on_delete=models.PROTECT,
+        related_name="pos_transactions",
+        null=True,
+        blank=True,
+        help_text="The PosReport to which this PosTransaction belongs.",
     )
 
     external_transaction_id = models.CharField(
@@ -1298,8 +1321,16 @@ class PosTransaction(
 class PosSale(ExportModelOperationsMixin("pos_sale"), CampRelatedModel, UUIDModel):
     """A single product sold in a PoS transaction.
 
-    Multiples of the same product result sold in a single tx results in multilpe PosSale objects.
+    Multiples of the same product result sold in a single tx result in multiple PosSale objects.
     """
+
+    objects = PosSaleQuerySet.as_manager()
+
+    external_id = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text="The external ID of the product.",
+    )
 
     transaction = models.ForeignKey(
         "economy.PosTransaction",
@@ -1353,8 +1384,6 @@ class PosProductCost(
     product_cost = models.DecimalField(
         max_digits=8,
         decimal_places=2,
-        null=True,
-        blank=True,
         help_text="The cost/expense (in DKK, including VAT) for each product sold. For products composed of multiple ingredients this number should include the total cost per product sold.",
     )
 

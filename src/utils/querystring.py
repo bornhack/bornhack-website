@@ -10,4 +10,5 @@ from utils.templatetags import querystring
 def querystring_from_request(request, **kwargs):
     """Convenience function to use the querystring templatetag from python."""
     context = RequestContext(request)
-    return querystring.querystring(context, **kwargs)
+    qs = querystring.querystring(context, **kwargs)
+    return qs

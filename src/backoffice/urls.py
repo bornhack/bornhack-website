@@ -142,7 +142,6 @@ from .views import PosReportPosCountEndView
 from .views import PosReportPosCountStartView
 from .views import PosReportUpdateView
 from .views import PosSaleListView
-from .views import PosSalesImportView
 from .views import PosTransactionListView
 from .views import PosUpdateView
 from .views import RefundDetailView
@@ -1345,13 +1344,26 @@ urlpatterns = [
                 ),
                 path(
                     "sales/",
-                    PosSaleListView.as_view(),
-                    name="possale_list",
-                ),
-                path(
-                    "sales/import/",
-                    PosSalesImportView.as_view(),
-                    name="possale_import",
+                    include(
+                        [
+                            path(
+                                "table/",
+                                PosSaleListView.as_view(),
+                                name="possale_list_table",
+                                kwargs={
+                                    "viewtype": "table",
+                                },
+                            ),
+                            path(
+                                "charts/<str:aggregator>/<str:field>/<str:groupby>/",
+                                PosSaleListView.as_view(),
+                                name="possale_list_charts",
+                                kwargs={
+                                    "viewtype": "charts",
+                                },
+                            ),
+                        ],
+                    ),
                 ),
                 path(
                     "<slug:pos_slug>/",

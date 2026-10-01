@@ -169,6 +169,7 @@ class PosSaleFilter(FilterSet):
         to_field_name="name",
     )
     timestamp = filters.DateTimeFromToRangeFilter(field_name="transaction__timestamp")
+    pos_date = filters.DateFromToRangeFilter(label="PoS Date")
     cost = filters.RangeFilter(label="Cost")
     profit = filters.RangeFilter(label="Profit")
 
@@ -179,22 +180,9 @@ class PosSaleFilter(FilterSet):
     @property
     def qs(self):
         """Add annotations here to make sure they are filterable."""
-        # define subq for getting latest product cost
-        latest_cost = PosProductCost.objects.filter(
-            product__uuid=models.OuterRef("product__uuid"),
-            camp=self.request.camp,
-        ).order_by("-timestamp")
-
         self.queryset = PosSale.objects.filter(
             transaction__pos__team__camp=self.request.camp,
-        ).annotate(
-            cost=models.functions.Coalesce(
-                models.Subquery(latest_cost.values("product_cost")[:1]),
-                0,
-                output_field=models.DecimalField(),
-            ),
-            profit=models.Sum(models.F("sales_price") - models.F("cost")),
-        )
+        ).annotate_cost_profit().annotate_pos_date()
         return super().qs
 
 

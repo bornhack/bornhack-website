@@ -1384,6 +1384,28 @@ class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
     def duration(self):
         return timedelta(minutes=self.duration_minutes)
 
+    @property
+    def available_slots(self) -> list[dict[str,int|Slot]]:
+        """Return list of currently available slots this event fits in."""
+        slots = []
+        slotindex = 0
+        # loop over sessions, get free slots
+        for session in self.camp.event_sessions.filter(
+            event_type=self.event_type,
+            event_duration_minutes__gte=self.duration_minutes,
+        ):
+            for slot in session.get_available_slots():
+                # loop over speakers to see if they are all available
+                for speaker in self.speakers.all():
+                    if not speaker.is_available(slot.when):
+                        # this speaker is not available, skip this slot
+                        break
+                else:
+                    # all speakers are available for this slot
+                    slots.append({"index": slotindex, "slot": slot})
+                    slotindex += 1
+        return slots
+
 
 class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedModel):
     """The old way of scheduling events. Model to be deleted after prod data migration."""

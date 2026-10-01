@@ -8,6 +8,8 @@ from django import template
 from django.template import Context
 from django.template import Engine
 from django.utils.safestring import mark_safe
+from django.utils.formats import localize
+from django.utils.timezone import localtime
 
 register = template.Library()
 
@@ -96,3 +98,45 @@ def templaterender(template):
     )
     template_obj = engine.from_string(template)
     return template_obj.render(context=Context())
+
+
+@register.simple_tag(takes_context=True)
+def format_django_filter(context, filterset) -> str:
+    """Format values in a django-filter filterset as HTML."""
+    output = ""
+    if hasattr(filterset.form, "cleaned_data") and any(filterset.form.cleaned_data):
+        output = '<table class="table table-sm"><tr><th>Key</th><th>Filter</th></tr>'
+        for key, value in filterset.form.cleaned_data.items():
+            if not value:
+                continue
+            output += f'<tr><td><span class="badge bg-primary">{key}</span></td><td>'
+            if key == "pos_date":
+                if value.start:
+                    output += f'Not before <b>{localize(value.start.date())}</b><br>'
+                if value.stop:
+                    output += f'Not after <b>{localize(value.stop.date())}</b>'
+                output += "</td></tr>"
+            elif key == "timestamp":
+                if value.start:
+                    output += f'Not before <b>{localize(localtime(value.start))}</b><br>'
+                if value.stop:
+                    output += f'Not after <b>{localize(localtime(value.stop))}</b>'
+                output += "</td></tr>"
+            elif key in ["price", "cost", "profit"]:
+                if value.start:
+                    output += f'At least <b>{(value.start)} HAX</b><br>'
+                if value.stop:
+                    output += f'No more than <b>{(value.stop)} HAX</b>'
+                output += "</td></tr>"
+            elif key == "size":
+                if value.start:
+                    output += f'At least <b>{(value.start)}</b><br>'
+                if value.stop:
+                    output += f'No more than <b>{(value.stop)}</b>'
+                output += "</td></tr>"
+            else:
+                output += f'{value}</td></tr>'
+        output += "</table>"
+    else:
+        output += "No active filters!"
+    return mark_safe(output)
