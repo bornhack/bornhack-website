@@ -96,7 +96,6 @@ class PosSaleQuerySet(models.QuerySet):
             "backoffice:possale_list_table",
             kwargs={"camp_slug": request.camp.slug},
         )
-        print(f"aggregating with {aggregator} on field {field}")
         for tag in tags:
             aggs = {
                 str(date): aggregator(
