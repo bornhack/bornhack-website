@@ -90,8 +90,16 @@ class SizeColumn(tables.Column):
 
 
 class BrandColumn(tables.Column):
-    def render(self, value, table):
-        return filter_button(value, table.request, brand=value)
+    def render(self, value, record, table):
+        button = filter_button(value, table.request, brand=value)
+        url = reverse(
+            "backoffice:posproduct_list",
+            kwargs={"camp_slug": table.request.camp.slug},
+        )
+        product = record.product if hasattr(record, "product") else record
+        link = f'<a href="{url}?brand={product.brand_name}">(show products)</a>'
+        return mark_safe(f"{button} {link}")
+
 
 
 class NameColumn(tables.Column):
@@ -118,6 +126,16 @@ class CostColumn(tables.Column):
             table.request,
             cost_min=value,
             cost_max=value,
+        )
+
+
+class PosDateColumn(tables.Column):
+    def render(self, value, table):
+        return filter_button(
+            localize(value, use_l10n=True),
+            table.request,
+            pos_date_after=value,
+            pos_date_before=value,
         )
 
 
@@ -177,7 +195,7 @@ class PosProductTable(tables.Table):
         )
         qs = querystring_from_request(self.request, prodid=record.external_id)
         url = reverse(
-            "backoffice:possale_list",
+            "backoffice:possale_list_table",
             kwargs={"camp_slug": self.request.camp.slug},
         )
         link = f'<a href="{url}{qs}">show</a>'
@@ -243,10 +261,10 @@ class PosSaleTable(tables.Table):
     transaction__pos__name = PosColumn(verbose_name="Pos")
     transaction__external_transaction_id = tables.Column(verbose_name="Transaction")
     transaction__timestamp = TimestampColumn(verbose_name="Timestamp")
+    pos_date = PosDateColumn(verbose_name="PoS Date")
     product__brand_name = BrandColumn(verbose_name="Brand")
     product__name = NameColumn(verbose_name="Name")
     product__unit_size = SizeColumn(verbose_name="Size")
-    product__description = DescriptionColumn(verbose_name="Description")
     sales_price = HaxColumn(verbose_name="Price")
     product__tags = TagsColumn(verbose_name="Tags")
     cost = CostColumn(verbose_name="Cost")
@@ -284,9 +302,9 @@ class PosSaleTable(tables.Table):
             "transaction__pos__name",
             "transaction__external_transaction_id",
             "transaction__timestamp",
+            "pos_date",
             "product__brand_name",
             "product__name",
-            "product__description",
             "product__unit_size",
             "product__tags",
             "sales_price",
@@ -335,7 +353,7 @@ class PosTransactionTable(tables.Table):
             products_max=value,
         )
         url = reverse(
-            "backoffice:possale_list",
+            "backoffice:possale_list_table",
             kwargs={"camp_slug": self.request.camp.slug},
         )
         link = f'<a href="{url}?txid={record.external_transaction_id}">show</a>'

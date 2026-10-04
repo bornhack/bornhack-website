@@ -7,8 +7,7 @@ import random
 import sys
 import uuid
 from collections import defaultdict
-from datetime import datetime
-from datetime import timedelta
+import datetime
 from itertools import chain
 from zoneinfo import ZoneInfo
 
@@ -50,6 +49,7 @@ from economy.models import Chain
 from economy.models import Credebtor
 from economy.models import Expense
 from economy.models import Pos
+from economy.models import PosReport
 from economy.models import Reimbursement
 from events.factories import EventProposalFactory
 from events.factories import EventProposalUrlFactory
@@ -105,23 +105,164 @@ from .functions import output_fake_md_description
 fake = Faker()
 tz = ZoneInfo(settings.TIME_ZONE)
 logger = logging.getLogger(f"bornhack.{__name__}")
+
+# to update this map from a running instance:
+# pprint({camp.camp.lower.year: {"colour": camp.colour, "tagline": camp.tagline, "light_text": camp.light_text, "buildup": (camp.buildup.lower, camp.buildup.upper), "camp": (camp.camp.lower, camp.camp.upper), "teardown": (camp.teardown.lower, camp.teardown.upper)} for camp in Camp.objects.order_by("slug")})
+
 CAMP_MAP = {
-    2016: {"colour": "#004dff", "tagline": "Initial Commit"},
-    2017: {"colour": "#750787", "tagline": "Make Tradition"},
-    2018: {"colour": "#008026", "tagline": "scale it"},
-    2019: {"colour": "#ffed00", "tagline": "a new /home", "light_text": False},
-    2020: {"colour": "#ff8c00", "tagline": "Make Clean"},
-    2021: {"colour": "#e40303", "tagline": "Continuous Delivery"},
-    2022: {"colour": "#000000", "tagline": "black ~/hack"},
-    2023: {"colour": "#613915", "tagline": "make legacy"},
-    2024: {"colour": "#73d7ee", "tagline": "Feature Creep", "light_text": False},
-    2025: {"colour": "#ffafc7", "tagline": "10 Badges", "light_text": False},
-    2026: {"colour": "#ffffff", "tagline": "Undecided", "light_text": False},
-    2027: {"colour": "#004dff", "tagline": "Undecided"},
-    2028: {"colour": "#750787", "tagline": "Undecided"},
-    2029: {"colour": "#008026", "tagline": "Undecided"},
-    2030: {"colour": "#ffed00", "tagline": "Undecided", "light_text": False},
-    2031: {"colour": "#ff8c00", "tagline": "Undecided"},
+ 2016: {'buildup': (datetime.datetime(2016, 8, 25, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2016, 8, 27, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2016, 8, 27, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2016, 9, 3, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#004DFF',
+        'light_text': True,
+        'tagline': 'Initial Commit',
+        'teardown': (datetime.datetime(2016, 9, 3, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2016, 9, 5, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2017: {'buildup': (datetime.datetime(2017, 8, 20, 14, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2017, 8, 22, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2017, 8, 22, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2017, 8, 29, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#750787',
+        'light_text': True,
+        'tagline': 'Make Tradition',
+        'teardown': (datetime.datetime(2017, 8, 29, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2017, 8, 31, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2018: {'buildup': (datetime.datetime(2018, 8, 12, 14, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2018, 8, 16, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2018, 8, 16, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2018, 8, 23, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#008026',
+        'light_text': True,
+        'tagline': 'scale it',
+        'teardown': (datetime.datetime(2018, 8, 23, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2018, 8, 26, 14, 0, tzinfo=datetime.timezone.utc))},
+ 2019: {'buildup': (datetime.datetime(2019, 8, 5, 6, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2019, 8, 8, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2019, 8, 8, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2019, 8, 15, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#FFED00',
+        'light_text': False,
+        'tagline': 'A new /home',
+        'teardown': (datetime.datetime(2019, 8, 15, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2019, 8, 18, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2020: {'buildup': (datetime.datetime(2020, 8, 7, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2020, 8, 11, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2020, 8, 11, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2020, 8, 18, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#FF8C00',
+        'light_text': True,
+        'tagline': 'make clean',
+        'teardown': (datetime.datetime(2020, 8, 18, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2020, 8, 21, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2021: {'buildup': (datetime.datetime(2021, 8, 15, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2021, 8, 19, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2021, 8, 19, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2021, 8, 26, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#E40303',
+        'light_text': True,
+        'tagline': 'Continuous Delivery',
+        'teardown': (datetime.datetime(2021, 8, 26, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2021, 8, 29, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2022: {'buildup': (datetime.datetime(2022, 7, 30, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2022, 8, 3, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2022, 8, 3, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2022, 8, 10, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#000000',
+        'light_text': True,
+        'tagline': 'black ~/hack',
+        'teardown': (datetime.datetime(2022, 8, 10, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2022, 8, 13, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2023: {'buildup': (datetime.datetime(2023, 7, 29, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2023, 8, 2, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2023, 8, 2, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2023, 8, 9, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#613915',
+        'light_text': True,
+        'tagline': 'make legacy',
+        'teardown': (datetime.datetime(2023, 8, 9, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2023, 8, 12, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2024: {'buildup': (datetime.datetime(2024, 7, 12, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2024, 7, 17, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2024, 7, 17, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2024, 7, 24, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#73D7EE',
+        'light_text': True,
+        'tagline': 'Feature Creep',
+        'teardown': (datetime.datetime(2024, 7, 24, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2024, 7, 28, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2025: {'buildup': (datetime.datetime(2025, 7, 10, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2025, 7, 16, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2025, 7, 16, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2025, 7, 23, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#FFAFC7',
+        'light_text': False,
+        'tagline': '10 Badges',
+        'teardown': (datetime.datetime(2025, 7, 23, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2025, 7, 26, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2026: {'buildup': (datetime.datetime(2026, 7, 11, 15, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2026, 7, 15, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2026, 7, 15, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2026, 7, 22, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#FFFFFF',
+        'light_text': False,
+        'tagline': 'touch grass',
+        'teardown': (datetime.datetime(2026, 7, 22, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2026, 7, 27, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2027: {'buildup': (datetime.datetime(2027, 7, 15, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2027, 7, 21, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2027, 7, 21, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2027, 7, 28, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#004DFF',
+        'light_text': True,
+        'tagline': 'Undecided',
+        'teardown': (datetime.datetime(2027, 7, 28, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2027, 8, 1, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2028: {'buildup': (datetime.datetime(2028, 7, 13, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2028, 7, 19, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2028, 7, 19, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2028, 7, 26, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#750787',
+        'light_text': True,
+        'tagline': 'Undecided',
+        'teardown': (datetime.datetime(2028, 7, 26, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2028, 7, 30, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2029: {'buildup': (datetime.datetime(2029, 7, 12, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2029, 7, 18, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2029, 7, 18, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2029, 7, 25, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#008026',
+        'light_text': True,
+        'tagline': 'Undecided',
+        'teardown': (datetime.datetime(2029, 7, 25, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2029, 7, 29, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2030: {'buildup': (datetime.datetime(2030, 7, 11, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2030, 7, 17, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2030, 7, 17, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2030, 7, 24, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#FFED00',
+        'light_text': False,
+        'tagline': 'Undecided',
+        'teardown': (datetime.datetime(2030, 7, 24, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2030, 7, 28, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2031: {'buildup': (datetime.datetime(2031, 7, 10, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2031, 7, 16, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2031, 7, 16, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2031, 7, 23, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#FF8C00',
+        'light_text': True,
+        'tagline': 'Undecided',
+        'teardown': (datetime.datetime(2031, 7, 23, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2031, 7, 27, 10, 0, tzinfo=datetime.timezone.utc))},
+ 2032: {'buildup': (datetime.datetime(2032, 7, 7, 10, 0, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2032, 7, 14, 10, 0, tzinfo=datetime.timezone.utc)),
+        'camp': (datetime.datetime(2032, 7, 14, 10, 0, tzinfo=datetime.timezone.utc),
+                 datetime.datetime(2032, 7, 21, 10, 0, tzinfo=datetime.timezone.utc)),
+        'colour': '#E40303',
+        'light_text': True,
+        'tagline': 'Undecided',
+        'teardown': (datetime.datetime(2032, 7, 21, 10, 0, tzinfo=datetime.timezone.utc),
+                     datetime.datetime(2032, 7, 25, 15, 0, tzinfo=datetime.timezone.utc))}
 }
 
 
@@ -142,38 +283,25 @@ class Bootstrap:
 
         camp_instances = []
         for data in camps_list:
-            year = data["year"]
-            read_only = data["read_only"]
-
+            # year is a camp property, do not try to set it
+            year = data.pop("year")
+            # always create camps read/write and change it later where relevant
+            read_only = data.pop("read_only")
             camp = Camp(
                 title=f"BornHack {year}",
-                tagline=data["tagline"],
                 slug=f"bornhack-{year}",
                 shortslug=f"bornhack-{year}",
                 call_for_participation_open=(not read_only),
                 call_for_sponsors_open=(not read_only),
-                buildup=DateTimeTZRange(
-                    datetime(year, 8, 25, 12, 0, tzinfo=tz),
-                    datetime(year, 8, 27, 12, 0, tzinfo=tz),
-                ),
-                camp=DateTimeTZRange(
-                    datetime(year, 8, 27, 12, 0, tzinfo=tz),
-                    datetime(year, 9, 3, 12, 0, tzinfo=tz),
-                ),
-                teardown=DateTimeTZRange(
-                    datetime(year, 9, 3, 12, 0, tzinfo=tz),
-                    datetime(year, 9, 5, 12, 0, tzinfo=tz),
-                ),
-                colour=data["colour"],
-                light_text=data.get("light_text", True),
+                read_only=False,
+                **data,
             )
-
             camp_instances.append(camp)
 
         Camp.objects.bulk_create(camp_instances)
-        self.camps = camp_instances
+        self.camps = Camp.objects.all()
 
-        return camp_instances
+        return self.camps
 
     def create_event_routing_types(self) -> None:
         """Create event routing types."""
@@ -465,19 +593,6 @@ class Bootstrap:
             support_speaker_event_conflicts=True,
         )
 
-        types["keynote"] = EventType(
-            name="Keynote",
-            slug="keynote",
-            color="#FF3453",
-            light_text=True,
-            description="A keynote presentation",
-            icon="star",
-            host_title="Speaker",
-            event_duration_minutes="90",
-            support_autoscheduling=True,
-            support_speaker_event_conflicts=True,
-        )
-
         types["debate"] = EventType(
             name="Debate",
             slug="debate",
@@ -701,8 +816,8 @@ class Bootstrap:
             price=1200,
             category=categories["tickets"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-standard-ticket",
             ticket_type=ticket_types["adult_full_week"],
@@ -715,8 +830,8 @@ class Bootstrap:
             price=1337,
             category=categories["tickets"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-hacker-ticket",
             ticket_type=ticket_types["adult_full_week"],
@@ -729,8 +844,8 @@ class Bootstrap:
             price=495,
             category=categories["tickets"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-child-ticket",
             ticket_type=ticket_types["child_full_week"],
@@ -743,8 +858,8 @@ class Bootstrap:
             price=300,
             category=categories["tickets"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-one-day-ticket",
             ticket_type=ticket_types["adult_one_day"],
@@ -757,8 +872,8 @@ class Bootstrap:
             price=165,
             category=categories["tickets"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-one-day-child-ticket",
             ticket_type=ticket_types["child_one_day"],
@@ -771,8 +886,8 @@ class Bootstrap:
             price=3325,
             category=categories["villages"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-village-tent-3x3m-no-floor",
             ticket_type=ticket_types["village"],
@@ -785,8 +900,8 @@ class Bootstrap:
             price=3675,
             category=categories["villages"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-village-tent-3x3m-with-floor",
             ticket_type=ticket_types["village"],
@@ -799,8 +914,8 @@ class Bootstrap:
             price=150,
             category=categories["merchandise"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-tshirt-large",
             ticket_type=ticket_types["merchandise"],
@@ -813,8 +928,8 @@ class Bootstrap:
             price=150,
             category=categories["merchandise"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-tshirt-medium",
             ticket_type=ticket_types["merchandise"],
@@ -827,8 +942,8 @@ class Bootstrap:
             price=150,
             category=categories["merchandise"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-tshirt-small",
             ticket_type=ticket_types["merchandise"],
@@ -841,8 +956,8 @@ class Bootstrap:
             price=100,
             category=categories["facilities"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-100-hax",
             ticket_type=ticket_types["facilities"],
@@ -855,8 +970,8 @@ class Bootstrap:
             price=18000,
             category=categories["packages"],
             available_in=(
-                datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
-                datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 1, 1, 12, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 12, 20, 12, 0, tzinfo=tz),
             ),
             slug=f"{camp.slug}-corporate-hackers-small",
         )
@@ -1039,12 +1154,12 @@ class Bootstrap:
             NewsItem(
                 title=f"Welcome to {camp.title}",
                 content="news body here with <b>html</b> support",
-                published_at=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
+                published_at=datetime.datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
             ),
             NewsItem(
                 title=f"{camp.title} is over",
                 content="news body here",
-                published_at=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
+                published_at=datetime.datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
             ),
         ]
         NewsItem.objects.bulk_create(news)
@@ -1066,18 +1181,18 @@ class Bootstrap:
                 event_location=event_locations["speakers_tent"],
                 event_duration_minutes=60,
                 when=(
-                    datetime(start.year, start.month, start.day, 11, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 17, 0, tzinfo=tz),
                 ),
             )
             EventSession.objects.create(
                 camp=camp,
                 event_type=event_types["recreational"],
-                event_location=event_locations["speakers_tent"],
+                event_location=event_locations["bar_area"],
                 event_duration_minutes=60,
                 when=(
-                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 13, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 13, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 14, 0, tzinfo=tz),
                 ),
             )
             EventSession.objects.create(
@@ -1086,74 +1201,48 @@ class Bootstrap:
                 event_location=event_locations["bar_area"],
                 event_duration_minutes=180,
                 when=(
-                    datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz) + timedelta(hours=3),
+                    datetime.datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz) + datetime.timedelta(hours=3),
                 ),
             )
             EventSession.objects.create(
                 camp=camp,
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_1"],
-                event_duration_minutes=360,
+                event_duration_minutes=180,
                 when=(
-                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
                 ),
             )
             EventSession.objects.create(
                 camp=camp,
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_2"],
-                event_duration_minutes=360,
+                event_duration_minutes=180,
                 when=(
-                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
                 ),
             )
             EventSession.objects.create(
                 camp=camp,
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_3"],
-                event_duration_minutes=360,
+                event_duration_minutes=180,
                 when=(
-                    datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
-                ),
-            )
-        # create sessions for the keynotes
-        for day in [days[1], days[3], days[5]]:
-            EventSession.objects.create(
-                camp=camp,
-                event_type=event_types["keynote"],
-                event_location=event_locations["speakers_tent"],
-                event_duration_minutes=90,
-                when=(
-                    datetime(
-                        day.lower.year,
-                        day.lower.month,
-                        day.lower.day,
-                        20,
-                        0,
-                        tzinfo=tz,
-                    ),
-                    datetime(
-                        day.lower.year,
-                        day.lower.month,
-                        day.lower.day,
-                        21,
-                        30,
-                        tzinfo=tz,
-                    ),
+                    datetime.datetime(start.year, start.month, start.day, 12, 0, tzinfo=tz),
+                    datetime.datetime(start.year, start.month, start.day, 18, 0, tzinfo=tz),
                 ),
             )
 
     def create_camp_proposals(self, camp: Camp, event_types: dict) -> None:
-        """Create camp proposals: talks, workshops and keynotes."""
+        """Create camp proposals: talks and workshops."""
         self.output(f"Creating event- and speaker_proposals for {camp.year}...")
 
-        # add 45 talks
+        # add 35 talks
         talkproposals = EventProposalFactory.create_batch(
-            45,
+            35,
             track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["talk"],
         )
@@ -1162,14 +1251,6 @@ class Bootstrap:
             15,
             track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["workshop"],
-        )
-        # and 3 keynotes
-        # (in the real world these are submitted as talks
-        # and promoted to keynotes by the content team)
-        keynoteproposals = EventProposalFactory.create_batch(
-            3,
-            track=factory.Iterator(camp.event_tracks.all()),
-            event_type=event_types["keynote"],
         )
 
         tags = [
@@ -1184,7 +1265,7 @@ class Bootstrap:
             "linux",
         ]
 
-        for ep in talkproposals + workshopproposals + keynoteproposals:
+        for ep in talkproposals + workshopproposals:
             # create a speakerproposal for this EventProposal
             sp = SpeakerProposalFactory(camp=camp, user=ep.user)
             ep.speakers.add(sp)
@@ -1197,19 +1278,10 @@ class Bootstrap:
                 if other_speakers.exists():
                     # add an extra speaker
                     ep.speakers.add(random.choice(other_speakers))  # noqa: S311
-
             # add tags for 2 out of 3 events
             if random.choice([True, True, False]):  # noqa: S311
                 # add 1-3 tags for this EP
                 ep.tags.add(*random.sample(tags, k=random.randint(1, 3)))  # noqa: S311
-
-        EventProposal.objects.create(
-            user=random.choice(User.objects.all()),  # noqa: S311
-            title="Lunch break",
-            abstract="Daily lunch break. Remember to drink water.",
-            event_type=event_types["recreational"],
-            track=random.choice(camp.event_tracks.all()),  # noqa: S311
-        ).mark_as_approved()
 
     def create_proposal_urls(self, camp: Camp) -> None:
         """Create URL objects for the proposals."""
@@ -1257,16 +1329,10 @@ class Bootstrap:
                         continue
                     # 90% chance this speaker is available for any given chunk
                     form.cleaned_data[data["fieldname"]] = random.randint(1, 100) < 90
-            # print(f"saving availability for speaker {sp}: {form.cleaned_data}")
             save_speaker_availability(form, sp)
 
     def approve_speaker_proposals(self, camp: Camp) -> None:
-        """Approve all keynotes but reject 10% of other events."""
-        for sp in camp.speaker_proposals.filter(
-            event_proposals__event_type__name="Keynote",
-        ):
-            sp.mark_as_approved()
-
+        """Approve most but reject 10% of other events."""
         for sp in camp.speaker_proposals.filter(proposal_status="pending"):
             # we do not approve all speakers
             x = random.randint(1, 100)  # noqa: S311
@@ -1279,15 +1345,15 @@ class Bootstrap:
                 sp.mark_as_rejected()
 
     def approve_event_proposals(self, camp: Camp) -> None:
-        """Approve event proposals but reject 10% if its not a keynote."""
+        """Approve event proposals but reject 10%."""
         for ep in camp.event_proposals.filter(proposal_status="pending"):
             # are all speakers for this event approved?
             for sp in ep.speakers.all():
                 if not hasattr(sp, "speaker"):
                     break
             else:
-                # all speakers are approved, approve the event? always approve keynotes!
-                if random.randint(1, 100) < 90 or ep.event_type.name == "Keynote":
+                # all speakers are approved, approve the event?
+                if random.randint(1, 100) < 90:
                     ep.mark_as_approved()
                 else:
                     ep.mark_as_rejected()
@@ -1302,24 +1368,6 @@ class Bootstrap:
     def create_camp_scheduling(self, camp: Camp, autoschedule: bool) -> None:
         """Create camp scheduling."""
         self.output(f"Creating scheduling for {camp.year}...")
-
-        # create a lunchbreak daily in speakers tent
-        lunch = Event.objects.get(track__camp=camp, title="Lunch break")
-        for day in camp.get_days(camppart="camp")[1:-1]:
-            date = day.lower.date()
-            start = datetime(date.year, date.month, date.day, 12, 0, tzinfo=tz)
-            lunchslot = EventSlot.objects.get(
-                event_session__event_location=camp.event_locations.get(
-                    name="Speakers Tent",
-                ),
-                event_session__event_type=EventType.objects.get(
-                    name="Recreational Event",
-                ),
-                when=(start, start + timedelta(hours=1)),
-            )
-            lunchslot.event = lunch
-            lunchslot.autoscheduled = False
-            lunchslot.save()
 
         # exercise the autoscheduler a bit
         if autoschedule:
@@ -1708,24 +1756,24 @@ class Bootstrap:
         shifts[0] = TeamShift(
             team=teams["shuttle"],
             shift_range=(
-                datetime(camp.year, 8, 27, 2, 0, tzinfo=tz),
-                datetime(camp.year, 8, 27, 8, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 8, 27, 2, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 8, 27, 8, 0, tzinfo=tz),
             ),
             people_required=1,
         )
         shifts[1] = TeamShift(
             team=teams["shuttle"],
             shift_range=(
-                datetime(camp.year, 8, 27, 8, 0, tzinfo=tz),
-                datetime(camp.year, 8, 27, 14, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 8, 27, 8, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 8, 27, 14, 0, tzinfo=tz),
             ),
             people_required=1,
         )
         shifts[2] = TeamShift(
             team=teams["shuttle"],
             shift_range=(
-                datetime(camp.year, 8, 27, 14, 0, tzinfo=tz),
-                datetime(camp.year, 8, 27, 20, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 8, 27, 14, 0, tzinfo=tz),
+                datetime.datetime(camp.year, 8, 27, 20, 0, tzinfo=tz),
             ),
             people_required=1,
         )
@@ -1864,7 +1912,7 @@ class Bootstrap:
                 seats=2,
                 from_location="Copenhagen",
                 to_location="BornHack",
-                when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
+                when=datetime.datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
                 description="I have space for two people and a little bit of luggage",
             ),
             Ride(
@@ -1873,7 +1921,7 @@ class Bootstrap:
                 seats=2,
                 from_location="BornHack",
                 to_location="Copenhagen",
-                when=datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
+                when=datetime.datetime(camp.year, 9, 4, 12, 0, tzinfo=tz),
                 description="I have space for two people and a little bit of luggage",
             ),
             Ride(
@@ -1882,7 +1930,7 @@ class Bootstrap:
                 seats=1,
                 from_location="Aarhus",
                 to_location="BornHack",
-                when=datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
+                when=datetime.datetime(camp.year, 8, 27, 12, 0, tzinfo=tz),
                 description="I need a ride and have a large backpack",
             ),
         ]
@@ -2270,21 +2318,31 @@ class Bootstrap:
 
     def create_camp_pos(self, teams: dict[str, Team]) -> None:
         """Create POS locations for camp."""
-        pos = [
-            Pos(
-                name="Infodesk",
-                slug="infodesk",
-                team=teams["info"],
-                external_id="HHR9izotB6HLzgT6k",
-            ),
-            Pos(
-                name="Bar",
-                slug="bar",
-                team=teams["bar"],
-                external_id="bTasxE2YYXZh35wtQ",
-            ),
-        ]
-        Pos.objects.bulk_create(pos)
+        info = Pos.objects.create(
+            name="Infodesk",
+            slug="infodesk",
+            team=teams["info"],
+            external_id="HHR9izotB6HLzgT6k",
+        )
+        bar = Pos.objects.create(
+            name="Bar",
+            slug="bar",
+            team=teams["bar"],
+            external_id="bTasxE2YYXZh35wtQ",
+        )
+        camp = teams["info"].camp
+        # create posreports for all buildup, camp and teardown days.
+        # skip last day of buildup and first day of teardown due to overlap with camp days.
+        for day in camp.get_days("buildup")[:-1] + camp.get_days("camp") + camp.get_days("teardown")[1:]:
+            PosReport.objects.create(
+                pos=info,
+                period=(day.lower.replace(hour=7), day.lower.replace(hour=7)+datetime.timedelta(hours=23)),
+            )
+            PosReport.objects.create(
+                pos=bar,
+                period=(day.lower.replace(hour=8), day.lower.replace(hour=9)+datetime.timedelta(hours=23)),
+            )
+
 
     def output(self, message: str) -> None:
         """Method for logging the output."""
@@ -2347,136 +2405,130 @@ class Bootstrap:
         if camp.year > timezone.now().year:
             self.output("Not creating anything for this year yet")
 
-        ticket_types = self.create_camp_ticket_types(camp)
-
-        camp_products = self.create_camp_products(
-            camp,
-            self.product_categories,
-            ticket_types,
-        )
-
-        self.create_orders(self.users, camp_products)
-
-        self.create_camp_tracks(camp)
-
-        locations = self.create_event_locations(camp)
-
-        self.create_camp_news(camp)
-
-        teams = self.create_camp_teams(camp)
-        self.teams[camp.year] = teams
-
-        if not camp.read_only and not permissions_added:
-            # add permissions for the first camp that is not read_only
-            self.add_team_permissions(camp)
-            permissions_added = True
-
-        self.create_camp_team_tasks(camp, teams)
-
-        team_memberships = self.create_camp_team_memberships(
-            camp,
-            teams,
-            self.users,
-        )
-
-        self.create_camp_team_shifts(camp, teams, team_memberships)
-
-        self.create_camp_pos(teams)
-
-        self.create_camp_cfp(camp)
-
-        self.create_camp_proposals(camp, self.event_types)
-
-        self.create_proposal_urls(camp)
-
-        self.create_camp_event_sessions(camp, self.event_types, locations)
-
-        self.generate_speaker_availability(camp)
-
         try:
-            self.approve_speaker_proposals(camp)
-        except ValidationError:
-            self.output(
-                "Name collision, bad luck. Run the bootstrap script again! PRs to make this less annoying welcome :)",
+            ticket_types = self.create_camp_ticket_types(camp)
+
+            camp_products = self.create_camp_products(
+                camp,
+                self.product_categories,
+                ticket_types,
             )
-            sys.exit(1)
 
-        self.approve_event_proposals(camp)
+            self.create_orders(self.users, camp_products)
 
-        self.create_camp_scheduling(camp, autoschedule)
+            self.create_camp_tracks(camp)
 
-        # shuffle it up - delete and create new random availability
-        self.generate_speaker_availability(camp)
+            locations = self.create_event_locations(camp)
 
-        # and create some speaker<>event conflicts
-        self.create_camp_speaker_event_conflicts(camp)
+            self.create_camp_news(camp)
 
-        # recalculate the autoschedule
-        self.create_camp_rescheduling(camp, autoschedule)
+            teams = self.create_camp_teams(camp)
+            self.teams[camp.year] = teams
 
-        self.create_camp_villages(camp, self.users)
+            if not camp.read_only and not permissions_added:
+                # add permissions for the first camp that is not read_only
+                self.add_team_permissions(camp)
+                permissions_added = True
 
-        facility_types = self.create_facility_types(
-            teams,
-            self.quickfeedback_options,
-        )
+            self.create_camp_team_tasks(camp, teams)
 
-        facilities = self.create_facilities(facility_types)
+            team_memberships = self.create_camp_team_memberships(
+                camp,
+                teams,
+                self.users,
+            )
 
-        self.create_facility_feedbacks(
-            facilities,
-            self.quickfeedback_options,
-            self.users,
-        )
+            self.create_camp_team_shifts(camp, teams, team_memberships)
 
-        info_categories = self.create_camp_info_categories(camp, teams)
+            self.create_camp_pos(teams)
 
-        self.create_camp_info_items(camp, info_categories)
+            self.create_camp_cfp(camp)
 
-        self.create_camp_feedback(camp, self.users)
+            self.create_camp_proposals(camp, self.event_types)
 
-        self.create_camp_rides(camp, self.users)
+            self.create_proposal_urls(camp)
 
-        self.create_camp_cfs(camp)
+            self.create_camp_event_sessions(camp, self.event_types, locations)
 
-        sponsor_tiers = self.create_camp_sponsor_tiers(camp)
+            self.generate_speaker_availability(camp)
 
-        self.create_camp_sponsors(camp, sponsor_tiers)
+            try:
+                self.approve_speaker_proposals(camp)
+            except ValidationError:
+                self.output(
+                    "Name collision, bad luck. Run the bootstrap script again! PRs to make this less annoying welcome :)",
+                )
+                sys.exit(1)
 
-        tokens = self.create_camp_tokens(camp)
+            self.approve_event_proposals(camp)
 
-        self.create_camp_token_finds(camp, tokens)
+            self.create_camp_scheduling(camp, autoschedule)
 
-        self.create_camp_expenses(camp)
+            # shuffle it up - delete and create new random availability
+            self.generate_speaker_availability(camp)
 
-        self.create_camp_reimbursements(camp)
+            # and create some speaker<>event conflicts
+            self.create_camp_speaker_event_conflicts(camp)
 
-        self.create_camp_revenues(camp)
+            # recalculate the autoschedule
+            self.create_camp_rescheduling(camp, autoschedule)
 
-        self.create_camp_map_layer(camp)
+            self.create_camp_villages(camp, self.users)
 
-        if read_only:
-            self.output(f"Updatin {camp.title} to read-only...")
-            camp.read_only = True
-            camp.save(update_fields=["read_only"])
+            facility_types = self.create_facility_types(
+                teams,
+                self.quickfeedback_options,
+            )
 
-        if camp.year == timezone.now().year:
-            self.output("Updating team permissions...")
-            for member in TeamMember.objects.filter(team__camp=camp):
-                member.save()
+            facilities = self.create_facilities(facility_types)
+
+            self.create_facility_feedbacks(
+                facilities,
+                self.quickfeedback_options,
+                self.users,
+            )
+
+            info_categories = self.create_camp_info_categories(camp, teams)
+
+            self.create_camp_info_items(camp, info_categories)
+
+            self.create_camp_feedback(camp, self.users)
+
+            self.create_camp_rides(camp, self.users)
+
+            self.create_camp_cfs(camp)
+
+            sponsor_tiers = self.create_camp_sponsor_tiers(camp)
+
+            self.create_camp_sponsors(camp, sponsor_tiers)
+
+            tokens = self.create_camp_tokens(camp)
+
+            self.create_camp_token_finds(camp, tokens)
+
+            self.create_camp_expenses(camp)
+
+            self.create_camp_reimbursements(camp)
+
+            self.create_camp_revenues(camp)
+
+            self.create_camp_map_layer(camp)
+
+            if read_only:
+                self.output(f"Updating {camp.title} to read-only...")
+                camp.read_only = True
+                camp.save(update_fields=["read_only"])
+
+            if camp.year == timezone.now().year:
+                self.output("Updating team permissions...")
+                for member in TeamMember.objects.filter(team__camp=camp):
+                    member.save()
+        except Exception:
+            logger.exception(f"Exception during bootstrapping of camp {camp} :(")
 
     def post_bootstrap(self):
         """Make the last changes after the bootstrapping is done."""
-        self.output("Creating event routing...")
-        teams = self.teams[next(reversed(self.teams.keys()))]
-        Routing.objects.create(
-            team=teams["orga"],
-            eventtype=Type.objects.get(name="public_credit_name_changed"),
-        )
-        Routing.objects.create(
-            team=teams["orga"],
-            eventtype=Type.objects.get(name="ticket_created"),
-        )
+        pass
 
     def bootstrap_tests(self) -> None:
         """Method for bootstrapping the test database."""

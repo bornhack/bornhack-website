@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from django.contrib.postgres.fields.ranges import RangeStartsWith
+
 import json
+from django.db.models.functions import Upper, Lower
 import logging
 from typing import TYPE_CHECKING
+from datetime import timedelta
 
+from django.http import Http404
 from django.contrib import messages
 from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
+from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import FormView
@@ -308,13 +314,17 @@ class PosSaleListView(
     """A list of PosSale objects."""
 
     model = PosSale
-    template_name = "pos_sale_list.html"
     table_class = PosSaleTable
     filterset_class = PosSaleFilter
+
+    def get_template_names(self, *args, **kwargs):
+        """Use the table or chart template."""
+        return f"pos_sale_list_{self.kwargs['viewtype']}.html"
 
     def get_context_data(self, *args, **kwargs):
         """Include the total (unfiltered) count and sums."""
         context = super().get_context_data(*args, **kwargs)
+        # used by the "filter info" box
         context["total_sales_count"] = PosSale.objects.filter(
             transaction__pos__team__camp=self.camp,
         ).count()
@@ -324,27 +334,56 @@ class PosSaleListView(
         context["filtered_sales_sum"] = context["filter"].qs.aggregate(
             models.Sum("sales_price"),
         )["sales_price__sum"]
+
+        if self.kwargs["viewtype"] == "charts":
+            # field to aggregate?
+            if self.kwargs["field"] == "salesprice":
+                field = "sales_price"
+            elif self.kwargs["field"] == "profit":
+                field = "profit"
+            else:
+                raise Http404
+
+            # aggregator?
+            if self.kwargs["aggregator"] == "count":
+                aggregator = models.Count
+                agg = "Number of Sales"
+                unit = "Sales"
+            elif self.kwargs["aggregator"] == "sum":
+                aggregator = models.Sum
+                if field == "profit":
+                    agg = "Profit"
+                else:
+                    agg = "Sum of Sales"
+                unit = "HAX"
+            else:
+                raise Http404
+
+            # group by?
+            if self.kwargs["groupby"] == "date":
+                sales = context["filter"].qs.get_daily_sales_by_date(aggregator=aggregator, request=self.request, field=field)
+                axis1 = "date"
+                axis2 = "tags"
+            elif self.kwargs["groupby"] == "tags":
+                sales = context["filter"].qs.get_daily_sales_by_tags(aggregator=aggregator, request=self.request, field=field)
+                axis1 = "tags"
+                axis2 = "date"
+            else:
+                raise Http404
+
+            context["widgets"] = {
+                "unit": unit,
+                "columns": [{
+                    "chart": sales,
+                    "title": f"{agg} by {axis1} then {axis2}",
+                    "selector": "#column_chart",
+                }],
+                "options": {
+                    "camp_colour": self.request.camp.colour,
+                    "light_text": self.request.camp.light_text,
+                },
+            }
         return context
-
-
-class PosSalesImportView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
-    form_class = PosSalesJSONForm
-    template_name = "pos_sales_json_upload_form.html"
-
-    def form_valid(self, form):
-        if "sales" in form.files:
-            sales_data = json.loads(form.files["sales"].read().decode())
-            products, transactions, sales = import_pos_sales_json(sales_data)
-            messages.success(
-                self.request,
-                f"PoS sales json processed OK. Created {products} new products and {transactions} new transactions containing {sales} new sales.",
-            )
-        return redirect(
-            reverse(
-                "backoffice:epaytransaction_list",
-                kwargs={"camp_slug": self.camp.slug},
-            ),
-        )
 
 
 class PosProductListView(
@@ -407,11 +446,6 @@ class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView[Po
         """Only show relevant expenses."""
         context = super().get_context_data(**kwargs)
         pos_teams = Team.objects.filter(camp=self.camp, points_of_sale__isnull=False)
-        expenses = Expense.objects.filter(
-            camp=self.camp,
-            responsible_team__in=pos_teams,
-        )
-        context["form"].fields["expenses"].queryset = expenses
         return context
 
 

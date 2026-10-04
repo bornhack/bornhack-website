@@ -55,6 +55,7 @@
             <div class="btn-group-vertical">
               <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
               <a href="{% url 'backoffice:event_update' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+              <a href="{% url 'backoffice:event_schedule' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-calendar"></i> Schedule</a>
               <a href="{% url 'backoffice:event_delete' camp_slug=camp.slug slug=event.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
             </div>
           </td>

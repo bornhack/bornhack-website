@@ -1,0 +1,8 @@
+{% extends 'pos_sale_list.html' %}
+{% load django_tables2 %}
+
+{% block pos_sale_body %}
+      {% include "includes/table_pagination.html" %}
+      {% render_table table %}
+      {% include "includes/table_pagination.html" %}
+{% endblock pos_sale_body %}

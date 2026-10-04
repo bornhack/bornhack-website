@@ -494,3 +494,12 @@ img {
     overflow-y: auto;
     display: block;
 }
+
+
+/* apexcharts */
+.apexcharts-treemap-rect {
+  cursor: pointer;
+}
+.apexcharts-bar-area {
+  cursor: pointer;
+}

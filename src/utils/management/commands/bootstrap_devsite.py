@@ -115,10 +115,10 @@ class Command(BaseCommand):
         """Bootstrap data using threading."""
         years = options["years"]
         writable_years = options["writable_years"]
-        prepared_camps = bootstrap.prepare_camp_list(years, writable_years)
+        prepared_camps = bootstrap.prepare_camp_list(years_range=years, writable_range=writable_years)
 
         self.decorated_output("Creating global data", "green")
-        bootstrap.bootstrap_global_data(prepared_camps)
+        bootstrap.bootstrap_global_data(prepared_camps=prepared_camps)
         self.decorated_output("Finished creating global data", "green")
 
         threads = options["threads"]
