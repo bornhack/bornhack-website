@@ -1541,9 +1541,8 @@ def import_pos_product_costs(costs: list[dict[str,str|float]], camp: Camp) -> in
     new_costs = 0
     for cost in costs:
         if not cost["product_cost"]:
-            # some costs have None as value, skip them
-            logger.warning(f"Skipping cost with no price: {cost}")
-            continue
+            # treat all falsy as 0
+            cost["product_cost"] = 0
         poscost, created=PosProductCost.objects.get_or_create(
             product=PosProduct.objects.get(external_id=cost["product_id"]),
             timestamp=cost["timestamp"],
