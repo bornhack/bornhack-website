@@ -38,7 +38,8 @@ class PosSaleQuerySet(models.QuerySet):
             profit=models.Case(
                 models.When(cost=0, then=models.Value(0)),
                 default=models.Sum(models.F("sales_price") - models.F("cost")),
-                output_field=models.DecimalField(),
+                # throw away decimals for profit calculation
+                output_field=models.IntegerField(),
             ),
         )
 
