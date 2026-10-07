@@ -1,5 +1,4 @@
-{% if perms.camps.economy_team_member %}
-  <h3>Economy Team</h3>
+  <h3>Economy</h3>
   <a href="{% url 'backoffice:chain_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Chains</h4>
     <p class="list-group-item-text">Use this view to see the Chains and Credebtors registered in the system.</p>
@@ -8,13 +7,14 @@
     <h4 class="list-group-item-heading">Expenses</h4>
     <p class="list-group-item-text">Use this view to see and approve/reject expenses.</p>
   </a>
-  <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
-    <h4 class="list-group-item-heading">Reimbursements</h4>
-    <p class="list-group-item-text">Use this view to view and create reimbursements for approved expenses.</p>
-  </a>
   <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Revenues</h4>
     <p class="list-group-item-text">Use this view to see and approve/reject revenues.</p>
+  </a>
+{% if perms.camps.economy_team_member %}
+  <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Reimbursements</h4>
+    <p class="list-group-item-text">Use this view to view and create reimbursements for approved expenses.</p>
   </a>
   <a href="{% url 'backoffice:bank_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Banks</h4>

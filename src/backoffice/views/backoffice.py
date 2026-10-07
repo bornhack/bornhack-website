@@ -41,7 +41,7 @@ class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateVie
             tabs["content"] = {"name": "Content"}
         if "camps.orga_team_member" in perms:
             tabs["orga"] = {"name": "Orga", "count": context["held_email_count"]}
-        if "camps.economy_team_member" in perms:
+        if "camps.orga_team_member" in perms or "camps.economy_team_member" in perms or context["is_team_lead"]:
             tabs["economy"] = {"name": "Economy"}
         if "camps.orga_team_member" in perms or context["is_team_pos"]:
             tabs["pos"] = {"name": "Pos"}

@@ -85,3 +85,18 @@ class OrgaOrTeamLeadViewMixin(CampViewMixin, UserPassesTestMixin):
             if perm.startswith("camps.") and perm.endswith("_team_lead"):
                 return True
         raise PermissionDenied("No thanks")
+
+
+class OrgaOrTeamLeadOrEconomyTeamViewMixin(UserPassesTestMixin):
+    """A mixin for views that should be accessible only to orga and team leads and economy team members."""
+
+    def test_func(self) -> bool:
+        """This view requires camps.orga_team_member or camps.<any team>_team_lead permission or camps.economy_team_member."""
+        if self.request.user.has_perm("camps.economy_team_member"):
+            return True
+        if self.request.user.has_perm("camps.orga_team_member"):
+            return True
+        for perm in self.request.user.get_all_permissions():
+            if perm.startswith("camps.") and perm.endswith("_team_lead"):
+                return True
+        raise PermissionDenied("No thanks")

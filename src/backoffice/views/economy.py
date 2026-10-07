@@ -27,7 +27,7 @@ from backoffice.forms import CoinifyCSVForm
 from backoffice.forms import EpayCSVForm
 from backoffice.forms import MobilePayCSVForm
 from backoffice.forms import ZettleUploadForm
-from backoffice.mixins import EconomyTeamPermissionMixin
+from backoffice.mixins import EconomyTeamPermissionMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin
 from camps.mixins import CampViewMixin
 from economy.models import AccountingExport
 from economy.models import Bank
@@ -55,6 +55,7 @@ from economy.utils import ZettleExcelImporter
 from economy.utils import import_clearhaus_csv
 from economy.utils import import_epay_csv
 from utils.mixins import VerbUpdateView
+from utils.mixins import AnyTeamMemberRequiredMixin
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -63,7 +64,7 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 # CHAINS & CREDEBTORS
 
 
-class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+class ChainListView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, ListView):
     model = Chain
     template_name = "chain_list_backoffice.html"
 
@@ -93,7 +94,7 @@ class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         )
 
 
-class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+class ChainDetailView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, DetailView):
     model = Chain
     template_name = "chain_detail_backoffice.html"
     slug_url_kwarg = "chain_slug"
@@ -179,7 +180,7 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
         return context
 
 
-class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+class CredebtorDetailView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, DetailView):
     model = Credebtor
     template_name = "credebtor_detail_backoffice.html"
     slug_url_kwarg = "credebtor_slug"
@@ -199,7 +200,7 @@ class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView)
 # EXPENSES
 
 
-class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+class ExpenseListView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, ListView):
     model = Expense
     template_name = "expense_list_backoffice.html"
 
@@ -233,7 +234,7 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         return context
 
 
-class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+class ExpenseDetailView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, DetailView):
     model = Expense
     template_name = "expense_detail_backoffice.html"
 
@@ -353,7 +354,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
 # REVENUES
 
 
-class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+class RevenueListView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, ListView):
     model = Revenue
     template_name = "revenue_list_backoffice.html"
 
@@ -379,7 +380,7 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         return context
 
 
-class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+class RevenueDetailView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, DetailView):
     model = Revenue
     template_name = "revenue_detail_backoffice.html"
 
