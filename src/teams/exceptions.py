@@ -24,12 +24,14 @@ class IrcChannelInUseError(ValidationError):
         """Exception raised a public irc channel is in use."""
         super().__init__("The public IRC channel name is already in use on another team!")
 
+
 class StartAfterEndError(ValidationError):
     """Exception raised when start date is after end date."""
 
     def __init__(self) -> None:
         """Exception raised when start date is after end date."""
         super().__init__("Start can not be after end.")
+
 
 class StartSameAsEndError(ValidationError):
     """Exception raised when start date is the same as end date."""

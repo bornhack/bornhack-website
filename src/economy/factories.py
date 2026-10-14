@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import random
-from datetime import timezone
+from datetime import UTC
 
 import factory
 import faker
 from django.contrib.auth.models import User
+
 from camps.models import Camp
-from teams.models import Team
 from utils.slugs import unique_slugify
 
 from .models import Bank
@@ -79,7 +79,7 @@ class CoinifyInvoiceFactory(factory.django.DjangoModelFactory):
     coinify_created = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     payment_amount = factory.Faker(
         "pydecimal",
@@ -118,7 +118,7 @@ class CoinifyPaymentIntentFactory(factory.django.DjangoModelFactory):
     coinify_created = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     reference_type = "payment_intent"
     merchant_id = factory.Faker("uuid4")
@@ -155,7 +155,7 @@ class CoinifyPayoutFactory(factory.django.DjangoModelFactory):
     coinify_created = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     amount = factory.Faker("pydecimal", right_digits=2, min_value=1000, max_value=10000)
     fee = factory.Faker("pydecimal", right_digits=2, min_value=1000, max_value=10000)
@@ -177,7 +177,7 @@ class CoinifySettlementFactory(factory.django.DjangoModelFactory):
     create_time = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     gross_amount = factory.Faker(
         "pydecimal",
@@ -221,7 +221,7 @@ class EpayTransactionFactory(factory.django.DjangoModelFactory):
     auth_date = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     auth_amount = factory.Faker(
         "pydecimal",
@@ -232,7 +232,7 @@ class EpayTransactionFactory(factory.django.DjangoModelFactory):
     captured_date = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     captured_amount = factory.Faker(
         "pydecimal",
@@ -403,12 +403,12 @@ class ZettleBalanceFactory(factory.django.DjangoModelFactory):
     statement_time = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     payment_time = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     payment_reference = factory.Faker("random_int", min=4000, max=5000)
     description = factory.Faker("sentence")
@@ -428,7 +428,7 @@ class ZettleReceiptFactory(factory.django.DjangoModelFactory):
     zettle_created = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     receipt_number = factory.Faker("random_int", min=4000, max=5000)
     vat = factory.Faker("pydecimal", right_digits=2, min_value=500, max_value=3000)
@@ -475,7 +475,7 @@ class MobilePayTransactionFactory(factory.django.DjangoModelFactory):
     mobilepay_created = factory.Faker(
         "date_time_between",
         start_date="-6y",
-        tzinfo=timezone.utc,
+        tzinfo=UTC,
     )
     comment = factory.Faker("sentence")
     transaction_id = factory.Faker("numerify", text="###E############")
@@ -551,7 +551,15 @@ class ExpenseFactory(factory.django.DjangoModelFactory):
     invoice_date = factory.Faker("date")
     approved = factory.Faker("random_element", elements=[True, True, False, None])
     notes = factory.Faker("text")
-    payment_status = factory.Faker("random_element", elements=["PAID_IN_NETBANK", "PAID_WITH_TYKLINGS_MASTERCARD", "PAID_WITH_AHFS_MASTERCARD", "PAID_NEEDS_REIMBURSEMENT"])
+    payment_status = factory.Faker(
+        "random_element",
+        elements=[
+            "PAID_IN_NETBANK",
+            "PAID_WITH_TYKLINGS_MASTERCARD",
+            "PAID_WITH_AHFS_MASTERCARD",
+            "PAID_NEEDS_REIMBURSEMENT",
+        ],
+    )
 
 
 class RevenueFactory(factory.django.DjangoModelFactory):
@@ -573,4 +581,12 @@ class RevenueFactory(factory.django.DjangoModelFactory):
     invoice_date = factory.Faker("date")
     approved = factory.Faker("random_element", elements=[True, True, False, None])
     notes = factory.Faker("text")
-    payment_status = factory.Faker("random_element", elements=["PAID_IN_NETBANK", "PAID_TO_TYKLINGS_MASTERCARD", "PAID_TO_AHFS_MASTERCARD", "PAID_NEEDS_REDISBURSEMENT"])
+    payment_status = factory.Faker(
+        "random_element",
+        elements=[
+            "PAID_IN_NETBANK",
+            "PAID_TO_TYKLINGS_MASTERCARD",
+            "PAID_TO_AHFS_MASTERCARD",
+            "PAID_NEEDS_REDISBURSEMENT",
+        ],
+    )

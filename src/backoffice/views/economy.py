@@ -27,7 +27,8 @@ from backoffice.forms import CoinifyCSVForm
 from backoffice.forms import EpayCSVForm
 from backoffice.forms import MobilePayCSVForm
 from backoffice.forms import ZettleUploadForm
-from backoffice.mixins import EconomyTeamPermissionMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin
+from backoffice.mixins import EconomyTeamPermissionMixin
+from backoffice.mixins import OrgaOrTeamLeadOrEconomyTeamViewMixin
 from camps.mixins import CampViewMixin
 from economy.models import AccountingExport
 from economy.models import Bank
@@ -55,7 +56,6 @@ from economy.utils import ZettleExcelImporter
 from economy.utils import import_clearhaus_csv
 from economy.utils import import_epay_csv
 from utils.mixins import VerbUpdateView
-from utils.mixins import AnyTeamMemberRequiredMixin
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -187,12 +187,8 @@ class CredebtorDetailView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, D
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["expenses"] = (
-            self.get_object().expenses.filter(camp=self.camp).prefetch_related("user", "creditor")
-        )
-        context["revenues"] = (
-            self.get_object().revenues.filter(camp=self.camp).prefetch_related("user", "debtor")
-        )
+        context["expenses"] = self.get_object().expenses.filter(camp=self.camp).prefetch_related("user", "creditor")
+        context["revenues"] = self.get_object().revenues.filter(camp=self.camp).prefetch_related("user", "debtor")
         return context
 
 
@@ -215,14 +211,18 @@ class ExpenseListView(CampViewMixin, OrgaOrTeamLeadOrEconomyTeamViewMixin, ListV
     def get_context_data(self, **kwargs):
         """Include unpaid and unapproved expenses seperately."""
         context = super().get_context_data(**kwargs)
-        context["unpaid_expenses"] = Expense.objects.filter(
-            camp=self.camp,
-            payment_status="UNPAID_NEEDS_PAYMENT",
-        ).exclude(
-            creditor__name="Reimbursement",
-        ).prefetch_related(
-            "creditor",
-            "user",
+        context["unpaid_expenses"] = (
+            Expense.objects.filter(
+                camp=self.camp,
+                payment_status="UNPAID_NEEDS_PAYMENT",
+            )
+            .exclude(
+                creditor__name="Reimbursement",
+            )
+            .prefetch_related(
+                "creditor",
+                "user",
+            )
         )
         context["unapproved_expenses"] = Expense.objects.filter(
             camp=self.camp,
@@ -303,7 +303,10 @@ class ReimbursementUpdateView(
             # mark as paid button was pressed
             reimbursement = form.save()
             reimbursement.mark_as_paid()
-            messages.success(self.request, "Reimbursement marked as paid, related expenses and revenues payment_status set accordingly")
+            messages.success(
+                self.request,
+                "Reimbursement marked as paid, related expenses and revenues payment_status set accordingly",
+            )
         elif "save" in form.data:
             reimbursement = form.save()
             messages.success(self.request, "Reimbursement notes updated")

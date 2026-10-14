@@ -64,7 +64,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["game_team"] = Team.objects.filter(
             camp=self.request.camp,
-            name__icontains="game"
+            name__icontains="game",
         ).first()
         context["form"] = TokenFindSubmitForm()
 

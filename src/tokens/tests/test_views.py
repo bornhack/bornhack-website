@@ -1,9 +1,9 @@
 """Tests for token views."""
 
 from __future__ import annotations
-from zoneinfo import ZoneInfo
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup
 from django.conf import settings

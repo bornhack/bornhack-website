@@ -176,7 +176,6 @@ class TeamMemberApproveView(
         )
 
 
-
 class TeamMemberMakeLeadView(
     LoginRequiredMixin,
     TeamViewMixin,
@@ -184,6 +183,7 @@ class TeamMemberMakeLeadView(
     UpdateView,
 ):
     """View for turning a team member into a team lead."""
+
     template_name = "teammember_make_lead.html"
     model = TeamMember
     fields = ()
@@ -208,6 +208,7 @@ class TeamMemberTakeLeadView(
     UpdateView,
 ):
     """View for turning a team lead into a normal member."""
+
     template_name = "teammember_take_lead.html"
     model = TeamMember
     fields = ()

@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import uuid
 
 from django.core.exceptions import ValidationError
@@ -25,12 +26,12 @@ class TestTokenModel(BornhackTestBase):
         )
 
     def create_token(
-            self,
-            token_str: str|None = None,
-            time_range: DateTimeTZRange|None = None
+        self,
+        token_str: str | None = None,
+        time_range: DateTimeTZRange | None = None,
     ) -> Token:
         """Helper method for creating tokens"""
-        random_token = str(uuid.uuid4()).replace('-', '')
+        random_token = str(uuid.uuid4()).replace("-", "")
         return Token.objects.create(
             token=token_str or random_token,
             camp=self.camp,
@@ -38,7 +39,7 @@ class TestTokenModel(BornhackTestBase):
             hint="Test token hint",
             description="Test token description",
             active=True,
-            valid_when=time_range
+            valid_when=time_range,
         )
 
     def test_token_regex_validator_min_length(self) -> None:
@@ -88,9 +89,6 @@ class TestTokenModel(BornhackTestBase):
         assert token.is_valid_now is False
 
         # Is valid
-        time_range = DateTimeTZRange(
-            lower=now - timezone.timedelta(days=5),
-            upper=now + timezone.timedelta(days=5))
+        time_range = DateTimeTZRange(lower=now - timezone.timedelta(days=5), upper=now + timezone.timedelta(days=5))
         token = self.create_token(time_range=time_range)
         assert token.is_valid_now
-

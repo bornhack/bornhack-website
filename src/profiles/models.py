@@ -7,9 +7,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
+from camps.models import Camp
 from economy.models import Expense
 from economy.models import Revenue
-from camps.models import Camp
 from teams.models import TeamMember
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -94,8 +94,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         return self.user.email
 
     def get_display_name(self, user: User, camp: Camp) -> str:
-        """
-        Return the profile's public or private name depending on
+        """Return the profile's public or private name depending on
         requesting user's team membership.
 
         `private_name` is returned for all volunteers, defined as someone who is
@@ -137,11 +136,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
 
         Unrestricted usage.
         """
-        return (
-            self.public_credit_name
-            if self.public_credit_name_approved
-            else "Unnamed"
-        )
+        return self.public_credit_name if self.public_credit_name_approved else "Unnamed"
 
     @property
     def private_name(self) -> str:
@@ -152,8 +147,6 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         """
         if self.name:
             return self.name
-        elif self.public_credit_name_approved:
+        if self.public_credit_name_approved:
             return self.public_credit_name
-        else:
-            return self.user.username
-
+        return self.user.username

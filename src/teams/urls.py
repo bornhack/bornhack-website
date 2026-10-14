@@ -1,4 +1,5 @@
 """Django URLs for application Teams."""
+
 from __future__ import annotations
 
 from django.urls import include
@@ -17,10 +18,10 @@ from teams.views.info import InfoItemUpdateView
 from teams.views.members import TeamJoinView
 from teams.views.members import TeamLeaveView
 from teams.views.members import TeamMemberApproveView
-from teams.views.members import TeamMemberRemoveView
 from teams.views.members import TeamMemberMakeLeadView
-from teams.views.members import TeamMemberTakeLeadView
+from teams.views.members import TeamMemberRemoveView
 from teams.views.members import TeamMembersView
+from teams.views.members import TeamMemberTakeLeadView
 from teams.views.shifts import MemberDropsShift
 from teams.views.shifts import MemberTakesShift
 from teams.views.shifts import ShiftCreateMultipleView

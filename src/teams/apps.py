@@ -1,4 +1,5 @@
 """App config for the teams application."""
+
 from __future__ import annotations
 
 from django.apps import AppConfig
@@ -12,6 +13,7 @@ from .signal_handlers import teammember_saved
 
 class TeamsConfig(AppConfig):
     """App config for the signals connected to the teams application."""
+
     name = "teams"
 
     def ready(self) -> None:

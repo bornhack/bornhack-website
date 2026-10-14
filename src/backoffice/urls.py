@@ -27,6 +27,9 @@ from .views import BankCSVUploadView
 from .views import BankDetailView
 from .views import BankListView
 from .views import BankTransactionDetailView
+from .views import CampFeedbackDetailView
+from .views import CampFeedbackListView
+from .views import CampFeedbackProcessView
 from .views import ChainDetailView
 from .views import ChainListView
 from .views import ClearhausSettlementDetailView
@@ -86,9 +89,6 @@ from .views import FacilityTypeImportView
 from .views import FacilityTypeListView
 from .views import FacilityTypeUpdateView
 from .views import FacilityUpdateView
-from .views import CampFeedbackDetailView
-from .views import CampFeedbackListView
-from .views import CampFeedbackProcessView
 from .views import InvoiceDownloadMultipleView
 from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView

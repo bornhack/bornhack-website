@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from django.db import models
 from django.contrib.auth.models import User
-from django_prometheus.models import ExportModelOperationsMixin
+from django.db import models
 from django.utils import timezone
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
@@ -19,27 +19,27 @@ class CampFeedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUI
 
     camp = models.ForeignKey(
         "camps.Camp",
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
 
     user = models.ForeignKey(
         "auth.User",
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
     )
 
     feedback = models.TextField(
-        help_text="Enter your feedback for this year's camp"
+        help_text="Enter your feedback for this year's camp",
     )
 
     state = models.CharField(
-        choices = StateChoices.choices,
+        choices=StateChoices.choices,
         default=StateChoices.UNPROCESSED,
         help_text="Set state of the feedback",
     )
 
     processed_at = models.DateTimeField(
         null=True,
-        blank=True
+        blank=True,
     )
 
     processed_by = models.ForeignKey(
@@ -51,8 +51,7 @@ class CampFeedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUI
     )
 
     def process_feedback(self, state: str, user: User) -> None:
-        """
-        Process feedback by changing the state, timestamp and user.
+        """Process feedback by changing the state, timestamp and user.
 
         When state arg is `StateChoices.UNPROCESSED`, the `processed_by`
         and `processed_at` fields get set to None.
@@ -61,7 +60,7 @@ class CampFeedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUI
         """
         if not user.has_perm("camps.orga_team_member"):
             raise PermissionError(
-                f"User: {user} is missing permissions for processing feedback"
+                f"User: {user} is missing permissions for processing feedback",
             )
 
         # When state is invalid, this raises a ValueError.
@@ -75,4 +74,3 @@ class CampFeedback(ExportModelOperationsMixin("feedback"), CampRelatedModel, UUI
             self.processed_at = timezone.now()
 
         self.save()
-

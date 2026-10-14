@@ -15,6 +15,7 @@ from profiles.models import Profile
 fake = Faker()
 logger = logging.getLogger(f"bornhack.{__name__}")
 
+
 class ProfileFactory(factory.django.DjangoModelFactory):
     """Factory for creating user profiles."""
 

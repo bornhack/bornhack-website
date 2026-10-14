@@ -18,6 +18,7 @@ from utils.bootstrap.functions import output_fake_md_description
 fake = Faker()
 logger = logging.getLogger(f"bornhack.{__name__}")
 
+
 class SpeakerProposalFactory(factory.django.DjangoModelFactory):
     """Factory for speaker proposals."""
 
@@ -26,7 +27,7 @@ class SpeakerProposalFactory(factory.django.DjangoModelFactory):
 
         model = SpeakerProposal
 
-    name = factory.Sequence(lambda _: fake.unique.name()) 
+    name = factory.Sequence(lambda _: fake.unique.name())
     email = factory.Sequence(lambda _: fake.unique.email())
     biography = output_fake_md_description()
     submission_notes = factory.Iterator(["", output_fake_description()])

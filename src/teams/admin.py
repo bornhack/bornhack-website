@@ -1,4 +1,5 @@
 """Django admin for teams."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -24,17 +25,20 @@ from .models import TeamTask
 @admin.register(TeamTask)
 class TeamTaskAdmin(admin.ModelAdmin):
     """Django admin for team tasks."""
+
     list_display: ClassVar[list[str]] = ["id", "team", "name", "description"]
 
 
 class TeamMemberInline(admin.TabularInline):
     """Django admin inline field for team member."""
+
     model = TeamMember
 
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     """Django admin for teams."""
+
     save_as = True
 
     @admin.display(
@@ -73,6 +77,7 @@ class TeamAdmin(admin.ModelAdmin):
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
     """Django admin for team members."""
+
     list_filter: ClassVar[list] = [CampPropertyListFilter, "team", "approved"]
 
     actions: ClassVar[list[str]] = ["approve_membership", "remove_member"]
@@ -116,4 +121,5 @@ class TeamMemberAdmin(admin.ModelAdmin):
 @admin.register(TeamShift)
 class TeamShiftAdmin(admin.ModelAdmin):
     """Django admin for team shifts."""
+
     list_filter: ClassVar[list[str]] = ["team"]

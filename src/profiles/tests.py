@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from collections import namedtuple
+
 from django.contrib.auth.models import AnonymousUser
 from django.template import Context
 from django.template import Template
@@ -27,8 +30,7 @@ class TestTemplateTags(BornhackTestBase):
         context = {"user": self.profile}
         # Profile without approved `public_credit_name`
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.public_fallback
@@ -36,8 +38,7 @@ class TestTemplateTags(BornhackTestBase):
         # Profile with approved `public_credit_name`
         self.profile.public_credit_name_approved = True
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.profile.public_credit_name
@@ -51,8 +52,7 @@ class TestTemplateTags(BornhackTestBase):
         }
         # Profile with `name`
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.profile.name
@@ -61,8 +61,7 @@ class TestTemplateTags(BornhackTestBase):
         self.profile.name = None
         self.profile.public_credit_name_approved = True
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.profile.public_credit_name
@@ -71,8 +70,7 @@ class TestTemplateTags(BornhackTestBase):
         self.profile.name = None
         self.profile.public_credit_name_approved = False
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.profile.user.username
@@ -86,8 +84,7 @@ class TestTemplateTags(BornhackTestBase):
         }
         # Team member of related camp
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.profile.private_name
@@ -95,8 +92,7 @@ class TestTemplateTags(BornhackTestBase):
         # Team member of previous camp
         TeamMember.objects.filter(user=self.user, team__camp=self.camp).delete()
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.profile.public_name
@@ -105,8 +101,7 @@ class TestTemplateTags(BornhackTestBase):
         fake_request = self.FakeRequest(user=self.users[13])
         context.update({"request": fake_request})
         result = Template(
-            "{% load profile_display %}"
-            "{% display_name user %}"
+            "{% load profile_display %}{% display_name user %}",
         ).render(Context(context))
 
         assert result == self.profile.public_name
@@ -131,16 +126,13 @@ class TestProfileModel(BornhackTestBase):
         assert self.profile.public_credit_name_approved is True
 
     def test_return_approved_public_credit_name(self) -> None:
-        """
-        Test `public_name` property returns the approved `public_credit_name`.
-        """
+        """Test `public_name` property returns the approved `public_credit_name`."""
         self.profile.public_credit_name_approved = True
 
         assert self.profile.public_name == self.profile.public_credit_name
 
     def test_public_name_not_approved_return_unnamed(self) -> None:
-        """
-        Test `public_name` property returns `Unnamed`
+        """Test `public_name` property returns `Unnamed`
         when `public_credit_name` isn't approved.
         """
         assert self.profile.public_name == "Unnamed"
@@ -157,8 +149,7 @@ class TestProfileModel(BornhackTestBase):
         assert self.profile.private_name == expected
 
     def test_private_name_return_public_credit_name(self) -> None:
-        """
-        Test `private_name` property returns the approved public_credit_name,
+        """Test `private_name` property returns the approved public_credit_name,
         when no `name` is set.
         """
         self.profile.name = None
@@ -167,8 +158,7 @@ class TestProfileModel(BornhackTestBase):
         assert self.profile.private_name == self.profile.public_credit_name
 
     def test_private_name_return_username_as_fallback(self) -> None:
-        """
-        Test `private_name` property return the username as a fallback,
+        """Test `private_name` property return the username as a fallback,
         when no profile name or public_credit_name is added.
         """
         self.profile.name = None
@@ -202,9 +192,7 @@ class TestProfileModel(BornhackTestBase):
         assert result == self.profile.public_name
 
     def test_get_display_name_with_unauthenticated_user(self) -> None:
-        """
-        Test `get_display_name` return public name when user is unauthenticated.
-        """
+        """Test `get_display_name` return public name when user is unauthenticated."""
         user = AnonymousUser()
 
         result = self.profile.get_display_name(user, self.camp)

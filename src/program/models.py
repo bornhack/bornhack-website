@@ -1385,7 +1385,7 @@ class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
         return timedelta(minutes=self.duration_minutes)
 
     @property
-    def available_slots(self) -> list[dict[str,int|Slot]]:
+    def available_slots(self) -> list[dict[str, int | Slot]]:
         """Return list of currently available slots this event fits in."""
         slots = []
         slotindex = 0

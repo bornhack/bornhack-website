@@ -1,29 +1,21 @@
 from __future__ import annotations
 
-from django.contrib.postgres.fields.ranges import RangeStartsWith
-
-import json
-from django.db.models.functions import Upper, Lower
 import logging
 from typing import TYPE_CHECKING
-from datetime import timedelta
 
-from django.http import Http404
 from django.contrib import messages
 from django.db import models
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
-from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
-from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
-from backoffice.forms import PosSalesJSONForm
 from backoffice.mixins import OrgaTeamPermissionMixin
 from backoffice.mixins import PosViewMixin
 from camps.mixins import CampViewMixin
@@ -31,7 +23,6 @@ from economy.filters import PosProductCostFilter
 from economy.filters import PosProductFilter
 from economy.filters import PosSaleFilter
 from economy.filters import PosTransactionFilter
-from economy.models import Expense
 from economy.models import Pos
 from economy.models import PosProduct
 from economy.models import PosProductCost
@@ -42,7 +33,6 @@ from economy.tables import PosProductCostTable
 from economy.tables import PosProductTable
 from economy.tables import PosSaleTable
 from economy.tables import PosTransactionTable
-from economy.utils import import_pos_sales_json
 from teams.models import Team
 from utils.mixins import AnyTeamPosRequiredMixin
 
@@ -361,11 +351,19 @@ class PosSaleListView(
 
             # group by?
             if self.kwargs["groupby"] == "date":
-                sales = context["filter"].qs.get_daily_sales_by_date(aggregator=aggregator, request=self.request, field=field)
+                sales = context["filter"].qs.get_daily_sales_by_date(
+                    aggregator=aggregator,
+                    request=self.request,
+                    field=field,
+                )
                 axis1 = "date"
                 axis2 = "tags"
             elif self.kwargs["groupby"] == "tags":
-                sales = context["filter"].qs.get_daily_sales_by_tags(aggregator=aggregator, request=self.request, field=field)
+                sales = context["filter"].qs.get_daily_sales_by_tags(
+                    aggregator=aggregator,
+                    request=self.request,
+                    field=field,
+                )
                 axis1 = "tags"
                 axis2 = "date"
             else:
@@ -373,11 +371,13 @@ class PosSaleListView(
 
             context["widgets"] = {
                 "unit": unit,
-                "columns": [{
-                    "chart": sales,
-                    "title": f"{agg} by {axis1} then {axis2}",
-                    "selector": "#column_chart",
-                }],
+                "columns": [
+                    {
+                        "chart": sales,
+                        "title": f"{agg} by {axis1} then {axis2}",
+                        "selector": "#column_chart",
+                    },
+                ],
                 "options": {
                     "camp_colour": self.request.camp.colour,
                     "light_text": self.request.camp.light_text,

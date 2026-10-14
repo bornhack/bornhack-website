@@ -4,12 +4,12 @@ import datetime
 import logging
 from collections import OrderedDict
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from zoneinfo import ZoneInfo
 from psycopg2.extras import DateTimeTZRange
 
 logger = logging.getLogger(f"bornhack.{__name__}")

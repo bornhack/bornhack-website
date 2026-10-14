@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 import logging
+from datetime import timedelta
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from datetime import timedelta
 
 from camps.models import Camp
-from tickets.models import TicketType
 from shop.models import Product
 from shop.models import SubProductRelation
+from tickets.models import TicketType
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -66,14 +66,17 @@ class Command(BaseCommand):
                         "available_in": (timezone.now(), tocamp.camp.upper + timedelta(days=30)),
                         "cost": product.cost,
                         "comment": product.comment.replace(str(fromcamp.year), str(tocamp.year)),
-                    }
+                    },
                 )
                 if created:
                     print(f"Created new product {newprod}")
                 products[product] = newprod
 
         # loop again and create bundle products
-        for product in Product.objects.filter(sub_products__isnull=False, sub_products__ticket_type__camp=fromcamp).distinct():
+        for product in Product.objects.filter(
+            sub_products__isnull=False,
+            sub_products__ticket_type__camp=fromcamp,
+        ).distinct():
             print(product)
             # create bundle product
             newprod, created = Product.objects.get_or_create(
@@ -86,7 +89,7 @@ class Command(BaseCommand):
                     "available_in": (timezone.now(), tocamp.camp.upper + timedelta(days=30)),
                     "cost": product.cost,
                     "comment": product.comment.replace(str(fromcamp.year), str(tocamp.year)),
-                }
+                },
             )
             for spr in product.sub_product_relations.all():
                 newspr, created = SubProductRelation.objects.get_or_create(
@@ -98,6 +101,6 @@ class Command(BaseCommand):
                     print(f"Created new SPR {newspr} for bundle product {newprod}")
         self.output(
             self.style.SUCCESS(
-                f"----------[ Done creating tickets! Remember to manually set FKs from camp to ticket types! ]----------",
+                "----------[ Done creating tickets! Remember to manually set FKs from camp to ticket types! ]----------",
             ),
         )

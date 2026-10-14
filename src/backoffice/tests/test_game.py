@@ -1,5 +1,6 @@
-import pytest
+from __future__ import annotations
 
+import pytest
 from django.urls import reverse
 
 from tokens.models import TokenCategory
@@ -43,7 +44,7 @@ class TestTokenCategoryListView:
         admin_client,
         token_category,
         token_factory,
-        test_camps
+        test_camps,
     ):
         """Test the object list has annotated token count for current camp."""
         expected = 0
@@ -79,7 +80,7 @@ class TestTokenCategoryDetailView:
         token_category,
         token_category_factory,
         test_camps,
-        token_factory
+        token_factory,
     ):
         """Test only tokens for this category and camp is added to context."""
         category2 = token_category_factory(persist=True, name="test")
@@ -89,7 +90,7 @@ class TestTokenCategoryDetailView:
             for _ in range(3):
                 if camp == test_camps.current:
                     expected.append(
-                        token_factory(persist=True, camp=camp, category=token_category)
+                        token_factory(persist=True, camp=camp, category=token_category),
                     )
                 token_factory(persist=True, camp=camp, category=category2)
 
@@ -97,4 +98,3 @@ class TestTokenCategoryDetailView:
         result = response.context.get("category_tokens")
 
         assert list(result) == expected
-

@@ -24,8 +24,8 @@ from maps.views import UserLocationListView
 from maps.views import UserLocationUpdateView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
-from sponsors.views import SponsorsView
 from sponsors.views import CallForSponsorsView
+from sponsors.views import SponsorsView
 from utils.views import csrfview
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form

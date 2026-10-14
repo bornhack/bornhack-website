@@ -6,7 +6,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("maps", "0004_userlocationtype_userlocation"),
     ]
@@ -15,6 +14,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="layer",
             name="public",
-            field=models.BooleanField(default=True, help_text="Make the layer visible to the public. A non-public layer is only visible for team members"),
+            field=models.BooleanField(
+                default=True,
+                help_text="Make the layer visible to the public. A non-public layer is only visible for team members",
+            ),
         ),
     ]

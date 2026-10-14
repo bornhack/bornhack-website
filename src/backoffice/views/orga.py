@@ -13,9 +13,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
-from django.views.generic import UpdateView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
+from django.views.generic import UpdateView
 from django.views.generic import View
 from django.views.generic.edit import FormView
 
@@ -365,4 +365,3 @@ class CampFeedbackProcessView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView
         return HttpResponseRedirect(
             reverse("backoffice:feedback_list", kwargs={"camp_slug": self.camp.slug}),
         )
-

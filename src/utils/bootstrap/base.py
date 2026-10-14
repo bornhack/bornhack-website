@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import datetime
 import logging
 import random
 import sys
 import uuid
 from collections import defaultdict
-import datetime
 from itertools import chain
 from zoneinfo import ZoneInfo
 
@@ -25,7 +25,6 @@ from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from faker import Faker
-from psycopg2.extras import DateTimeTZRange
 
 from camps.models import Camp
 from camps.models import Permission as CampPermission
@@ -55,7 +54,6 @@ from events.factories import EventProposalFactory
 from events.factories import EventProposalUrlFactory
 from events.factories import SpeakerProposalFactory
 from events.factories import SpeakerProposalUrlFactory
-from events.models import Routing
 from events.models import Type
 from facilities.models import Facility
 from facilities.models import FacilityFeedback
@@ -75,7 +73,6 @@ from program.models import Event
 from program.models import EventLocation
 from program.models import EventProposal
 from program.models import EventSession
-from program.models import EventSlot
 from program.models import EventTrack
 from program.models import EventType
 from program.models import SpeakerProposal
@@ -110,159 +107,295 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 # pprint({camp.camp.lower.year: {"colour": camp.colour, "tagline": camp.tagline, "light_text": camp.light_text, "buildup": (camp.buildup.lower, camp.buildup.upper), "camp": (camp.camp.lower, camp.camp.upper), "teardown": (camp.teardown.lower, camp.teardown.upper)} for camp in Camp.objects.order_by("slug")})
 
 CAMP_MAP = {
- 2016: {'buildup': (datetime.datetime(2016, 8, 25, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2016, 8, 27, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2016, 8, 27, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2016, 9, 3, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#004DFF',
-        'light_text': True,
-        'tagline': 'Initial Commit',
-        'teardown': (datetime.datetime(2016, 9, 3, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2016, 9, 5, 10, 0, tzinfo=datetime.timezone.utc))},
- 2017: {'buildup': (datetime.datetime(2017, 8, 20, 14, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2017, 8, 22, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2017, 8, 22, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2017, 8, 29, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#750787',
-        'light_text': True,
-        'tagline': 'Make Tradition',
-        'teardown': (datetime.datetime(2017, 8, 29, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2017, 8, 31, 10, 0, tzinfo=datetime.timezone.utc))},
- 2018: {'buildup': (datetime.datetime(2018, 8, 12, 14, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2018, 8, 16, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2018, 8, 16, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2018, 8, 23, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#008026',
-        'light_text': True,
-        'tagline': 'scale it',
-        'teardown': (datetime.datetime(2018, 8, 23, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2018, 8, 26, 14, 0, tzinfo=datetime.timezone.utc))},
- 2019: {'buildup': (datetime.datetime(2019, 8, 5, 6, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2019, 8, 8, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2019, 8, 8, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2019, 8, 15, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#FFED00',
-        'light_text': False,
-        'tagline': 'A new /home',
-        'teardown': (datetime.datetime(2019, 8, 15, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2019, 8, 18, 10, 0, tzinfo=datetime.timezone.utc))},
- 2020: {'buildup': (datetime.datetime(2020, 8, 7, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2020, 8, 11, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2020, 8, 11, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2020, 8, 18, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#FF8C00',
-        'light_text': True,
-        'tagline': 'make clean',
-        'teardown': (datetime.datetime(2020, 8, 18, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2020, 8, 21, 10, 0, tzinfo=datetime.timezone.utc))},
- 2021: {'buildup': (datetime.datetime(2021, 8, 15, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2021, 8, 19, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2021, 8, 19, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2021, 8, 26, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#E40303',
-        'light_text': True,
-        'tagline': 'Continuous Delivery',
-        'teardown': (datetime.datetime(2021, 8, 26, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2021, 8, 29, 10, 0, tzinfo=datetime.timezone.utc))},
- 2022: {'buildup': (datetime.datetime(2022, 7, 30, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2022, 8, 3, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2022, 8, 3, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2022, 8, 10, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#000000',
-        'light_text': True,
-        'tagline': 'black ~/hack',
-        'teardown': (datetime.datetime(2022, 8, 10, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2022, 8, 13, 10, 0, tzinfo=datetime.timezone.utc))},
- 2023: {'buildup': (datetime.datetime(2023, 7, 29, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2023, 8, 2, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2023, 8, 2, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2023, 8, 9, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#613915',
-        'light_text': True,
-        'tagline': 'make legacy',
-        'teardown': (datetime.datetime(2023, 8, 9, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2023, 8, 12, 10, 0, tzinfo=datetime.timezone.utc))},
- 2024: {'buildup': (datetime.datetime(2024, 7, 12, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2024, 7, 17, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2024, 7, 17, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2024, 7, 24, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#73D7EE',
-        'light_text': True,
-        'tagline': 'Feature Creep',
-        'teardown': (datetime.datetime(2024, 7, 24, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2024, 7, 28, 10, 0, tzinfo=datetime.timezone.utc))},
- 2025: {'buildup': (datetime.datetime(2025, 7, 10, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2025, 7, 16, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2025, 7, 16, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2025, 7, 23, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#FFAFC7',
-        'light_text': False,
-        'tagline': '10 Badges',
-        'teardown': (datetime.datetime(2025, 7, 23, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2025, 7, 26, 10, 0, tzinfo=datetime.timezone.utc))},
- 2026: {'buildup': (datetime.datetime(2026, 7, 11, 15, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2026, 7, 15, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2026, 7, 15, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2026, 7, 22, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#FFFFFF',
-        'light_text': False,
-        'tagline': 'touch grass',
-        'teardown': (datetime.datetime(2026, 7, 22, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2026, 7, 27, 10, 0, tzinfo=datetime.timezone.utc))},
- 2027: {'buildup': (datetime.datetime(2027, 7, 15, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2027, 7, 21, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2027, 7, 21, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2027, 7, 28, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#004DFF',
-        'light_text': True,
-        'tagline': 'Undecided',
-        'teardown': (datetime.datetime(2027, 7, 28, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2027, 8, 1, 10, 0, tzinfo=datetime.timezone.utc))},
- 2028: {'buildup': (datetime.datetime(2028, 7, 13, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2028, 7, 19, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2028, 7, 19, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2028, 7, 26, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#750787',
-        'light_text': True,
-        'tagline': 'Undecided',
-        'teardown': (datetime.datetime(2028, 7, 26, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2028, 7, 30, 10, 0, tzinfo=datetime.timezone.utc))},
- 2029: {'buildup': (datetime.datetime(2029, 7, 12, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2029, 7, 18, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2029, 7, 18, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2029, 7, 25, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#008026',
-        'light_text': True,
-        'tagline': 'Undecided',
-        'teardown': (datetime.datetime(2029, 7, 25, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2029, 7, 29, 10, 0, tzinfo=datetime.timezone.utc))},
- 2030: {'buildup': (datetime.datetime(2030, 7, 11, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2030, 7, 17, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2030, 7, 17, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2030, 7, 24, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#FFED00',
-        'light_text': False,
-        'tagline': 'Undecided',
-        'teardown': (datetime.datetime(2030, 7, 24, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2030, 7, 28, 10, 0, tzinfo=datetime.timezone.utc))},
- 2031: {'buildup': (datetime.datetime(2031, 7, 10, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2031, 7, 16, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2031, 7, 16, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2031, 7, 23, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#FF8C00',
-        'light_text': True,
-        'tagline': 'Undecided',
-        'teardown': (datetime.datetime(2031, 7, 23, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2031, 7, 27, 10, 0, tzinfo=datetime.timezone.utc))},
- 2032: {'buildup': (datetime.datetime(2032, 7, 7, 10, 0, tzinfo=datetime.timezone.utc),
-                    datetime.datetime(2032, 7, 14, 10, 0, tzinfo=datetime.timezone.utc)),
-        'camp': (datetime.datetime(2032, 7, 14, 10, 0, tzinfo=datetime.timezone.utc),
-                 datetime.datetime(2032, 7, 21, 10, 0, tzinfo=datetime.timezone.utc)),
-        'colour': '#E40303',
-        'light_text': True,
-        'tagline': 'Undecided',
-        'teardown': (datetime.datetime(2032, 7, 21, 10, 0, tzinfo=datetime.timezone.utc),
-                     datetime.datetime(2032, 7, 25, 15, 0, tzinfo=datetime.timezone.utc))}
+    2016: {
+        "buildup": (
+            datetime.datetime(2016, 8, 25, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2016, 8, 27, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2016, 8, 27, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2016, 9, 3, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#004DFF",
+        "light_text": True,
+        "tagline": "Initial Commit",
+        "teardown": (
+            datetime.datetime(2016, 9, 3, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2016, 9, 5, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2017: {
+        "buildup": (
+            datetime.datetime(2017, 8, 20, 14, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2017, 8, 22, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2017, 8, 22, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2017, 8, 29, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#750787",
+        "light_text": True,
+        "tagline": "Make Tradition",
+        "teardown": (
+            datetime.datetime(2017, 8, 29, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2017, 8, 31, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2018: {
+        "buildup": (
+            datetime.datetime(2018, 8, 12, 14, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2018, 8, 16, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2018, 8, 16, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2018, 8, 23, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#008026",
+        "light_text": True,
+        "tagline": "scale it",
+        "teardown": (
+            datetime.datetime(2018, 8, 23, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2018, 8, 26, 14, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2019: {
+        "buildup": (
+            datetime.datetime(2019, 8, 5, 6, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2019, 8, 8, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2019, 8, 8, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2019, 8, 15, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#FFED00",
+        "light_text": False,
+        "tagline": "A new /home",
+        "teardown": (
+            datetime.datetime(2019, 8, 15, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2019, 8, 18, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2020: {
+        "buildup": (
+            datetime.datetime(2020, 8, 7, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2020, 8, 11, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2020, 8, 11, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2020, 8, 18, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#FF8C00",
+        "light_text": True,
+        "tagline": "make clean",
+        "teardown": (
+            datetime.datetime(2020, 8, 18, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2020, 8, 21, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2021: {
+        "buildup": (
+            datetime.datetime(2021, 8, 15, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2021, 8, 19, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2021, 8, 19, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2021, 8, 26, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#E40303",
+        "light_text": True,
+        "tagline": "Continuous Delivery",
+        "teardown": (
+            datetime.datetime(2021, 8, 26, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2021, 8, 29, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2022: {
+        "buildup": (
+            datetime.datetime(2022, 7, 30, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2022, 8, 3, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2022, 8, 3, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2022, 8, 10, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#000000",
+        "light_text": True,
+        "tagline": "black ~/hack",
+        "teardown": (
+            datetime.datetime(2022, 8, 10, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2022, 8, 13, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2023: {
+        "buildup": (
+            datetime.datetime(2023, 7, 29, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2023, 8, 2, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2023, 8, 2, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2023, 8, 9, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#613915",
+        "light_text": True,
+        "tagline": "make legacy",
+        "teardown": (
+            datetime.datetime(2023, 8, 9, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2023, 8, 12, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2024: {
+        "buildup": (
+            datetime.datetime(2024, 7, 12, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2024, 7, 17, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2024, 7, 17, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2024, 7, 24, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#73D7EE",
+        "light_text": True,
+        "tagline": "Feature Creep",
+        "teardown": (
+            datetime.datetime(2024, 7, 24, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2024, 7, 28, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2025: {
+        "buildup": (
+            datetime.datetime(2025, 7, 10, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2025, 7, 16, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2025, 7, 16, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2025, 7, 23, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#FFAFC7",
+        "light_text": False,
+        "tagline": "10 Badges",
+        "teardown": (
+            datetime.datetime(2025, 7, 23, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2025, 7, 26, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2026: {
+        "buildup": (
+            datetime.datetime(2026, 7, 11, 15, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2026, 7, 15, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2026, 7, 15, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2026, 7, 22, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#FFFFFF",
+        "light_text": False,
+        "tagline": "touch grass",
+        "teardown": (
+            datetime.datetime(2026, 7, 22, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2026, 7, 27, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2027: {
+        "buildup": (
+            datetime.datetime(2027, 7, 15, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2027, 7, 21, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2027, 7, 21, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2027, 7, 28, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#004DFF",
+        "light_text": True,
+        "tagline": "Undecided",
+        "teardown": (
+            datetime.datetime(2027, 7, 28, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2027, 8, 1, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2028: {
+        "buildup": (
+            datetime.datetime(2028, 7, 13, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2028, 7, 19, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2028, 7, 19, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2028, 7, 26, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#750787",
+        "light_text": True,
+        "tagline": "Undecided",
+        "teardown": (
+            datetime.datetime(2028, 7, 26, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2028, 7, 30, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2029: {
+        "buildup": (
+            datetime.datetime(2029, 7, 12, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2029, 7, 18, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2029, 7, 18, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2029, 7, 25, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#008026",
+        "light_text": True,
+        "tagline": "Undecided",
+        "teardown": (
+            datetime.datetime(2029, 7, 25, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2029, 7, 29, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2030: {
+        "buildup": (
+            datetime.datetime(2030, 7, 11, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2030, 7, 17, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2030, 7, 17, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2030, 7, 24, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#FFED00",
+        "light_text": False,
+        "tagline": "Undecided",
+        "teardown": (
+            datetime.datetime(2030, 7, 24, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2030, 7, 28, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2031: {
+        "buildup": (
+            datetime.datetime(2031, 7, 10, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2031, 7, 16, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2031, 7, 16, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2031, 7, 23, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#FF8C00",
+        "light_text": True,
+        "tagline": "Undecided",
+        "teardown": (
+            datetime.datetime(2031, 7, 23, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2031, 7, 27, 10, 0, tzinfo=datetime.UTC),
+        ),
+    },
+    2032: {
+        "buildup": (
+            datetime.datetime(2032, 7, 7, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2032, 7, 14, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "camp": (
+            datetime.datetime(2032, 7, 14, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2032, 7, 21, 10, 0, tzinfo=datetime.UTC),
+        ),
+        "colour": "#E40303",
+        "light_text": True,
+        "tagline": "Undecided",
+        "teardown": (
+            datetime.datetime(2032, 7, 21, 10, 0, tzinfo=datetime.UTC),
+            datetime.datetime(2032, 7, 25, 15, 0, tzinfo=datetime.UTC),
+        ),
+    },
 }
 
 
@@ -1206,7 +1339,8 @@ class Bootstrap:
                 event_duration_minutes=180,
                 when=(
                     datetime.datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz),
-                    datetime.datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz) + datetime.timedelta(hours=3),
+                    datetime.datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz)
+                    + datetime.timedelta(hours=3),
                 ),
             )
             EventSession.objects.create(
@@ -2340,13 +2474,12 @@ class Bootstrap:
         for day in camp.get_days("buildup")[:-1] + camp.get_days("camp") + camp.get_days("teardown")[1:]:
             PosReport.objects.create(
                 pos=info,
-                period=(day.lower.replace(hour=7), day.lower.replace(hour=7)+datetime.timedelta(hours=23)),
+                period=(day.lower.replace(hour=7), day.lower.replace(hour=7) + datetime.timedelta(hours=23)),
             )
             PosReport.objects.create(
                 pos=bar,
-                period=(day.lower.replace(hour=8), day.lower.replace(hour=9)+datetime.timedelta(hours=23)),
+                period=(day.lower.replace(hour=8), day.lower.replace(hour=9) + datetime.timedelta(hours=23)),
             )
-
 
     def output(self, message: str) -> None:
         """Method for logging the output."""
@@ -2532,7 +2665,6 @@ class Bootstrap:
 
     def post_bootstrap(self):
         """Make the last changes after the bootstrapping is done."""
-        pass
 
     def bootstrap_tests(self) -> None:
         """Method for bootstrapping the test database."""

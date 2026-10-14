@@ -1,5 +1,7 @@
+from __future__ import annotations
 
 from django.urls import reverse
+
 from feedback.models import CampFeedback
 from utils.tests import BornhackTestBase
 
@@ -14,14 +16,14 @@ class TestCampFeedbackProcessView(BornhackTestBase):
         cls.feedback = CampFeedback.objects.create(
             camp=cls.camp,
             user=cls.users[0],
-            feedback="Test Feedback"
+            feedback="Test Feedback",
         )
 
         cls.admin = cls.users["admin"]
         cls.kwargs = {
             "camp_slug": cls.camp.slug,
             "pk": cls.feedback.pk,
-            "state": "reviewed"
+            "state": "reviewed",
         }
 
     def test_admin_processing_feedback_as_reviewed(self) -> None:
@@ -57,9 +59,7 @@ class TestCampFeedbackProcessView(BornhackTestBase):
         assert self.feedback.state == CampFeedback.StateChoices.UNPROCESSED
 
     def test_bad_request_processing_feedback_with_invalid_state(self) -> None:
-        """
-        Test processing feedback with invalid state return BadRequest.
-        """
+        """Test processing feedback with invalid state return BadRequest."""
         self.client.force_login(self.admin)
         self.kwargs.update({"state": "unknown"})
         url = reverse("backoffice:feedback_process", kwargs=self.kwargs)

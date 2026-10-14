@@ -190,9 +190,7 @@ class ProductLabelsTest(TestCase):
         assert result.get("text") == "Sales end in 5 days!"
 
     def test_labels_for_product_is_empty_when_no_label_applies(self):
-        """
-        Test the product.labels returns an empty list when no label applies.
-        """
+        """Test the product.labels returns an empty list when no label applies."""
         product = ProductFactory()
 
         assert len(product.labels) == 0

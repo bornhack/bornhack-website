@@ -51,7 +51,9 @@ class Command(BaseCommand):
                     f"- {ticket.shortname}_ticket_{ticket.pk}.pdf",
                 )
             # get oneday ticket count from Sponsor or fall back to tier
-            oneday_tickets = sponsor.oneday_tickets if sponsor.oneday_tickets is not None else sponsor.tier.oneday_tickets
+            oneday_tickets = (
+                sponsor.oneday_tickets if sponsor.oneday_tickets is not None else sponsor.tier.oneday_tickets
+            )
             existing = SponsorTicket.objects.filter(
                 sponsor=sponsor,
                 ticket_type=day_ticket_type,

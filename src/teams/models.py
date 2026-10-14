@@ -1,12 +1,11 @@
 """All models for teams application."""
+
 from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.core.validators import MaxValueValidator
-from django.core.validators import MinValueValidator
 from django.contrib.auth.models import Group
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
@@ -58,6 +57,7 @@ TEAM_GUIDE_TEMPLATE = """
 
 class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     """Model for team."""
+
     camp = models.ForeignKey(
         "camps.Camp",
         related_name="teams",
@@ -227,6 +227,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     class Meta:
         """Meta."""
+
         ordering: ClassVar[list[str]] = ["name"]
         unique_together = (("name", "camp"), ("slug", "camp"))
 
@@ -410,6 +411,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
 class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     """Model for team member."""
+
     user = models.ForeignKey(
         "auth.User",
         on_delete=models.PROTECT,
@@ -441,6 +443,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
     class Meta:
         """Meta."""
+
         ordering: ClassVar[list[str]] = ["-lead", "-approved"]
 
     def __str__(self) -> str:
@@ -487,6 +490,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
 class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
     """Model for team tasks."""
+
     team = models.ForeignKey(
         "teams.Team",
         related_name="tasks",
@@ -514,6 +518,7 @@ class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
 
     class Meta:
         """Meta."""
+
         ordering: ClassVar[list[str]] = ["completed", "when", "name"]
         unique_together = (("name", "team"), ("slug", "team"))
 
@@ -555,6 +560,7 @@ class TaskComment(
     CreatedUpdatedModel,
 ):
     """Model for task comments."""
+
     task = models.ForeignKey(
         "teams.TeamTask",
         on_delete=models.PROTECT,
@@ -566,8 +572,10 @@ class TaskComment(
 
 class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
     """Model for team shifts."""
+
     class Meta:
         """Meta."""
+
         ordering = ("shift_range",)
 
     team = models.ForeignKey(

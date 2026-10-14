@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 
-from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from camps.models import Camp
-from info.models import InfoCategory, InfoItem
+from info.models import InfoCategory
+from info.models import InfoItem
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -60,12 +60,12 @@ class Command(BaseCommand):
                             "anchor": info.anchor,
                             "body": info.body,
                             "weight": info.weight,
-                        }
+                        },
                     )
                     if created:
                         print(f"Created new InfoItem {newinfo}")
         self.output(
             self.style.SUCCESS(
-                f"----------[ Done creating info! ]----------",
+                "----------[ Done creating info! ]----------",
             ),
         )

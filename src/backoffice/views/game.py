@@ -58,11 +58,12 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
         """Update initial form data with a unique token."""
         initial = super().get_initial()
         DEFAULT_LENGTH = 18
-        initial.update({
-            "token": str(uuid.uuid4()).replace("-", "")[:DEFAULT_LENGTH]
-        })
+        initial.update(
+            {
+                "token": str(uuid.uuid4()).replace("-", "")[:DEFAULT_LENGTH],
+            },
+        )
         return initial
-
 
     def form_valid(self, form):
         token = form.save(commit=False)
@@ -142,9 +143,7 @@ class TokenCategoryListView(CampViewMixin, RaisePermissionRequiredMixin, ListVie
     template_name = "token_category_list.html"
 
     def get_queryset(self):
-        """
-        Get all Categories and annotate count of tokens for the current camp.
-        """
+        """Get all Categories and annotate count of tokens for the current camp."""
         camp_tokens = Count("token", filter=Q(token__camp=self.request.camp))
         return TokenCategory.objects.annotate(token_count=camp_tokens)
 
@@ -179,12 +178,14 @@ class TokenCategoryDetailView(CampViewMixin, RaisePermissionRequiredMixin, Detai
     def get_context_data(self, **kwargs):
         """Add all category tokens for the current camp to context."""
         context = super().get_context_data(**kwargs)
-        context.update({
-            "category_tokens": Token.objects.filter(
-                category=self.object,
-                camp=self.request.camp
-            )
-        })
+        context.update(
+            {
+                "category_tokens": Token.objects.filter(
+                    category=self.object,
+                    camp=self.request.camp,
+                ),
+            },
+        )
         return context
 
 

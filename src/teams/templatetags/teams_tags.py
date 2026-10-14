@@ -1,4 +1,5 @@
 """Template tags for teams."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -23,7 +24,7 @@ def is_team_member(user: User, team: Team) -> bool:
 
 
 @register.simple_tag
-def membershipstatus(user: User, team: Team, showicon: bool=False) -> str:
+def membershipstatus(user: User, team: Team, showicon: bool = False) -> str:
     """Template tag to return membership status."""
     if user in team.leads.all():
         text = "Lead"
@@ -39,5 +40,5 @@ def membershipstatus(user: User, team: Team, showicon: bool=False) -> str:
         icon = "fa-times"
 
     if showicon:
-        return mark_safe(f"<i class='fa {icon}' title='{text}'></i>") # noqa: S308
+        return mark_safe(f"<i class='fa {icon}' title='{text}'></i>")  # noqa: S308
     return text

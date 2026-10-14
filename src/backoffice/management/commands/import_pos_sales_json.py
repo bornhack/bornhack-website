@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import json
 import logging
 
 from django.core.management.base import BaseCommand
 
-from economy.utils import import_pos_data
 from camps.models import Camp
+from economy.utils import import_pos_data
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 

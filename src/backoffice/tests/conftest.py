@@ -1,9 +1,12 @@
-import pytest
+from __future__ import annotations
+
 import uuid
 
+import pytest
+
+from tokens.models import Token
 from tokens.models import TokenCategory
 from tokens.models import TokenFind
-from tokens.models import Token
 
 
 @pytest.fixture
@@ -44,7 +47,7 @@ def token_factory(db, camp, token_category):
         defaults = {
             "category": token_category,
             "camp": camp,
-            "token": str(uuid.uuid4()).replace('-', ''),
+            "token": str(uuid.uuid4()).replace("-", ""),
             "hint": "token-hint",
             "description": "token description",
             "active": True,
@@ -96,4 +99,3 @@ def token_find_factory(db, token, users):
 def token_find(token_find_factory) -> TokenFind:
     """Fixture for returning a single token find."""
     return token_find_factory(persist=True)
-

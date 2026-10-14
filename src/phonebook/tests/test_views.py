@@ -59,7 +59,7 @@ class TestPhonebookViews(BornhackTestBase):
     def test_dect_registration_list_view(self) -> None:
         """Test the basics of the dect registrations list view."""
         url = reverse("phonebook:dectregistration_list", kwargs={"camp_slug": self.camp.slug})
-        self.client.force_login(self.users[0]) 
+        self.client.force_login(self.users[0])
 
         response = self.client.get(url)
         content = response.content.decode()
@@ -69,7 +69,7 @@ class TestPhonebookViews(BornhackTestBase):
 
     def test_dect_registration_create_view(self) -> None:
         """Test the basics of the dect registrations create view."""
-        self.client.force_login(self.users[0]) 
+        self.client.force_login(self.users[0])
 
         url = reverse("phonebook:dectregistration_create", kwargs={"camp_slug": self.camp.slug})
 

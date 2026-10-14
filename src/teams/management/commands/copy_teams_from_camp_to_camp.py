@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -49,6 +48,6 @@ class Command(BaseCommand):
                 print(f"Created new team {newteam}")
         self.output(
             self.style.SUCCESS(
-                f"----------[ Done creating teams! ]----------",
+                "----------[ Done creating teams! ]----------",
             ),
         )

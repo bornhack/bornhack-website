@@ -106,10 +106,10 @@ class TeamSettingsView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixi
 
         dect_filter = DectRegistration.objects.filter(
             camp=self.camp,
-            user__in=self.object.members.all()
+            user__in=self.object.members.all(),
         )
         form.fields["public_dect_number"].queryset = dect_filter.filter(
-            publish_in_phonebook=True
+            publish_in_phonebook=True,
         )
 
         return form
@@ -118,7 +118,7 @@ class TeamSettingsView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixi
         """Method for returning the success url."""
         kwargs = {
             "camp_slug": self.camp.slug,
-            "team_slug": self.get_object().slug
+            "team_slug": self.get_object().slug,
         }
         return reverse_lazy("teams:general", kwargs=kwargs)
 

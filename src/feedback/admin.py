@@ -14,7 +14,7 @@ class FeedbackAdmin(admin.ModelAdmin):
 
     actions = [
         "mark_as_reviewed",
-        "mark_as_spam"
+        "mark_as_spam",
     ]
 
     @admin.action(description="Mark this feedback as reviewed")

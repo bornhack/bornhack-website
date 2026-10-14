@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from django.urls import reverse
 
-from utils.tests import BornhackTestBase
 from program.models import Event
+from utils.tests import BornhackTestBase
+
 
 class TestFeedbackCreateView(BornhackTestBase):
     """Test FeedbackCreateView"""
@@ -24,4 +27,3 @@ class TestFeedbackCreateView(BornhackTestBase):
         response = self.client.get(url)
 
         self.assertRedirects(response, expected)
-
