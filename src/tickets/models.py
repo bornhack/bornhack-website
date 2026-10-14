@@ -109,6 +109,7 @@ class TicketType(
             "Useful for products which are bought in larger quantity (ie. village chairs)"
         ),
     )
+    human = models.BooleanField(default=False, help_text="True for ticket types which grant humans access to the event")
 
     def __str__(self) -> str:
         return f"{self.name} ({self.camp.title})"
