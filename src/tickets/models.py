@@ -25,7 +25,6 @@ from django.db.models import When
 from django.db.models.functions import Coalesce
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
@@ -109,7 +108,9 @@ class TicketType(
             "Useful for products which are bought in larger quantity (ie. village chairs)"
         ),
     )
-    human = models.BooleanField(default=False, help_text="True for ticket types which grant humans access to the event")
+    human_access = models.BooleanField(
+        default=False, help_text="True for ticket types which grant humans access to the event"
+    )
 
     def __str__(self) -> str:
         return f"{self.name} ({self.camp.title})"

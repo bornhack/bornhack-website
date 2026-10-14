@@ -28,24 +28,25 @@ class TicketTypeAdmin(admin.ModelAdmin):
         "camp",
         "includes_badge",
         "single_ticket_per_product",
+        "human_access",
     ]
-    list_filter = ["name", "camp", "includes_badge", "single_ticket_per_product"]
+    list_filter = ["name", "camp", "includes_badge", "single_ticket_per_product", "human_access"]
     save_as = True
 
 
 @admin.register(SponsorTicket)
 class SponsorTicketAdmin(BaseTicketAdmin):
-    list_display = ["pk", "ticket_type", "sponsor", "used_at"]
+    list_display = ["pk", "ticket_type", "sponsor", "used_at", "ticket_type__camp", "ticket_type__human_access"]
 
-    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "sponsor"]
+    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "sponsor", "ticket_type__human_access"]
 
     search_fields = ["pk", "sponsor__name"]
 
 
 @admin.register(PrizeTicket)
 class PrizeTicketAdmin(BaseTicketAdmin):
-    list_display = ["pk", "ticket_type", "user", "comment", "used_at"]
-    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "user"]
+    list_display = ["pk", "ticket_type", "user", "comment", "used_at", "ticket_type__camp", "ticket_type__human_access"]
+    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "user", "ticket_type__human_access"]
 
 
 @admin.register(ShopTicket)
@@ -65,10 +66,13 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "product",
         "used_at",
         "product_quantity",
+        "ticket_type__camp",
+        "ticket_type__human_access",
     ]
 
     list_filter = [
         "ticket_type__camp",
+        "ticket_type__human_access",
         "used_at",
         "ticket_type",
         "opr__order",
