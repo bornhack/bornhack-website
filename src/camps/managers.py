@@ -114,7 +114,6 @@ class CampQuerySet(models.QuerySet):
             )
             .order_by()
             .annotate(
-                sales_count=NACount("pk"),
                 sales_sum=NASum("sales_price"),
             )
             .annotate(total=Coalesce(NASum("sales_price"), 0))
@@ -128,7 +127,6 @@ class CampQuerySet(models.QuerySet):
             )
             .order_by()
             .annotate(
-                sales_count=NACount("pk"),
                 sales_sum=NASum("sales_price"),
             )
             .annotate(total=Coalesce(NASum("sales_price"), 0))
@@ -142,7 +140,6 @@ class CampQuerySet(models.QuerySet):
             )
             .order_by()
             .annotate(
-                sales_count=NACount("pk"),
                 sales_sum=NASum("sales_price"),
             )
             .annotate(total=Coalesce(NASum("sales_price"), 0))
@@ -156,7 +153,18 @@ class CampQuerySet(models.QuerySet):
             )
             .order_by()
             .annotate(
-                sales_count=NACount("pk"),
+                sales_sum=NASum("sales_price"),
+            )
+            .annotate(total=Coalesce(NASum("sales_price"), 0))
+            .values("total"),
+        )
+
+        total_subq = Subquery(
+            PosSale.objects.filter(
+                transaction__pos__team__camp=OuterRef("pk"),
+            )
+            .order_by()
+            .annotate(
                 sales_sum=NASum("sales_price"),
             )
             .annotate(total=Coalesce(NASum("sales_price"), 0))
@@ -168,4 +176,5 @@ class CampQuerySet(models.QuerySet):
             sales_sum_nonalc=nonalco_subq,
             sales_sum_bar=bar_subq,
             sales_sum_info=info_subq,
+            sales_sum_total=total_subq,
         )

@@ -20,7 +20,7 @@
             <th colspan=2 role="colgroup">Participants</th>
             <th colspan={{ event_types|length }} role="colgroup">Events</th>
             <th colspan=2 role="colgroup">Volunteers</th>
-            <th colspan=4 role="colgroup">Point of Sale</th>
+            <th colspan=6 role="colgroup">Point of Sale</th>
           </tr>
           <tr>
             <th>Name</th>
@@ -35,6 +35,8 @@
             <th role="col" class="text-center">Infodesk</th>
             <th role="col" class="text-center">Alcoholic</th>
             <th role="col" class="text-center">Non-alcoholic</th>
+            <th role="col" class="text-center">Total</th>
+            <th role="col" class="text-center">Sale Per Participant</th>
           </tr>
         </thead>
         <tbody>
@@ -52,6 +54,8 @@
               <td class="text-center">{{ listcamp.sales_sum_info }}&nbsp;HAX</td>
               <td class="text-center">{{ listcamp.sales_sum_alc }}&nbsp;HAX</td>
               <td class="text-center">{{ listcamp.sales_sum_nonalc }}&nbsp;HAX</td>
+              <td class="text-center">{{ listcamp.sales_sum_total }}&nbsp;HAX</td>
+              <td class="text-center">{% widthratio listcamp.sales_sum_total listcamp.total_tickets_used 1 %}&nbsp;HAX</td>
             </tr>
           {% empty %}
             <h3>No camps found, what gives?!</h3>
