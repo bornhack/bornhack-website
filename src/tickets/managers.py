@@ -100,14 +100,11 @@ class TicketTypeQuerySet(models.QuerySet):
     """Custom qs for TicketType."""
 
     def with_price_stats(self):
-        # We have to make subqueries to be able to annotate the specific
-        # ticket type. Otherwise, values would be accumulative across all types.
-        def _make_subquery(annotation: Expression | F) -> Subquery:
-            return Subquery(
-                TicketType.objects.annotate(annotation_value=annotation)
-                .filter(pk=models.OuterRef("pk"))
-                .values("annotation_value")[:1],
-            )
+        """
+        We have to make subqueries to be able to annotate the specific
+        ticket type. Otherwise, values would be accumulative across all types.
+        """
+        from .models import TicketType
 
         quantity = F("product__orderproductrelation__quantity") - Coalesce(
             "product__orderproductrelation__rprs__quantity",
