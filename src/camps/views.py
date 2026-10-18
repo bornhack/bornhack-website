@@ -61,5 +61,5 @@ class CampStatsView(ListView):
         """Add closest camp to context."""
         context = super().get_context_data(**kwargs)
         context["closest_camp"] = get_closest_camp(timezone.now(), max_days_from_prev=60)
-        context["event_types"] = EventType.objects.all()
+        context["event_types"] = EventType.objects.order_by("name").all()
         return context

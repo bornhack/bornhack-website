@@ -365,7 +365,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     def event_type_stats(self) -> dict[str, int]:
         """Return event counts for this camp."""
         EventType = apps.get_model("program", "EventType")
-        return EventType.objects.annotate_event_count(camp=self)
+        return EventType.objects.order_by("name").annotate_event_count(camp=self)
 
     def checked_in_tickets(self, ticket_type, used_before=None, used_after=None) -> list:
         """Get a concatenated list with all tickets of the specified type
