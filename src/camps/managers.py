@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Self
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import ExpressionWrapper
 from django.db.models import F
@@ -11,7 +12,7 @@ from django.db.models import Func
 from django.db.models import OuterRef
 from django.db.models import Subquery
 from django.db.models.functions import Coalesce
-from django.contrib.auth.models import User
+
 
 class NASum(models.Sum):
     contains_aggregate = False
@@ -26,16 +27,18 @@ class CampQuerySet(models.QuerySet):
 
     def annotate_volunteer_count(self) -> Self:
         """Annotate the number of volunteers across all teams."""
-
         return self.annotate(
             volunteer_count=models.Subquery(
                 User.objects.filter(
                     teammember__approved=True,
-                    teammember__team__camp=models.OuterRef("pk")
-                ).distinct().annotate(
-                    c=NACount("pk", distinct=True)
-                ).values("c")
-            )
+                    teammember__team__camp=models.OuterRef("pk"),
+                )
+                .distinct()
+                .annotate(
+                    c=NACount("pk", distinct=True),
+                )
+                .values("c"),
+            ),
         )
 
     def annotate_participants(self, checked_in: bool = True) -> Self:
@@ -102,32 +105,67 @@ class CampQuerySet(models.QuerySet):
 
     def annotate_pos_data(self) -> Self:
         """Annotate PoS sales data."""
-        from economy.models import PosProduct
+        from economy.models import PosSale
 
-        alco_subq = Subquery(
-            PosProduct.objects.annotate_sales(
-                camp=OuterRef("pk"),
+        bar_subq = Subquery(
+            PosSale.objects.filter(
+                transaction__pos__name="Bar",
+                transaction__pos__team__camp=OuterRef("pk"),
             )
-            .filter(
-                abv__gt=0,
-                sales_sum__gt=0,
+            .order_by()
+            .annotate(
+                sales_count=NACount("pk"),
+                sales_sum=NASum("sales_price"),
             )
-            .annotate(total=models.Func("sales_sum", function="SUM"))
+            .annotate(total=Coalesce(NASum("sales_price"), 0))
             .values("total"),
         )
+
+        info_subq = Subquery(
+            PosSale.objects.filter(
+                transaction__pos__name="Infodesk",
+                transaction__pos__team__camp=OuterRef("pk"),
+            )
+            .order_by()
+            .annotate(
+                sales_count=NACount("pk"),
+                sales_sum=NASum("sales_price"),
+            )
+            .annotate(total=Coalesce(NASum("sales_price"), 0))
+            .values("total"),
+        )
+
+        alco_subq = Subquery(
+            PosSale.objects.filter(
+                product__abv__gt=0,
+                transaction__pos__team__camp=OuterRef("pk"),
+            )
+            .order_by()
+            .annotate(
+                sales_count=NACount("pk"),
+                sales_sum=NASum("sales_price"),
+            )
+            .annotate(total=Coalesce(NASum("sales_price"), 0))
+            .values("total"),
+        )
+
         nonalco_subq = Subquery(
-            PosProduct.objects.annotate_sales(
-                camp=OuterRef("pk"),
+            PosSale.objects.filter(
+                product__abv=0,
+                transaction__pos__team__camp=OuterRef("pk"),
             )
-            .filter(
-                abv=0,
-                sales_sum__gt=0,
+            .order_by()
+            .annotate(
+                sales_count=NACount("pk"),
+                sales_sum=NASum("sales_price"),
             )
-            .annotate(total=models.Func("sales_sum", function="SUM"))
+            .annotate(total=Coalesce(NASum("sales_price"), 0))
             .values("total"),
         )
 
         return self.annotate(
             sales_sum_alc=alco_subq,
             sales_sum_nonalc=nonalco_subq,
+            sales_sum_bar=bar_subq,
+            sales_sum_info=info_subq,
         )

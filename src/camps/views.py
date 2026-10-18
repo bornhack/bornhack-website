@@ -53,6 +53,7 @@ class CampStatsView(ListView):
             .annotate_participants(checked_in=True)
             .annotate_participants(checked_in=False)
             .annotate_volunteer_count()
+            .annotate_pos_data()
             .filter(camp__startswith__lt=timezone.now())
             .order_by("-camp")
         )

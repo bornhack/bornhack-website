@@ -8,7 +8,6 @@ from django.db import models
 from django.db.models import Avg
 from django.db.models import Count
 from django.db.models import Exists
-from django.db.models import Expression
 from django.db.models import F
 from django.db.models import Q
 from django.db.models import Subquery
@@ -100,8 +99,7 @@ class TicketTypeQuerySet(models.QuerySet):
     """Custom qs for TicketType."""
 
     def with_price_stats(self):
-        """
-        We have to make subqueries to be able to annotate the specific
+        """We have to make subqueries to be able to annotate the specific
         ticket type. Otherwise, values would be accumulative across all types.
         """
         from .models import TicketType
