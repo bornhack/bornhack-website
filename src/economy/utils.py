@@ -3,7 +3,6 @@ from __future__ import annotations
 import csv
 import datetime
 import io
-import requests
 import logging
 import tempfile
 from decimal import Decimal
@@ -11,8 +10,10 @@ from decimal import InvalidOperation
 from os.path import basename
 from pathlib import Path
 from zipfile import ZipFile
+from zoneinfo import ZoneInfo
 
 import pandas as pd
+import requests
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -32,9 +33,9 @@ from economy.models import MobilePayTransaction
 from economy.models import Pos
 from economy.models import PosProduct
 from economy.models import PosProductCost
+from economy.models import PosReport
 from economy.models import PosSale
 from economy.models import PosTransaction
-from economy.models import PosReport
 from economy.models import Reimbursement
 from economy.models import Revenue
 from economy.models import ZettleBalance
@@ -44,7 +45,6 @@ from shop.models import CreditNote
 from shop.models import CustomOrder
 from shop.models import Invoice
 from shop.models import Order
-from zoneinfo import ZoneInfo
 
 # we need the Danish timezone here and there
 cph = ZoneInfo(settings.TIME_ZONE)
@@ -1408,25 +1408,25 @@ def import_pos_data(camp: Camp) -> None:
         import_pos_sales(sales=payload["pos_sale"])
 
 
-def import_pos_transactions(transactions: list[dict[str,str]], pos_dict: dict[str,Pos]) -> int:
+def import_pos_transactions(transactions: list[dict[str, str]], pos_dict: dict[str, Pos]) -> int:
     """Import PoS transactions. Return number of new tx created.
 
-       transaction example:
-       {
-            "camp_slug":"bornhack-2026",
-            "pos_id":"HHR9izotB6HLzgT6k",
-            "transaction_id":"cxQHKJRZYFbgT6Acc",
-            "user_id":"TA5NbaQov5xgBN4cC",
-            "timestamp":"2026-07-14T21:28:23.522Z",
-            "sale_count":1
-       }
+    transaction example:
+    {
+         "camp_slug":"bornhack-2026",
+         "pos_id":"HHR9izotB6HLzgT6k",
+         "transaction_id":"cxQHKJRZYFbgT6Acc",
+         "user_id":"TA5NbaQov5xgBN4cC",
+         "timestamp":"2026-07-14T21:28:23.522Z",
+         "sale_count":1
+    }
     """
     new_tx = 0
     for ptx in transactions:
         txtime = datetime.datetime.fromisoformat(ptx["timestamp"])
         # get the PosReport
         try:
-            pr=PosReport.objects.get(pos=pos_dict[ptx["pos_id"]], period__contains=txtime)
+            pr = PosReport.objects.get(pos=pos_dict[ptx["pos_id"]], period__contains=txtime)
         except PosReport.DoesNotExist:
             logger.warning(f"Skipping transaction (no PosReport found): {ptx}")
             continue
@@ -1444,35 +1444,35 @@ def import_pos_transactions(transactions: list[dict[str,str]], pos_dict: dict[st
             continue
         new_tx += 1
         logger.debug(
-            f"Found new transaction with txid {transaction.external_transaction_id} as PosTransaction {transaction.pk}"
+            f"Found new transaction with txid {transaction.external_transaction_id} as PosTransaction {transaction.pk}",
         )
     logger.debug(f"Done processing transactions, {new_tx} new transactions created")
     return new_tx
 
 
-def import_pos_products(products: list[dict[str,str|int|float]]) -> int:
+def import_pos_products(products: list[dict[str, str | int | float]]) -> int:
     """Import PoS products. Return number of new products created.
 
-       product example:
-       {
-           "product_id":"2F69uxXqCZnQwkDyT",
-           "brand_name":"Club Mate",
-           "name":"Mate Cola",
-           "description":"",
-           "sales_price":25,
-           "unit_size":0,
-           "size_unit":"",
-           "abv":0,
-           "tags":["soda","bottle"],
-           "expenses":[]
-       }
+    product example:
+    {
+        "product_id":"2F69uxXqCZnQwkDyT",
+        "brand_name":"Club Mate",
+        "name":"Mate Cola",
+        "description":"",
+        "sales_price":25,
+        "unit_size":0,
+        "size_unit":"",
+        "abv":0,
+        "tags":["soda","bottle"],
+        "expenses":[]
+    }
     """
     new_products = 0
     for pp in products:
         # create or get the product
         kwargs = pp.copy()
-        del(kwargs["product_id"])
-        del(kwargs["expenses"])
+        del kwargs["product_id"]
+        del kwargs["expenses"]
         kwargs["abv"] = round(Decimal(kwargs["abv"]), 2) if kwargs["abv"] else 0
         kwargs["tags"] = ",".join(sorted(kwargs["tags"]))
         product, created = PosProduct.objects.get_or_create(
@@ -1484,13 +1484,12 @@ def import_pos_products(products: list[dict[str,str|int|float]]) -> int:
         if not created:
             continue
         new_products += 1
-        logger.debug(
-            f"Found new product with product_id {product.external_id} as PosProduct {product.pk}")
+        logger.debug(f"Found new product with product_id {product.external_id} as PosProduct {product.pk}")
     logger.debug(f"Done processing products, {new_products} new products created")
     return new_products
 
 
-def import_pos_sales(sales: list[dict[str,str|int]]) -> int:
+def import_pos_sales(sales: list[dict[str, str | int]]) -> int:
     """Import PoS sales. Return number of new sales created.
 
     sales json example:
@@ -1510,7 +1509,7 @@ def import_pos_sales(sales: list[dict[str,str|int]]) -> int:
         except PosTransaction.DoesNotExist:
             logger.warning(f"Skipping PosSale import (tx not found): {sale}")
             continue
-        possale, created=PosSale.objects.get_or_create(
+        possale, created = PosSale.objects.get_or_create(
             external_id=sale["sale_id"],
             defaults={
                 "transaction": tx,
@@ -1521,13 +1520,12 @@ def import_pos_sales(sales: list[dict[str,str|int]]) -> int:
         if not created:
             continue
         new_sales += 1
-        logger.debug(
-            f"Found new sale with id {sale['sale_id']} as PosSale {possale.pk}")
+        logger.debug(f"Found new sale with id {sale['sale_id']} as PosSale {possale.pk}")
     logger.debug(f"Done processing sales, {new_sales} new sales created")
     return new_sales
 
 
-def import_pos_product_costs(costs: list[dict[str,str|float]], camp: Camp) -> int:
+def import_pos_product_costs(costs: list[dict[str, str | float]], camp: Camp) -> int:
     """Import PoS product costs. Return number of new costs created.
 
     cost json example:
@@ -1543,7 +1541,7 @@ def import_pos_product_costs(costs: list[dict[str,str|float]], camp: Camp) -> in
         if not cost["product_cost"]:
             # treat all falsy as 0
             cost["product_cost"] = 0
-        poscost, created=PosProductCost.objects.get_or_create(
+        poscost, created = PosProductCost.objects.get_or_create(
             product=PosProduct.objects.get(external_id=cost["product_id"]),
             timestamp=cost["timestamp"],
             camp=camp,
@@ -1554,7 +1552,6 @@ def import_pos_product_costs(costs: list[dict[str,str|float]], camp: Camp) -> in
         if not created:
             continue
         new_costs += 1
-        logger.debug(
-            f"Found new cost with id {poscost.pk} as PosCost {poscost.pk}")
+        logger.debug(f"Found new cost with id {poscost.pk} as PosCost {poscost.pk}")
     logger.debug(f"Done processing costs, {new_costs} new costs created")
     return new_costs

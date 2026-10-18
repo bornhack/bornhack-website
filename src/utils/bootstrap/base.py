@@ -884,22 +884,22 @@ class Bootstrap:
         types["adult_full_week"] = TicketType(
             name="Adult Full Week",
             camp=camp,
-            human=True,
+            human_access=True,
         )
         types["adult_one_day"] = TicketType(
             name="Adult One Day",
             camp=camp,
-            human=True,
+            human_access=True,
         )
         types["child_full_week"] = TicketType(
             name="Child Full Week",
             camp=camp,
-            human=True,
+            human_access=True,
         )
         types["child_one_day"] = TicketType(
             name="Child One Day",
             camp=camp,
-            human=True,
+            human_access=True,
         )
         types["village"] = TicketType(
             name="Village",

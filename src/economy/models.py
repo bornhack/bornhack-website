@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import csv
-from django.contrib.postgres.fields.ranges import RangeStartsWith
 import os
 from datetime import datetime
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib.postgres.fields import RangeOperators
-from django.contrib.postgres.constraints import ExclusionConstraint
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.validators import RegexValidator
@@ -18,7 +18,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_prometheus.models import ExportModelOperationsMixin
-from zoneinfo import ZoneInfo
 
 from shop.models import Product
 from tickets.models import ShopTicket
@@ -34,7 +33,10 @@ from .email import send_expense_approved_email
 from .email import send_expense_rejected_email
 from .email import send_revenue_approved_email
 from .email import send_revenue_rejected_email
-from .managers import PosSaleQuerySet, PosTransactionQuerySet
+from .managers import PosProductQuerySet
+from .managers import PosSaleQuerySet
+from .managers import PosTransactionQuerySet
+
 
 class ChainManager(models.Manager):
     """ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
@@ -597,10 +599,10 @@ class Reimbursement(
     def amount(self):
         """The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses and substracting all the related revenues."""
         expenses_total = self.expenses.filter(created_for_reimbursement=False).aggregate(
-            models.Sum("amount", default=0)
+            models.Sum("amount", default=0),
         )["amount__sum"]
         revenues_total = self.revenues.filter(created_for_reimbursement=False).aggregate(
-            models.Sum("amount", default=0)
+            models.Sum("amount", default=0),
         )["amount__sum"]
         return expenses_total - revenues_total
 
@@ -828,7 +830,6 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
                 ],
             ),
         ]
-
 
     pos = models.ForeignKey(
         "economy.Pos",
@@ -1214,6 +1215,8 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
 
 class PosProduct(ExportModelOperationsMixin("pos_product"), UUIDModel):
     """A product sold in our PoS. This model does not inherit from CampRelatedModel, meaning pos products are not camp specific."""
+
+    objects = PosProductQuerySet.as_manager()
 
     external_id = models.CharField(
         max_length=100,

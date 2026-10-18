@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import csv
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from django.conf import settings
 
 from .models import Bank
 from .models import BankAccount

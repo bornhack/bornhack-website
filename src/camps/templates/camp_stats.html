@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static %}
+
+{% block title %}
+  Camp Stats | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <table class="table table-hover datatable">
+        <colgroup>
+          <col>
+          <col span=2 class="table-info">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th colspan=2 role="colgroup">Participants</th>
+            <th colspan={{ event_types|length }} role="colgroup">Events</th>
+            <th colspan=2 role="colgroup">Volunteers</th>
+          </tr>
+          <tr>
+            <th>Name</th>
+            <th role="col" class="text-center">Checked in</th>
+            <th role="col" class="text-center">Not arrived</th>
+            {% for event_type in event_types %}
+            <th role="col" class="text-center"><i title="{{ event_type.name }}" class="fas fa-{{ event_type.icon }} fa-fw" style="color: {{ event_type.color }};"></i></th>
+            {% endfor %}
+            <th role="col" class="text-center">Teams</th>
+            <th role="col" class="text-center">Volunteers</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for listcamp in camp_list %}
+            <tr{% if listcamp == closest_camp %} class="table-active"{% endif %}>
+              <td><a href="{% url 'camp_detail' camp_slug=listcamp.slug %}">{{ listcamp.title }}</a></td>
+              <td class="text-center">{{ listcamp.total_tickets_used }}</td>
+              <td class="text-center">{{ listcamp.total_tickets_unused }}</td>
+              {% for event_type in listcamp.event_type_stats %}
+              <td class="text-center">{{ event_type.event_count }}</td>
+              {% endfor %}
+              <td class="text-center">{{ listcamp.teams.count }}</td>
+              <td class="text-center">{{ listcamp.volunteer_count }}</td>
+            </tr>
+          {% empty %}
+            <h3>No camps found, what gives?!</h3>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}

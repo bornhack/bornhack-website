@@ -37,6 +37,7 @@ from .email import add_event_proposal_accepted_email
 from .email import add_event_proposal_rejected_email
 from .email import add_speaker_proposal_accepted_email
 from .email import add_speaker_proposal_rejected_email
+from .managers import EventTypeQuerySet
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -752,6 +753,8 @@ class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedMod
 
 class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
     """Every event needs to have a type."""
+
+    objects = EventTypeQuerySet.as_manager()
 
     name = models.CharField(
         max_length=100,

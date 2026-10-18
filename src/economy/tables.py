@@ -101,7 +101,6 @@ class BrandColumn(tables.Column):
         return mark_safe(f"{button} {link}")
 
 
-
 class NameColumn(tables.Column):
     def render(self, value, record, table):
         button = filter_button(value, table.request, name=value)

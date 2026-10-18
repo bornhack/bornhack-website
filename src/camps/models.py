@@ -21,6 +21,8 @@ from tickets.models import SponsorTicket
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 
+from .managers import CampQuerySet
+
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
@@ -43,6 +45,8 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = "Camps"
         ordering = ["-title"]
         get_latest_by = "camp"
+
+    objects = CampQuerySet.as_manager()
 
     title = models.CharField(
         verbose_name="Title",
@@ -357,6 +361,12 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         EventSlot = apps.get_model("program", "EventSlot")
         return EventSlot.objects.filter(event_session__in=self.event_sessions.all())
 
+    @property
+    def event_type_stats(self) -> dict[str, int]:
+        """Return event counts for this camp."""
+        EventType = apps.get_model("program", "EventType")
+        return EventType.objects.annotate_event_count(camp=self)
+
     def checked_in_tickets(self, ticket_type, used_before=None, used_after=None) -> list:
         """Get a concatenated list with all tickets of the specified type
         and support for filtering before/after time for when a ticket was used.
@@ -367,7 +377,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
         if used_before:
             shop_tickets = shop_tickets.filter(used_at__lte=used_before)
-            sponsor_tickets =  sponsor_tickets.filter(used_at__lte=used_before)
+            sponsor_tickets = sponsor_tickets.filter(used_at__lte=used_before)
             prize_tickets = prize_tickets.filter(used_at__lte=used_before)
         if used_after:
             shop_tickets = shop_tickets.filter(used_at__gte=used_after)

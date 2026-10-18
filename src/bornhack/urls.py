@@ -12,6 +12,7 @@ from django.views.generic import TemplateView
 from camps.views import CampDetailView
 from camps.views import CampListView
 from camps.views import CampRedirectView
+from camps.views import CampStatsView
 from contact.views import ContactView
 from feedback.views import CampFeedbackCreate
 from info.views import CampInfoView
@@ -59,6 +60,7 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     path("camps/", CampListView.as_view(), name="camp_list"),
+    path("camps/stats/", CampStatsView.as_view(), name="camp_stats"),
     path("maps/", include("maps.urls", namespace="maps")),
     path("", include("django_prometheus.urls")),
     # camp redirect views here

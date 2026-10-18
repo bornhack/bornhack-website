@@ -17,7 +17,8 @@ from django.views.generic.detail import SingleObjectMixin
 
 from utils.models import CampReadOnlyModeError
 
-from .models import ShopTicket, PrizeTicket
+from .models import PrizeTicket
+from .models import ShopTicket
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -48,6 +49,7 @@ def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
 
 class TicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
     """This view makes it possible to download ShopTickets and PrizeTickets."""
+
     model = ShopTicket
 
     def get_object(self, *args, **kwargs):
@@ -63,7 +65,7 @@ class TicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
 
     def get(self, request, *args, **kwargs):
         ticket = self.get_object(*args, **kwargs)
-        tt = ticket.ticket_type.name.lower().replace(" ","_")
+        tt = ticket.ticket_type.name.lower().replace(" ", "_")
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = (
             f'attachment; filename="BornHack_{ticket.ticket_type.camp.year}_{tt}_{ticket.shortname}_ticket_{ticket.pk}.pdf"'

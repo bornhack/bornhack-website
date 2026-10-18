@@ -54,40 +54,16 @@ class PosProductFilter(FilterSet):
 
     @property
     def qs(self):
-        """Only show products sold at least once during current camp. Add annotations here to make sure they are filterable."""
-        # define a reusable camp filter
-        campfilter = models.Q(pos_sales__transaction__pos__team__camp=self.request.camp)
-        # define subq for getting latest product cost
-        latest_cost = PosProductCost.objects.filter(
-            product__uuid=models.OuterRef("uuid"),
-            camp=self.request.camp,
-        ).order_by("-timestamp")
-
-        # define subq for getting number of costs for this product
-        cost_count = (
-            PosProductCost.objects.filter(
-                product=models.OuterRef("pk"),
-                camp=self.request.camp,
-            )  # filter by product and camp
-            .values("product")  # group by product to return only a single row
-            .annotate(cost_count=models.Count("uuid"))  # count number of costs
-            .values("cost_count")  # select the count
-        )
-
-        # annotate sales count, sales sum, and cost
-        self.queryset = PosProduct.objects.filter(
-            campfilter,
-            pos_sales__isnull=False,
-        ).annotate(
-            sales_count=models.Count("pos_sales", filter=campfilter),
-            sales_sum=models.Sum("pos_sales__sales_price", filter=campfilter),
-            # default cost to 0 if we have no costs for this product
-            cost=models.functions.Coalesce(
-                models.Subquery(latest_cost.values("product_cost")[:1]),
-                0,
-                output_field=models.DecimalField(),
-            ),
-            cost_count=models.Subquery(cost_count),
+        """Add annotations here to make sure they are filterable."""
+        self.queryset = (
+            PosProduct.objects.filter(
+                # Only show products sold at least once during current camp
+                pos_sales__transaction__pos__team__camp=self.request.camp,
+            )
+            # annotate sales count, sales sum
+            .annotate_sales(camp=self.request.camp)
+            # and cost
+            .annotate_costs(camp=self.request.camp)
         )
         return super().qs
 
@@ -180,9 +156,13 @@ class PosSaleFilter(FilterSet):
     @property
     def qs(self):
         """Add annotations here to make sure they are filterable."""
-        self.queryset = PosSale.objects.filter(
-            transaction__pos__team__camp=self.request.camp,
-        ).annotate_cost_profit().annotate_pos_date()
+        self.queryset = (
+            PosSale.objects.filter(
+                transaction__pos__team__camp=self.request.camp,
+            )
+            .annotate_cost_profit()
+            .annotate_pos_date()
+        )
         return super().qs
 
 
