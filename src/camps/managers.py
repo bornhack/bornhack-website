@@ -11,6 +11,14 @@ from django.db.models import Func
 from django.db.models import OuterRef
 from django.db.models import Subquery
 from django.db.models.functions import Coalesce
+from django.contrib.auth.models import User
+
+class NASum(models.Sum):
+    contains_aggregate = False
+
+
+class NACount(models.Count):
+    contains_aggregate = False
 
 
 class CampQuerySet(models.QuerySet):
@@ -18,17 +26,16 @@ class CampQuerySet(models.QuerySet):
 
     def annotate_volunteer_count(self) -> Self:
         """Annotate the number of volunteers across all teams."""
-        from teams.models import TeamMember
 
         return self.annotate(
-            volunteer_count=Subquery(
-                TeamMember.objects.order_by()
-                .filter(team__camp=OuterRef("pk"))
-                .annotate(
-                    c=models.Func("pk", function="COUNT"),
-                )
-                .values("c"),
-            ),
+            volunteer_count=models.Subquery(
+                User.objects.filter(
+                    teammember__approved=True,
+                    teammember__team__camp=models.OuterRef("pk")
+                ).distinct().annotate(
+                    c=NACount("pk", distinct=True)
+                ).values("c")
+            )
         )
 
     def annotate_participants(self, checked_in: bool = True) -> Self:
